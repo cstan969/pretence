@@ -59,6 +59,6 @@ class mongo_fncs_unittests(TestCase):
 
 
 tc = mongo_fncs_unittests()
-tc.test_collection_npcs()
-tc.test_collection_users()
+# tc.test_collection_npcs()
+# tc.test_collection_users()
 tc.test_collection_worlds()

@@ -34,12 +34,6 @@ def get_all_worlds():
 def get_world(world_name:str):
     return query_collection(collection_name='worlds',query={'world_name':world_name})
 
-# def create_user(user_name:str):
-#     if get_user(user_name) == []:
-#         upsert_user(user_name)
-#     else:
-
-
 def upsert_user(user_name:str):
     collection_name='users'
     item={
