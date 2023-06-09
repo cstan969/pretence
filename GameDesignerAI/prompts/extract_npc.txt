@@ -1,0 +1,18 @@
+Please put together a list of characters that we have explicitly discussed \
+do not include characters unless we have explicitly talked about them \
+The value of agent prompt should be \
+the prompt you would give to a generative AI in order to have it act as said NPC agent.\
+Your response should be of the json format below the --- \
+---
+{
+'name':
+'physical description':
+'personality':
+'mood':
+'quest name':
+'quest objectives':
+'agent prompt':
+}
+
+Extract a list of character names that have been explicitly discussed \
+I want the output in python list format.

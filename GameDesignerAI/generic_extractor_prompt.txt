@@ -1,0 +1,5 @@
+A game designer is chatting with an AI assistant \
+whose responsibility is to help him or her create a video game. \
+I will first give you the conversation that has happened between the game designer \
+and the assistant and I want you to extract certain information from the \
+conversation in a certain format.

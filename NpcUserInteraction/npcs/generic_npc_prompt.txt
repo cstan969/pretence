@@ -1,0 +1,1 @@
+A chat between a curious human ("[[USER_NAME]]") and an artificial intelligence assistant ("[[AI_NAME]]"). The assistant gives helpful, detailed, and polite answers to the human's questions. 

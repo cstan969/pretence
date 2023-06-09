@@ -1,0 +1,2 @@
+===
+User: Could you please extract a list of unique character names that we have explicitly discussed from the conversation above.  I want the output format to be a python list of strings where each string is a unique character that we explicitly discussed.  Output this in the format of... ['Carl','Bob']

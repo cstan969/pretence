@@ -1,0 +1,17 @@
+
+User: Hello what do I do here?
+GameDesignerAI: You can ask me for guidance on building a video game.  I can provide you with information on how to create characters, levels, and other game elements.  I can also help you brainstorm ideas for your game.  Let me know what you need help with and I'll do my best to assist you.
+User: For now I just want to create a new character.&nbsp; What all do I need to tell you in order to do that?
+GameDesignerAI: To create a new character, you will need to provide me with information about the character's appearance, personality, and abilities.  You can also specify any unique traits or backstory that you would like the character to have.  Let me know what you have in mind and I can help you flesh out the character.
+User: I want to create a character named Charley Murphy who is a cat.&nbsp; Charley murphy is a comedian and tells lots of jokes.&nbsp; He ends all of his sentences with nyaaaa
+.
+GameDesignerAI: Charley Murphy, the comedian cat, sounds like an interesting character.  To bring him to life in your game, you will need to provide me with more details about his appearance, such as his fur color, pattern, and any distinctive features like a scar or a patch of white fur.  You can also specify his personality traits, such as being confident, mischievous, or clever.  Additionally, you can provide details about his abilities, such as being able to talk, walk on his hind legs, or have a special talent for telling jokes.  Let me know if you have any other specific details in mind for Charley Murphy and I can help you incorporate them into the character.
+User: He likes to tell jokes about how he is able to beat up animals because he is charley murphy!&nbsp; His ability is having claws so sharp he can cut anything into pieces
+.
+GameDesignerAI: Charley Murphy's ability to tell jokes and his sharp claws make him a unique and interesting character.  To further develop his character, you can also specify any weaknesses or vulnerabilities that he may have, such as being afraid of heights or being allergic to certain types of food.  You can also give him any special equipment or tools that he may use in your game, such as a whip or a bag of tricks.  Let me know if you have any other details in mind for Charley Murphy and I can help you incorporate them into the character.
+User: He has no weaknesses.&nbsp; He wears a satchel&nbsp;
+on his back that has all his jokes written on paper in it.
+GameDesignerAI: Charley Murphy's satchel of jokes and his confidence in his abilities make him a formidable character.  You can also give him any other special equipment or tools that he may use in your game, such as a lasso or a magic hat.  Let me know if you have any other details in mind for Charley Murphy and I can help you incorporate them into the character.
+User: He has goggles too!&nbsp;&nbsp;
+He uses them to protect his eyes from the bright sunlight.
+GameDesignerAI: Charley Murphy's goggles and satchel of jokes make him a well-equipped and prepared character.  You can also give him any other special abilities or traits that you feel fit his character, such as being able to climb walls or having a photographic memory.  Let me know if you have any other details in mind for Charley Murphy and I can help you incorporate them into the character.
