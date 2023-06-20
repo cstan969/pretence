@@ -11,7 +11,7 @@ origins = [
     "http://localhost:5173",
     "localhost:5173",
     "http://127.0.0.1:5173",
-    "127.0.0.1:6173"
+    "127.0.0.1:5173"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -20,11 +20,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-
-@app.get('/extract')
-async def extract(q:dict):
-    extraction_fnc=q['extraction_fnc']
-    pass
 
 @app.post("/message_game_designer_ai_and_get_response")
 async def message_game_designer_ai_and_get_response(q:dict):

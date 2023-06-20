@@ -1,5 +1,2 @@
-A game designer is chatting with an AI assistant \
-whose responsibility is to help him or her create a video game. \
-I will first give you the conversation that has happened between the game designer \
-and the assistant and I want you to extract certain information from the \
-conversation in a certain format.
+A game designer ("User") is chatting with an AI assistant ("GamesDesignerAI")
+whose responsibility is to help ("User") create a video game. I will provide you the conversation that has happened between ("User") and ("GameDesignerAI") and I want you to extract certain information from the conversation in a certain format.

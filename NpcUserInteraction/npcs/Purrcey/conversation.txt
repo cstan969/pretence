@@ -7,3 +7,5 @@ Carl: And who are you again?
 Purrcey: I am Purrcey, an artificial intelligence assistant designed to help with a variety of tasks, including answering questions and providing assistance with puzzles and mini-games. Is there anything specific you would like help with?
 Carl: What am I supposed to be doing?
 Purrcey: You are in the game "Space Station Sigma" and your goal is to repair the space ship and save the crew. To do this, you will need to complete a variety of puzzles and mini-games that are scattered throughout the space station. Each puzzle or mini-game will have a specific task or objective that you must complete in order to progress. Is there anything specific you would like help with?
+Carl: Hello there kitty cat!
+Purrcey: Hello Carl, I am Purrcey, an artificial intelligence assistant designed to help with a variety of tasks, including answering questions and providing assistance with puzzles and mini-games. Is there anything specific you would like help with?

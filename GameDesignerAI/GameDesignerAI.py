@@ -13,18 +13,6 @@ class GameDesignerAI():
         self.conversation_path = os.path.join('worlds',self.world_name,'game_designer_conversation.txt')
         self.llm = VicunaLLM()
 
-    # def extract(self, extraction_prompt, temperature=0):
-    #     with open('generic_extractor_prompt.txt','r') as infile:
-    #         generic_extractor_prompt = infile.read()
-    #     prompt = generic_extractor_prompt
-    #     prompt += "\n"
-    #     conversation = self.get_conversation()
-    #     prompt += conversation + "\n'''\n"
-    #     prompt += extraction_prompt
-    #     response = self.message_game_designer_ai_and_get_response(user_message=prompt, save_conversation=False, temperature=temperature)
-    #     print('response: ', response)
-    #     return eval(response.lstrip().rstrip())
-
     def get_conversation(self):
         if os.path.exists(self.conversation_path):
             with open(self.conversation_path,'r') as infile:
@@ -41,6 +29,7 @@ class GameDesignerAI():
         #Add the message to the conversation stored as part of this class
         formatted_user_message = '\n' + self.user_name + ': ' + user_message
         prompt += formatted_user_message
+        # prompt += '\nGameDesignerAI: '
 
         #Save this message to the conversation in the file
         os.makedirs(os.path.dirname(self.conversation_path), exist_ok=True)

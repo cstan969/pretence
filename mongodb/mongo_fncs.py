@@ -8,6 +8,8 @@ def upsert_npc(world_name:str, npc_name:str, npc_metadata:dict):
     item['world_name']=world_name
     item['npc_name']=npc_name
     item['_id']='-'.join([collection_name,world_name,npc_name])
+    print('upsert_npc: ')
+    print(item)
     upsert_item(collection_name=collection_name,item=item)
 
 def get_npcs_in_world(world_name):
