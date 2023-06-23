@@ -26,10 +26,10 @@ class Extractor():
         elif EXTRACTOR_MODEL == "gpt-3.5-turbo":
             self.llm = OpenAI()
         elif EXTRACTOR_MODEL == "starcoder":
-            self.llm = VicunaLLM()
+            # self.llm = StarcoderLLM()
+            pass
         else:
             self.llm = VicunaLLM()
-            # self.llm = StarcoderLLM()
 
     def _extract(self, extraction_prompt):
         temperature = 0

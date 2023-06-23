@@ -1,0 +1,2 @@
+[console_scripts]
+espeak-phonemizer = espeak_phonemizer.__main__:main

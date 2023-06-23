@@ -1,4 +1,5 @@
-from langchain.llms.base import LLM
+from langchain.llms.base import LLM, LLMResult
+from langchain.schema import Generation
 from typing import Optional, List, Mapping, Any
 import pprint
 
@@ -16,14 +17,15 @@ class VicunaLLM(LLM):
                 "max_new_tokens": 512,
                 "stop": stop
             }
-        print('PAYLOAD:')
-        pprint.pprint(payload)
         response = requests.post(
             "http://127.0.0.1:8000/prompt",
             json=payload
         )
         response.raise_for_status()
-        return response.json()["response"]
+        return LLMResult(
+            generations=[[Generation(text=response.json()["response"])]]
+        )
+        # return response.json()["response"]
 
     def prompt(self, prompt: str, stop: Optional[List[str]] = [], temperature: Optional[float]=0, max_new_tokens=512):
         response = requests.post(

@@ -1,0 +1,3 @@
+[submodule "TTS/mimic3"]
+	path = TTS/mimic3
+	url = https://github.com/MycroftAI/mimic3

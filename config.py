@@ -3,7 +3,8 @@ port_allocations={
 'NpcUserInteractionAPI':8001,
 'MongoDB':8002,
 'GameDesignerAIAPI':8003,
-'ExtractorAPI': 8004
+'ExtractorAPI': 8004,
+'TTSAPI':8005
 }
 
 

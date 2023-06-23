@@ -21,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+'''Given a world_name, message the game designer for that world_name and get a response.'''
 @app.post("/message_game_designer_ai_and_get_response")
 async def message_game_designer_ai_and_get_response(q:dict):
     world_name = q['world_name']
@@ -29,6 +30,7 @@ async def message_game_designer_ai_and_get_response(q:dict):
     response = gdai.message_game_designer_ai_and_get_response(user_message=user_message)
     return {"response": response}
 
+'''Given a world name, get the past conversation that has happened with the game designer AI for that world'''
 @app.get('/get_conversation')
 async def get_conversation(q:dict):
     world_name=q['world_name']

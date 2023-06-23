@@ -2,6 +2,8 @@ import os
 from VicunaLLM.VicunaLLM import VicunaLLM
 from mongodb import mongo_fncs
 import json
+from config import GameDesigner_model
+from langchain.llms import OpenAI
 
 DEBUGGING = False
 
@@ -11,7 +13,14 @@ class GameDesignerAI():
         self.user_name="User"
         self.world_name = world_name
         self.conversation_path = os.path.join('worlds',self.world_name,'game_designer_conversation.txt')
-        self.llm = VicunaLLM()
+        
+        if GameDesigner_model == "vicuna-13b-1.1":
+            self.llm = VicunaLLM()
+        elif GameDesigner_model == "gpt-3.5-turbo":
+            print('using OpenAI Turbo')
+            self.llm = OpenAI()
+        else:
+            self.llm = VicunaLLM()
 
     def get_conversation(self):
         if os.path.exists(self.conversation_path):
@@ -33,16 +42,17 @@ class GameDesignerAI():
 
         #Save this message to the conversation in the file
         os.makedirs(os.path.dirname(self.conversation_path), exist_ok=True)
+        
+
+        unparsed_game_designer_ai_response=self.llm._generate(prompts=[prompt],stop=['\n' + self.user_name + ':'])
+        print('unparsed_response: ', unparsed_game_designer_ai_response)
+
+        game_designer_ai_response = unparsed_game_designer_ai_response.generations[0][0].text
+        formatted_npc_response = '\n' + game_designer_ai_response.lstrip().rstrip()
+        #Save this message to the conversation in the file
         if save_conversation:
             with open(self.conversation_path,'a') as infile:
                 infile.write(formatted_user_message)
-
-        game_designer_ai_response=self.llm.prompt(prompt=prompt,stop=['\n' + self.user_name + ':'],temperature=temperature)
-        print('Game Designer AI:\n')
-        print(game_designer_ai_response)
-        print('----')
-        formatted_npc_response = '\n' + game_designer_ai_response.lstrip().rstrip()
-        #Save this message to the conversation in the file
         if save_conversation:
             with open(self.conversation_path,'a') as infile:
                 infile.write(formatted_npc_response)
