@@ -9,3 +9,11 @@
   uvicorn GameDesignerAIAPI:app --reload --port 8003
   
   uvicorn ExtractorAPI:app --reload --port 8004
+
+  run GameDesignerSuite via ~/Pretence/pretence-app-2/pretence_frontend/src pnpm run dev
+
+  run mimic3 server via mimic3-server --cuda which run on http://0.0.0.0:59125
+
+  run TTS_API.py via uvicorn ~/Pretence/TTS/TTS_API:app --reload --port 8005
+
+  
