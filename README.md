@@ -2,7 +2,7 @@
 
   USE_4BIT=false && USE_13B_MODEL=true && uvicorn servers.vicuna_server:app
 
-  uvicorn VicunaNpcUserInteractionAPI:app --reload --port 8001
+  uvicorn NpcUserInteractionAPI:app --reload --port 8001
   
   uvicorn mongo_api:app --reload --port 8002
   
