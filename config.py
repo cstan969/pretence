@@ -1,3 +1,6 @@
+from langchain.llms.llamacpp import LlamaCpp
+
+
 port_allocations={
 'Vicuna':8000,
 'NpcUserInteractionAPI':8001,
@@ -7,12 +10,12 @@ port_allocations={
 'TTSAPI':8005
 }
 
-
 TURBO = 'gpt-3.5-turbo'
 VICUNA = 'vicuna-7b-1.1-16bit'
 STARCODER = 'starcoder'
 
 
 EXTRACTOR_MODEL= TURBO
-GameDesigner_model = VICUNA
-NpcUserInteraction_model = VICUNA
+GameDesigner_model = TURBO
+NpcUserInteraction_model = TURBO
+NPCBUILDER_MODEL = LlamaCpp

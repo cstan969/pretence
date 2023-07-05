@@ -24,7 +24,8 @@ class Extractor():
             # self.chat_model=ChatVicuna()
             self.llm = VicunaLLM()
         elif EXTRACTOR_MODEL == "gpt-3.5-turbo":
-            self.llm = OpenAI()
+            self.llm = OpenAI(max_tokens=512)
+            print('USING OPENAI TURBO 3.5')
         elif EXTRACTOR_MODEL == "starcoder":
             # self.llm = StarcoderLLM()
             pass
@@ -97,9 +98,10 @@ class Extractor():
         prompt="""User: Please extract a list of unique character names that we explicitly discussed in the conversation above.  I want the output format to be a python list of strings where each string is a unique character that we explicitly discussed.  Output this in the format of [character1, character2] if there are two characters or [character_name1,character_name2,character_name3] if there are three characters so on and so forth.  Output the list only.  I want no additional text."""
         extracted = self._extract(extraction_prompt=prompt)
         print('extracted: ', extracted)
-        match = re.search("\[.*?\]",extracted)
+        match = re.search("\[.*?\]",extracted.lstrip().rstrip())
         if match:
             npc_names = ast.literal_eval(match.group(0))
+        print('npc_names: ', npc_names)
         # else:
         #     prompt="""I received a response from a large language model that is not of the structured format that I need.
         #     Can you take a look at the text below, figure out what the character names are, and then output a list of character names in the format of [name1, name2] which is just a json list.  To reiterate, if there are two characters Bob and Carl then the result should be a list like [Bob,Carl]"""

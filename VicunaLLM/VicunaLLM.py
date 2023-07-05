@@ -13,7 +13,7 @@ class VicunaLLM(LLM):
     def _generate(self, prompts: List[str], stop: Optional[List[str]]=[]):
         payload={
                 "prompt": prompts[0],
-                "temperature": 0,
+                "temperature": 0.6,
                 "max_new_tokens": 512,
                 "stop": stop
             }
