@@ -145,19 +145,17 @@ class NpcUserInteraction():
     
     def _get_prompt(self):
         prompt_assembly_fncs_in_order = [
-            self._load_generic_npc_prompt(),
-            self._load_npc_in_world_prompt(),
-            self._load_starter_prompt(),
-            "----------\nHere is the conversation so far.\nCONVERSATION:\n",
-            self.get_conversation()
+            self._load_generic_npc_prompt(), #role of the NPC generically
+            self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
+            self._load_npc_in_world_prompt(), # role of the NPC in the world
+            self._load_starter_prompt(), # summarization of the NPC (personality etc)
+            self._load_conversation_prompt(), # conversation of user with NPC
         ]
         return '\n'.join([fnc for fnc in prompt_assembly_fncs_in_order])
 
 
     def _load_generic_npc_prompt(self):
         generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  I will be a player character and seek to achieve the quest objectives.""".format(npc_name=self.npc_name)
-        # generic_npc_prompt = """ROLE: You are an NPC in a single player video game. Your role is to converse with the game player by continuing the conversation shown below.\n\n"""
-        # generic_npc_prompt = generic_npc_prompt.replace('[[AI_NAME]]',self.npc_name).replace('[[USER_NAME]]',self.user_name)
         return generic_npc_prompt
 
     def _load_npc_in_world_prompt(self):
@@ -169,4 +167,10 @@ class NpcUserInteraction():
         prompt_info = json.dumps({k: v for k,v in self.npc_info.items() if k in ['mood','personality','quest objectives']})
         starter_prompt = """Here is information pertaining to {npc_name}:\n""".format(npc_name=self.npc_name) + prompt_info
         return starter_prompt
+    
+    def _load_conversation_prompt(self):
+        prompt = "----------\nHere is the conversation so far.\nCONVERSATION:\n",    
+        prompt += self.get_conversation()
+        return prompt
+    
     
