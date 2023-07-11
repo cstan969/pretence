@@ -63,12 +63,16 @@ class mongo_fncs_unittests(TestCase):
         get_all_scenes
         get_next_scene
         delete_scene'''
-        scene1 = upsert_scene(world_name='test_world_name',scene_info={})
+        scene1 = insert_scene(world_name='test_world_name',scene_info={})
         pprint.pprint(scene1)
-        scene2 = upsert_scene(world_name='test_world_name',scene_info={},previous_scene=scene1['_id'])
+        scene2 = insert_scene(world_name='test_world_name',scene_info={},previous_scene=scene1['_id'])
         pprint.pprint(scene2)
         next_scene = get_next_scene(scene_id=scene1['_id'])
         pprint.pprint(next_scene)
+        scenes_in_order = get_all_scenes_in_order(world_name='test_world_name')
+        pprint.pprint(scenes_in_order)
+        delete_scene(id=scene1['_id'])
+        delete_scene(id=scene2['_id'])
 
 
 tc = mongo_fncs_unittests()
