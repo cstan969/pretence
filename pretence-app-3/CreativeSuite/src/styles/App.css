@@ -1,0 +1,34 @@
+.app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+  
+  form {
+    margin-top: 10px;
+  }
+  
+  input {
+    width: 300px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  input[type="text"] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  div > div {
+    margin-bottom: 10px;
+  }
+  
+  div > h3 {
+    margin-top: 20px;
+  }

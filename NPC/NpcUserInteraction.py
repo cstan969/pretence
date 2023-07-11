@@ -61,6 +61,7 @@ class NpcUserInteraction():
             infile.write(formatted_npc_response)
         return formatted_npc_response
     
+    
     def _get_prompt(self):
         prompt_assembly_fncs_in_order = [
             self._load_generic_npc_prompt(),
@@ -69,12 +70,6 @@ class NpcUserInteraction():
             "----------\nHere is the conversation so far.  Please continue in 3 or fewer sentences.\nCONVERSATION:\n",
             self.get_conversation()
         ]
-        # prompt = self._load_generic_npc_prompt()
-        # prompt += """\n\n'''"""
-        # prompt += self._load_starter_prompt()
-        # prompt += """\n\n'''\n\nHere is the conversation that I would like you to continue:\n"""
-        # prompt += self.get_conversation()
-        # return prompt
         return '\n'.join([fnc for fnc in prompt_assembly_fncs_in_order])
 
 
@@ -85,9 +80,9 @@ class NpcUserInteraction():
         # generic_npc_prompt = """A chat between a player in a game ("[[USER_NAME]]") and an NPC quest giver ("[[AI_NAME]]") in a video game. 
         #   The NPC gives helpful, detailed, and polite answers to the human's questions.  The assistant is proactive in engaging with the player 
         #   and helps to guide the player in the world."""
-        generic_npc_prompt = """Act like an NPC in a video game.  The experience should be immersive.  The NPC should only know what is contained in the prompt."""
-        generic_npc_prompt = """ROLE: You are an NPC in a single player video game. Your role is to converse with the game player by continuing the conversation shown below.\n\n"""
-        generic_npc_prompt = generic_npc_prompt.replace('[[AI_NAME]]',self.npc_name).replace('[[USER_NAME]]',self.user_name)
+        generic_npc_prompt = """ROLE: Act like an NPC in a video game."""
+        # generic_npc_prompt = """ROLE: You are an NPC in a single player video game. Your role is to converse with the game player by continuing the conversation shown below.\n\n"""
+        # generic_npc_prompt = generic_npc_prompt.replace('[[AI_NAME]]',self.npc_name).replace('[[USER_NAME]]',self.user_name)
         return generic_npc_prompt
 
     def _load_npc_in_world_prompt(self):
@@ -106,27 +101,4 @@ class NpcUserInteraction():
         # starter_prompt = '  '.join([str(value) for key,value in self.npc_info.items() if key not in ["_id","npc_name","world_name","last_updated"]])
         return starter_prompt
 
-    # def _get_who_conversed_last(self):
-    #     '''look through a conversation and return who conversed last'''
-    #     user_index = self.conversation.find('[[USER_NAME]]:')
-    #     npc_index = self.conversation.find('[[AI_NAME]]:')
-    #     if user_index == -1 and npc_index == -1:
-    #         return 'none'
-    #     if user_index > npc_index:
-    #         return 'user'
-    #     elif npc_index > user_index:
-    #         return 'npc'
-
-    # def interactive_cli_conversation(self):
-    #     conversation = self.get_conversation()
-    #     print(conversation)
-    #     who_conversed_last = self._get_who_conversed_last()
-    #     print('who_convsered_last: ', who_conversed_last)
-    #     if who_conversed_last == 'none':
-    #         response = self.prompt_npc
-    #     elif who_conversed_last == 'npc':
-    #         user_input = input('[[USER_NAME]]:')
-    #     elif who_conversed_last == 'user':
-    #         response = self.prompt_npc
-        
     

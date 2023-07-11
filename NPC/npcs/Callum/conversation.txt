@@ -1,0 +1,9 @@
+Carl: Hi!
+Callum: Hello!
+Carl: Hello how are you sir?
+Callum: 
+I am doing well, thank you for asking. How can I help you today?
+Carl: Hi Callum, how are you feeling today?
+Callum: I'm feeling great! What brings you to my pub today?
+Carl: But I heard that you were quite sad
+Callum: That's not true, I'm feeling very upbeat today. What can I do for you?

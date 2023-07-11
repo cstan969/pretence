@@ -1,0 +1,47 @@
+
+User: Can you help me create a sailign game where the skipper is a monkey named Harry?
+GameDesignerAI: Sure!  Here are a few tips to get you started:
+
+1. Make sure the game is fun and engaging for players.
+2. Create a realistic sailing experience for the player.
+3. Make sure the game is visually appealing and easy to navigate.
+4. Incorporate elements of adventure and exploration into the game.
+5. Give the player the ability to customize their monkey character, Harry.
+6. Create a storyline that involves the player helping Harry on his adventures.
+7. Add different levels and challenges for the player to overcome.
+8. Incorporate different types of boats and sea creatures into the game.
+9. Allow players to interact with other players online.
+10. Continuously update and improve the game based on player feedback.
+
+I hope these tips help you in creating your sailing game!
+User: No no I only want help creating the NPC so that he can guide you as you sail around the world
+.
+GameDesignerAI: Sure!  Here are a few tips to help you create an engaging NPC for your sailing game:
+
+1. Give the NPC a unique personality and backstory.
+2. Make sure the NPC is able to communicate with the player in a clear and understandable way.
+3. Give the NPC the ability to provide helpful tips and advice to the player.
+4. Incorporate different levels of interaction with the player, such as answering questions or providing guidance.
+5. Make sure the NPC is visually appealing and fits in with the overall look and feel of the game.
+6. Give the NPC the ability to change and evolve based on the player's actions and decisions.
+7. Incorporate different types of NPCs into the game, each with their own unique personalities and abilities.
+8. Allow players to interact with different NPCs online.
+9. Continuously update and improve the NPC based on player feedback.
+10. Make sure the NPC is able to provide a fun and engaging experience for the player.
+
+I hope these tips help you in creating your sailing game's NPC!
+User: I want the monkey to be super helpful and to be very experienced when it comes to handling your raft.&nbsp; He is very helpful and guides you towards islands in order for you to gather lost treasures from when the world ended.&nbsp; However, when you make a mistake he yells at you for not listening!
+GameDesignerAI: Great!  Here are a few more tips to help you create a helpful and experienced NPC for your sailing game:
+
+1. Give the NPC a unique set of skills and abilities that make him an expert in sailing and handling a raft.
+2. Make sure the NPC is able to provide helpful tips and advice to the player in a clear and understandable way.
+3. Give the NPC the ability to communicate with the player in a friendly and helpful manner.
+4. Incorporate different levels of interaction with the player, such as answering questions or providing guidance.
+5. Make sure the NPC is visually appealing and fits in with the overall look and feel of the game.
+6. Give the NPC the ability to change and evolve based on the player's actions and decisions.
+7. Incorporate different types of NPCs into the game, each with their own unique personalities and abilities.
+8. Allow players to interact with different NPCs online.
+9. Continuously update and improve the NPC based on player feedback.
+10. Make sure the NPC is able to provide a fun and engaging experience for the player.
+
+I hope these tips help you in creating your sailing game's NPC!

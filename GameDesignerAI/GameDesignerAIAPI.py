@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from GameDesignerAI import GameDesignerAI
-from mongodb.mongo_fncs import upsert_npc
+from mongodb.mongo_fncs import upsert_npc, get_latest_npc_emotional_state
 
 from langchain.chat_models import ChatOpenAI
 from langchain import PromptTemplate, LLMChain
@@ -63,6 +63,7 @@ async def build_npc_from_json(q:dict):
         return response
     
     character_json = q['character_json']
+    del character_json['world_name']
     world_name=q['world_name']
 
     character_summary = _summarize_character_json(character_json)
@@ -75,7 +76,7 @@ async def build_npc_from_json(q:dict):
     llm_chain = LLMChain(prompt=prompt,llm=llm)
     q1 = """I am creating a video game character and could use some help completing the character.\n
         Here is the starting point of the character I want to make: {character_summary}. \
-        Can you create a JSON representation of this character for me?  Fill in each value field. I want the character to be of the following format...\n""".format(character_summary=character_summary)
+        Can you create a JSON representation of this character for me?  Fill in each field; I do not want any fields left empty. I want the character to be of the following format...\n""".format(character_summary=character_summary)
     q2 = """{
 'npc_name': string,
 'age': int, 
@@ -102,7 +103,8 @@ async def build_npc_from_json(q:dict):
 'Strengths':string,
 'Weaknesses':string,
 'emotional susceptibility': {},
-“Secrets”:[{“secret”:secret,”unlock_condition”:{“emotion”:emotion,”unlock_threshold”:threshold(7-10)}}]
+“Secrets”:[{“secret”:secret,”unlock_condition”:{“emotion”:emotion,”unlock_threshold”:threshold(7-10)}}],
+"text-to-image prompt':string
 
 emotional_susceptibility should include the following keys [drunk, angry, afraid, trusting, happy, motivated, compassionate, sad].  The values of emotional_susceptibility should be between 1 and 10 where 1 means the NPC is not susceptible to anger/drunkenness etc.
 
@@ -118,7 +120,9 @@ The quest(s) should be an interpersonal quest that can be resolved through commu
         "emotion": "ANTAGONISTIC",
         "unlock_threshold": 1-10
       }
-    }]"""
+    }]
+    
+'text-to-image prompt should be a prompt that I can use to describe the character to a text-to-image generator.  It should include gender, facial appearance, and clothing."""
     question = q1+q2
         
         

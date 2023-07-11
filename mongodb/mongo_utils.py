@@ -44,3 +44,7 @@ def delete_items(collection_name:str,query:dict):
     finally:
         client.close()
 
+def get_current_date_formatted_no_spaces():
+    now = datetime.now()
+    formatted_date = now.strftime("%Y%m%d%H%M%S")
+    return formatted_date
