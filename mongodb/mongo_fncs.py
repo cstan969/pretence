@@ -117,3 +117,60 @@ def get_formatted_conversational_chain(
     ordered_interactions = sorted(interactions, key=lambda x: datetime.strptime(x['created_at'], "%Y-%m-%d %H:%M:%S"))
     conversation_lines = [f"{user_name}: {msg['user_message']}\n{npc_name}: {msg['npc_response']}\n" for msg in ordered_interactions]
     return ''.join(conversation_lines).rstrip()
+
+
+
+################
+#####SCENES#####
+################
+def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str]=None):
+    #find scene_id that is linked to previous_scene currently
+    current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene})
+    #upsert the new scene
+    upserted_scene = {k:v for k,v in scene_info.items()}
+    scene_id = '-'.join(['scenes',world_name,get_current_date_formatted_no_spaces()])
+    upserted_scene['_id'] = scene_id
+    upserted_scene['world_name'] = world_name
+    upserted_scene['previous_scene'] = previous_scene
+    upsert_item(collection_name='scenes',item=upserted_scene)
+    #hook up the old next scene to the newly upserted scene
+    if len(current_scene_hooked_up_to_previous_scene) > 0:
+        current_scene_hooked_up_to_previous_scene = current_scene_hooked_up_to_previous_scene[0]
+        current_scene_hooked_up_to_previous_scene['previous_scene'] = scene_id
+        upsert_item(collection_name='scenes',item=current_scene_hooked_up_to_previous_scene)
+    return upserted_scene
+
+def update_scene(scene_id: str, scene_info:dict):
+    current_scene = query_collection(collection_name='scenes',query='_id':scene_id)
+    if current_scene == []:
+        return None
+    else:
+        upsert_item=current_scene[0]
+        for k,v in scene_info.items():
+            upsert_item[k] = v
+        upsert_item(collection_name='scenes',item=upsert_item)
+        
+    
+
+
+
+def get_next_scene(scene_id: Optional[str]=None):
+    scenes = query_collection(collection_name='scenes',query={'_id':scene_id})
+    return None if len(scenes) == 0 else scenes[0]
+    
+def get_all_scenes_in_order(world_name: str):
+    ''''Return all of the scenes for some world in order'''
+    scenes = query_collection(collection_name='scenes',query={'world_name':world_name})
+    if len(scenes) == 0:
+        return []
+    else:
+        previous_scene_dict = {scene['previous_scene']: scene for scene in scenes}
+        ordered_scenes = [scene for scene in scenes if scene['previous_scene'] is None]
+        cur_scene = ordered_scenes[0]['_id']
+        while cur_scene in previous_scene_dict:
+            ordered_scenes.append(previous_scene_dict[cur_scene])
+            cur_scene = previous_scene_dict[cur_scene]['_id']
+    return ordered_scenes
+
+def delete_scene(id:str):
+    delete_items(collection_name='scenes',query={'_id':id}) 
