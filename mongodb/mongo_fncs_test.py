@@ -1,4 +1,5 @@
 from unittest import TestCase
+import pprint
 from mongo_fncs import *
 
 class mongo_fncs_unittests(TestCase):
@@ -56,9 +57,22 @@ class mongo_fncs_unittests(TestCase):
         self.assertEqual(world,[])
         print('test_collection_worlds: successful')
 
+    def test_collection_scenes(self):
+        '''Included Functions to test:
+        upsert_scene
+        get_all_scenes
+        get_next_scene
+        delete_scene'''
+        scene1 = upsert_scene(world_name='test_world_name',scene_info={})
+        pprint.pprint(scene1)
+        scene2 = upsert_scene(world_name='test_world_name',scene_info={},previous_scene=scene1['_id'])
+        pprint.pprint(scene2)
+        next_scene = get_next_scene(scene_id=scene1['_id'])
+        pprint.pprint(next_scene)
 
 
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
 # tc.test_collection_users()
-tc.test_collection_worlds()
+# tc.test_collection_worlds()
+tc.test_collection_scenes()

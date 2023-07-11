@@ -117,3 +117,54 @@ def get_formatted_conversational_chain(
     ordered_interactions = sorted(interactions, key=lambda x: datetime.strptime(x['created_at'], "%Y-%m-%d %H:%M:%S"))
     conversation_lines = [f"{user_name}: {msg['user_message']}\n{npc_name}: {msg['npc_response']}\n" for msg in ordered_interactions]
     return ''.join(conversation_lines).rstrip()
+
+
+#####SCENES#####
+def upsert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str]=None):
+    #find scene_id that is linked to previous_scene currently
+    current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene})
+    #upsert the new scene
+    upserted_scene = {k:v for k,v in scene_info.items()}
+    scene_id = '-'.join(['scenes',world_name,get_current_date_formatted_no_spaces()])
+    upserted_scene['_id'] = scene_id
+    upserted_scene['world_name'] = world_name
+    upserted_scene['previous_scene'] = previous_scene
+    upsert_item(collection_name='scenes',item=upserted_scene)
+    #hook up the old next scene to the newly upserted scene
+    if len(current_scene_hooked_up_to_previous_scene) > 0:
+        current_scene_hooked_up_to_previous_scene = current_scene_hooked_up_to_previous_scene[0]
+        current_scene_hooked_up_to_previous_scene['previous_scene'] = scene_id
+        upsert_item(collection_name='scenes',item=current_scene_hooked_up_to_previous_scene)
+    return upserted_scene
+
+
+
+def get_next_scene(scene_id: Optional[str]=None):
+    scenes = query_collection(collection_name='scenes',query={'_id':scene_id})
+    return None if len(scenes) == 0 else scenes[0]
+    
+def get_all_scenes_in_order(world_name: str):
+    ''''Return all of the scenes for some world in order'''
+    scenes = query_collection(collect_name='scenes',query={'world_name':world_name})
+    if len(scenes) == 0:
+        return []
+    else:
+        ordered_scenes = []
+        scene_dict = {scene['_id']: scene for scene in scenes}
+
+        current_scene = None
+        while True:
+            if current_scene is None:
+                next_scene = next((scene for scene in scenes if scene['previous_scene'] is None), None)
+            else:
+                next_scene = scene_dict.get(current_scene['_id'], None)
+
+            if next_scene is None:
+                break
+
+            ordered_scenes.append(next_scene)
+            current_scene = next_scene
+    return ordered_scenes
+
+def delete_scene(id:str):
+    delete_items(collect_name='scenes',query={'_id':id}) 
