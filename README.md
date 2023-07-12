@@ -1,5 +1,7 @@
 # pretence
 
+  Add PRETENCE_PATH to your .bashrc or window path etc.
+
   USE_4BIT=false && USE_13B_MODEL=true && uvicorn servers.vicuna_server:app
 
   uvicorn NpcUserInteractionAPI:app --reload --port 8001
