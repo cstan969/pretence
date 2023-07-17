@@ -74,9 +74,14 @@ class mongo_fncs_unittests(TestCase):
         delete_scene(id=scene1['_id'])
         delete_scene(id=scene2['_id'])
 
+    def test_get_scene_objectives_completed(self):
+        items = get_scene_objectives_completed(scene_id="scenes-TraumaGame-20230711145400",user_name="Carl2")
+        print(items)
+
 
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
 # tc.test_collection_users()
 # tc.test_collection_worlds()
-tc.test_collection_scenes()
+# tc.test_collection_scenes()
+tc.test_get_scene_objectives_completed()

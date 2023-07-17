@@ -56,7 +56,7 @@ def get_npc(world_name:str, npc_name:str):
     return items[0] if len(items) > 0 else {}
 
 def delete_npc(world_name:str,npc_name:str):
-    delete_items(collect_name='npcs',query={'world_name':world_name,'npc_name':npc_name})
+    delete_items(collection_name='npcs',query={'world_name':world_name,'npc_name':npc_name})
 
 
 #####USER_NPC_INTERACTIONS#####
@@ -91,7 +91,7 @@ def delete_all_user_npc_interactions(
     world_name:str,
     user_name: str,
     npc_name: str):
-    delete_items(collect_name='user_npc_interactions',query={'world_name':world_name,'npc_name':npc_name,'user_name':user_name}) 
+    delete_items(collection_name='user_npc_interactions',query={'world_name':world_name,'npc_name':npc_name,'user_name':user_name}) 
 
 def get_latest_npc_emotional_state(
     world_name:str,
@@ -141,20 +141,22 @@ def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str
     return upserted_scene
 
 def update_scene(scene_id: str, scene_info:dict):
-    current_scene = query_collection(collection_name='scenes',query='_id':scene_id)
+    current_scene = query_collection(collection_name='scenes',query={'_id':scene_id})
     if current_scene == []:
         return None
     else:
-        upsert_item=current_scene[0]
+        item_to_upsert=current_scene[0]
         for k,v in scene_info.items():
-            upsert_item[k] = v
-        upsert_item(collection_name='scenes',item=upsert_item)
+            item_to_upsert[k] = v
+        upsert_item(collection_name='scenes',item=item_to_upsert)
         
     
+def get_scene(scene_id: str)->dict:
+    scenes = query_collection(collection_name='scenes',query={'_id':scene_id})
+    return None if len(scenes) == 0 else scenes[0]
 
 
-
-def get_next_scene(scene_id: Optional[str]=None):
+def get_next_scene(scene_id: Optional[str]=None)->dict:
     scenes = query_collection(collection_name='scenes',query={'_id':scene_id})
     return None if len(scenes) == 0 else scenes[0]
     
@@ -172,5 +174,72 @@ def get_all_scenes_in_order(world_name: str):
             cur_scene = previous_scene_dict[cur_scene]['_id']
     return ordered_scenes
 
+def get_starting_scene_of_world(world_name: str):
+    '''returns the starting scene for some world'''
+    scenes = query_collection(collection_name='scenes',query={'world_name':world_name, 'previous_scene': None})
+    return scenes[0] if len(scenes)>0 else None
+
 def delete_scene(id:str):
     delete_items(collection_name='scenes',query={'_id':id}) 
+
+###################################
+#####SCENE_OBJECTIVES_COMPLETED#####
+####################################
+
+def mark_objectives_completed(objectives_completed: dict, scene_id: str, user_name: str):
+    id = '-'.join(['scene_objectives_completed',scene_id,user_name])
+    items = query_collection(collection_name='scene_objectives_completed', query={'_id': id})
+    if items == []:
+        scene_objectives = query_collection(collection_name='scenes',query={'_id': scene_id})[0]['objectives']
+        item_to_upsert = {
+            '_id': id,
+            'scene_id': scene_id,
+            'user_name': user_name,
+            'objectives_completed': objectives_completed
+        }
+        upsert_item(collection_name='scene_objectives_completed',item=item_to_upsert)
+    else:
+        item_to_upsert = items[0]
+        for obj, comp in objectives_completed.items():
+            if comp == "completed":
+                item_to_upsert['objectives_completed'][obj] = "completed"
+        upsert_item(collection_name='scene_objectives_completed',item=item_to_upsert)
+    return item_to_upsert
+
+def get_scene_objectives_completed(scene_id: str, user_name: str):
+    items = query_collection(collection_name='scene_objectives_completed', query={'_id':'-'.join(['scene_objectives_completed',scene_id,user_name])})
+    return None if len(items)==0 else items[0]['objectives_completed']
+
+def delete_user_scene_objectives(scene_id: str, user_name:str):
+    delete_items(collection_name='scenes',query={'_id':'-'.join(['scene_objectives_completed',scene_id,user_name])}) 
+
+#####################
+#####GAME STATUS#####
+#####################
+
+def get_progress_of_user_in_game(world_name: str, user_name: str)->str:
+    '''Returns the scene_id that a user is up to for some world'''
+    items = query_collection(collection_name='progress_of_user_in_game',query={'world_name': world_name,'user_name':user_name})
+    if len(items) > 0:
+        return items[0]['scene_id']
+    else:
+        #return the first scene of the world
+        starting_scene = get_starting_scene_of_world(world_name=world_name)
+        if starting_scene is not None:
+            return starting_scene['_id']
+        else:
+            return None
+        
+def progress_user_to_next_scene(world_name:str, user_name:str):
+    '''Progresses the user to the next scene in the game in the DB'''
+    scene_id = get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
+    next_scene = get_next_scene(scene_id=scene_id)
+    next_scene_id = next_scene['_id']
+    item_to_upsert = {
+        '_id': '-'.join(['progress_of_user_in_game',world_name,user_name]),
+        'world_name': world_name,
+        'user_name': user_name,
+        'scene_id': next_scene_id
+    }
+    upsert_item(collection_name='progress_of_user_in_game',item=item_to_upsert)
+

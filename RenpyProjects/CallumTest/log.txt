@@ -1,0 +1,169 @@
+Wed Jul 12 22:46:34 2023
+Linux-5.19.0-46-generic-x86_64-with-glibc2.35
+Ren'Py 8.1.1.23060707
+ 
+
+Bootstrap to the start of init.init. took 0.02s
+Early init. took 0.00s
+Loader init. took 0.00s
+Loading error handling. took 0.01s
+Loading script. took 0.05s
+Loading save slot metadata. took 0.01s
+Loading persistent. took 0.00s
+Running init code. took 0.04s
+Loading analysis data. took 0.01s
+Analyze and compile ATL. took 0.00s
+Reloading save slot metadata. took 0.01s
+Index archives took 0.00s
+Backing up script files to '/home/carl/.renpy/backups/CallumTest':
+Dump and make backups. took 0.02s
+Cleaning cache. took 0.00s
+Making clean stores. took 0.00s
+Initial gc. took 0.01s
+DPI scale factor: 1.000000
+Creating interface object. took 0.00s
+Cleaning stores took 0.00s
+Init translation took 0.01s
+Build styles took 0.00s
+Load screen analysis took 0.00s
+Analyze screens took 0.00s
+Save screen analysis took 0.01s
+Prepare screens took 0.02s
+Save pyanalysis. took 0.00s
+Save bytecode. took 0.01s
+Running _start took 0.00s
+Performance test:
+Interface start. took 0.06s
+
+Initializing gl2 renderer:
+primary display bounds: (1920, 0, 1920, 1080)
+swap interval: 1 frames
+Windowed mode.
+Vendor: "b'NVIDIA Corporation'"
+Renderer: b'NVIDIA GeForce RTX 4090/PCIe/SSE2'
+Version: b'4.6.0 NVIDIA 525.125.06'
+Display Info: None
+Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
+Maximum texture size: 4096x4096
+{'_id': 'scenes-TraumaGame-20230711145400', 'world_name': 'TraumaGame', 'previous_scene': None, 'objectives': ['Convince Callum to join the journey of redemption.', 'Establish a connection and rapport with Callum.', "Uncover the reasons behind Callum's reluctance and bitterness.", 'Inspire Callum to believe in a better world.'], 'narration_intro': 'As you step into the dimly lit Sunken Hearth, the air heavy with forgotten stories, you eyes lock onto Callum, a former hero burdened by his past. Approach him and seek to convince him to embark on a transformative journey of redemption together.', 'narration_outro': "With a flicker of hope ignited in Callum's eyes, your heartfelt conversation lays the foundation of a bond. Your determination resonates within him, as he begins to consider the possibility of a brighter future. The scene ends with a seed of hope planted, your shared objective of embarking on a journey of redemption slowly taking root."}
+Screen sizes: virtual=(1920, 1080) physical=(1651, 928) drawable=(1651, 928)
+Maximum texture size: 4096x4096
+
+Full traceback:
+  File "game/script.rpy", line 74, in script
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "game/script.rpy", line 74, in <module>
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "game/script.rpy", line 29, in message_npc_and_get_response
+    response = api_requests.message_npc_and_get_response(user_message)
+  File "api_requests.py", line 27, in message_npc_and_get_response
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/models.py", line 897, in json
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/__init__.py", line 346, in loads
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 337, in decode
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 355, in raw_decode
+JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+While running game code:
+  File "game/script.rpy", line 74, in script
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "game/script.rpy", line 74, in <module>
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "game/script.rpy", line 29, in message_npc_and_get_response
+    response = api_requests.message_npc_and_get_response(user_message)
+JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+Resetting cache.
+Bootstrap to the start of init.init. took 182.88s
+Early init. took 0.00s
+Loader init. took 0.00s
+Loading error handling. took 0.01s
+Loading script. took 0.03s
+Loading save slot metadata. took 0.01s
+Loading persistent. took 0.00s
+Running init code. took 0.01s
+Loading analysis data. took 0.01s
+Analyze and compile ATL. took 0.00s
+Reloading save slot metadata. took 0.01s
+Index archives took 0.00s
+Dump and make backups. took 0.02s
+Cleaning cache. took 0.00s
+Making clean stores. took 0.00s
+Initial gc. took 0.01s
+DPI scale factor: 1.000000
+Creating interface object. took 0.00s
+Cleaning stores took 0.00s
+Init translation took 0.01s
+Build styles took 0.00s
+Load screen analysis took 0.01s
+Analyze screens took 0.00s
+Save screen analysis took 0.00s
+Prepare screens took 0.02s
+Save pyanalysis. took 0.00s
+Save bytecode. took 0.00s
+Running _start took 0.00s
+Performance test:
+Interface start. took 0.02s
+
+Initializing gl2 renderer:
+primary display bounds: (1920, 0, 1920, 1080)
+swap interval: 1 frames
+Windowed mode.
+Vendor: "b'NVIDIA Corporation'"
+Renderer: b'NVIDIA GeForce RTX 4090/PCIe/SSE2'
+Version: b'4.6.0 NVIDIA 525.125.06'
+Display Info: None
+Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
+Maximum texture size: 4096x4096
+Hello. I'm doing okay, thank you. Just lost in my thoughts as usual.
+True
+Screen sizes: virtual=(1920, 1080) physical=(1920, 1043) drawable=(1920, 1043)
+Maximum texture size: 4096x4096
+{'_id': 'scenes-TraumaGame-20230711145400', 'world_name': 'TraumaGame', 'previous_scene': None, 'objectives': ['Convince Callum to join the journey of redemption.', 'Establish a connection and rapport with Callum.', "Uncover the reasons behind Callum's reluctance and bitterness.", 'Inspire Callum to believe in a better world.'], 'narration_intro': 'As you step into the dimly lit Sunken Hearth, the air heavy with forgotten stories, you eyes lock onto Callum, a former hero burdened by his past. Approach him and seek to convince him to embark on a transformative journey of redemption together.', 'narration_outro': "With a flicker of hope ignited in Callum's eyes, your heartfelt conversation lays the foundation of a bond. Your determination resonates within him, as he begins to consider the possibility of a brighter future. The scene ends with a seed of hope planted, your shared objective of embarking on a journey of redemption slowly taking root."}
+{'_id': 'scenes-TraumaGame-20230711145400', 'world_name': 'TraumaGame', 'previous_scene': None, 'objectives': ['Convince Callum to join the journey of redemption.', 'Establish a connection and rapport with Callum.', "Uncover the reasons behind Callum's reluctance and bitterness.", 'Inspire Callum to believe in a better world.'], 'narration_intro': 'As you step into the dimly lit city of Sunken Hearth, the air heavy with forgotten stories, you eyes lock onto Callum, a former hero burdened by his past. Approach him and seek to convince him to embark on a transformative journey of redemption together.', 'narration_outro': "With a flicker of hope ignited in Callum's eyes, your heartfelt conversation lays the foundation of a bond. Your determination resonates within him, as he begins to consider the possibility of a brighter future. The scene ends with a seed of hope planted, your shared objective of embarking on a journey of redemption slowly taking root."}
+Traceback (most recent call last):
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/urllib3/connectionpool.py", line 380, in _make_request
+TypeError: getresponse() got an unexpected keyword argument 'buffering'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/lib/py3-linux-x86_64/../../renpy.py", line 244, in <module>
+    main()
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/lib/py3-linux-x86_64/../../renpy.py", line 240, in main
+    renpy.bootstrap.bootstrap(renpy_base)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/bootstrap.py", line 275, in bootstrap
+    renpy.main.main()
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/main.py", line 670, in main
+    run(restart)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/main.py", line 144, in run
+    renpy.execution.run_context(True)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/execution.py", line 953, in run_context
+    context.run()
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/execution.py", line 596, in run
+    node.execute()
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "game/script.rpy", line 66, in <module>
+  File "game/script.rpy", line 41, in play_narration_intro
+  File "api_requests.py", line 31, in npc_text_to_speech
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/api.py", line 116, in post
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/api.py", line 60, in request
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/sessions.py", line 524, in request
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/sessions.py", line 637, in send
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/adapters.py", line 439, in send
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/urllib3/connectionpool.py", line 598, in urlopen
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/urllib3/connectionpool.py", line 383, in _make_request
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/http/client.py", line 1377, in getresponse
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/http/client.py", line 320, in begin
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/http/client.py", line 281, in _read_status
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/socket.py", line 704, in readinto
+KeyboardInterrupt

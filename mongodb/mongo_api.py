@@ -78,5 +78,18 @@ async def get_user(user_name: str):
     user = fncs.get_user(user_name)
     return {"user": user}
 
+@app.get("/get_progress_of_user_in_game")
+async def get_progress_of_user_in_game(q: dict):
+    world_name = q['world_name']
+    user_name = q['user_name']
+    scene_id = fncs.get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
+    return {"scene_id": scene_id}
+
+@app.get("/get_scene")
+async def get_scene(q: dict):
+    scene_id=q['scene_id']
+    scene = fncs.get_scene(scene_id=scene_id)
+    return {"scene": scene}
+
 # if __name__ == '__main__':
 #     uvicorn.run(app,host='127.0.0.1', port=8002)

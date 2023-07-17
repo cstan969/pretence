@@ -14,14 +14,15 @@ from mongodb.mongo_fncs import get_formatted_conversational_chain
 npc_user_interaction = {
     "npc_name": "Callum",
     "user_name": "Carl",
+    'scene_id': "scenes-TraumaGame-20230711145400",
     "world_name": "TraumaGame",
     "user_message": "Hello there, how are you today?"
 }
 
 
-# response = requests.post(f"{base_url}/message_npc_and_get_response", json=npc_user_interaction)
-# # Again, assuming the server returns a JSON response, print the response
-# if response.status_code == 200:
-#     print('NPC Response:\n', response.json()['response'])
-# else:
-#     print(f"Request failed with status {response.status_code}")
+response = requests.post(f"{base_url}/message_npc_and_get_response", json=npc_user_interaction)
+# Again, assuming the server returns a JSON response, print the response
+if response.status_code == 200:
+    print('NPC Response:\n', response.json())
+else:
+    print(f"Request failed with status {response.status_code}")
