@@ -6,7 +6,7 @@ user_name='Carl3'
 scene_id="scenes-TraumaGame-20230711145400"
 
 base_url = 'http://localhost:8001'
-def message_npc_and_get_response(user_input):
+def message_npc_and_get_response(world_name, scene_id, npc_name, user_name, user_message):
     # npc_user_interaction = {
     #     'world_name': 'NocturnalVeil',
     #     'scene_id': 'scenes-NocturnalVeil-07112023093300',
@@ -14,13 +14,12 @@ def message_npc_and_get_response(user_input):
     #     "user_name": "Carl",
     #     "user_message": user_input
     # }
-
     npc_user_interaction = {
         'world_name': world_name,
-        'scene_id': 'scenes-TraumaGame-20230711145400',
-        "npc_name": "Callum",
-        "user_name": user_name,
-        "user_message": user_input
+        'scene_id': scene_id,
+        'npc_name': npc_name,
+        'user_name': user_name,
+        'user_message': user_message
     }
 
     response = requests.post(f"{base_url}/message_npc_and_get_response", json=npc_user_interaction)

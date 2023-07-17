@@ -125,7 +125,7 @@ class NpcUserInteraction():
     def _get_prompt(self):
         prompt_assembly_fncs_in_order = [
             self._load_generic_npc_prompt(), #role of the NPC generically
-            # self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
+            self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
             self._load_scene_objectives(), # the objectives of the scene for the protagonist to meet
             self._load_npc_prompt(), # summarization of the NPC (personality etc)
             self._load_npc_in_world_prompt(), # role of the NPC in the world
@@ -152,18 +152,6 @@ class NpcUserInteraction():
             prompt = "Here are the objectives the protagonist needs to complete:\n"
             prompt += str(scene_json['objectives'])
             return prompt
-            # prompt = "Here is the completion status of the objectives the protagonist needs to complete:\n"
-            # completed_objectives = get_scene_objectives_completed(scene_id=self.scene_id,user_name=self.user_name)
-            # print('completed objectives in load_scene_obj: ', completed_objectives)
-            # if completed_objectives is not None:
-            #     pprint.pprint(completed_objectives)
-            #     prompt += json.dumps(completed_objectives)
-            #     print(prompt)
-            #     return prompt
-            # else:
-            #     scene_json = get_scene(scene_id=self.scene_id)
-            #     prompt += json.dumps({obj: "not_completed" for obj in scene_json['objectives']})
-            #     return prompt
         except Exception as e:
             print('exception: ', str(e))
             return ""
@@ -174,7 +162,7 @@ class NpcUserInteraction():
         return """GAME INFORMATION: {world_npc_prompt}\n\n""".format(world_npc_prompt=world_json['world_npc_prompt'])
     
     def _load_npc_prompt(self):
-        prompt_info = json.dumps({k: v for k,v in self.npc_info.items() if k in ['mood','personality']})
+        prompt_info = json.dumps({k: v for k,v in self.npc_info.items() if k in ['personality','role']})
         starter_prompt = """Here is information pertaining to {npc_name}:\n""".format(npc_name=self.npc_name) + prompt_info
         return starter_prompt
     

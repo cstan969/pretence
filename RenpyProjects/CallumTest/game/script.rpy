@@ -7,10 +7,13 @@ init python:
     import api_requests
     class Game:
         def __init__(self):
-            self.world_name = 'TraumaGame'
+            # self.world_name = 'NocturnalVeil'
+            self.world_name='TraumaGame'
             self.user_name = 'Carl4'
+            # self.scene_id = 'scenes-NocturnalVeil-07112023093300'
             self.scene_id = 'scenes-TraumaGame-20230711145400' #self.current_scene()
             self.npc_name = 'Callum' #self.get_npc_in_scene()
+            # self.npc_name = 'Forensic Detective'
 
         def get_progress_of_user_in_game(self):
             response = api_requests.get_progress_of_user_in_game(world_name=self.world_name,user_name=self.user_name)
@@ -26,7 +29,13 @@ init python:
             pass
 
         def message_npc_and_get_response(self, user_message):
-            response = api_requests.message_npc_and_get_response(user_message)
+            response = api_requests.message_npc_and_get_response(
+                world_name=self.world_name,
+                user_name=self.user_name,
+                user_message=user_message,
+                scene_id=self.scene_id,
+                npc_name=self.npc_name
+            )
             npc_response = response['npc_response']
             scene_completed = response['scene_completed']
             print(npc_response)
