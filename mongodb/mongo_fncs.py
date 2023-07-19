@@ -2,6 +2,7 @@ from typing import Optional
 from mongodb.mongo_utils import query_collection, upsert_item, delete_items, get_current_date_formatted_no_spaces, get_current_datetime_as_string
 # from mongodb.mongo_utils import query_collection, upsert_item, delete_items
 from datetime import datetime
+import pprint
 
 #####USERS#####
 def upsert_user(user_name:str):
@@ -20,14 +21,13 @@ def get_user(user_name:str):
 
 
 #####WORLDS#####
-def upsert_world(world_name:str):
+def upsert_world(world_name:str, data: dict):
     '''create a new world and name'''
     collection_name = 'worlds'
-    item={
-        'world_name':world_name,
-        '_id': '-'.join([collection_name,world_name])
-    }
-    upsert_item(collection_name=collection_name,item=item)
+    item = data
+    item['world_name'] = world_name
+    item['_id'] = '-'.join([collection_name,world_name])
+    return upsert_item(collection_name=collection_name,item=item)
 
 def get_all_worlds():
     return query_collection(collection_name='worlds',query={})
@@ -38,8 +38,11 @@ def get_world(world_name:str):
 
 #####NPCS#####
 def upsert_npc(world_name:str, npc_name:str, npc_metadata:dict):
+    npc = get_npc(world_name=world_name, npc_name=npc_name)
+    item = {} if npc is None else npc
     collection_name = 'npcs'
-    item = npc_metadata
+    for k,v in npc_metadata.items():
+        item[k] = v
     item['world_name']=world_name
     item['npc_name']=npc_name
     item['_id']='-'.join([collection_name,world_name,npc_name])
@@ -53,7 +56,7 @@ def get_npcs_in_world(world_name):
 
 def get_npc(world_name:str, npc_name:str):
     items = query_collection(collection_name='npcs',query={'world_name': world_name, 'npc_name': npc_name})
-    return items[0] if len(items) > 0 else {}
+    return items[0] if len(items) > 0 else None
 
 def delete_npc(world_name:str,npc_name:str):
     delete_items(collection_name='npcs',query={'world_name':world_name,'npc_name':npc_name})
@@ -125,7 +128,10 @@ def get_formatted_conversational_chain(
 ################
 def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str]=None):
     #find scene_id that is linked to previous_scene currently
+    if previous_scene is not None and 'scenes-' not in previous_scene:
+        previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'scene_name':previous_scene})[0]['_id']
     current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene})
+    
     #upsert the new scene
     upserted_scene = {k:v for k,v in scene_info.items()}
     scene_id = '-'.join(['scenes',world_name,get_current_date_formatted_no_spaces()])
@@ -140,7 +146,7 @@ def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str
         upsert_item(collection_name='scenes',item=current_scene_hooked_up_to_previous_scene)
     return upserted_scene
 
-def update_scene(scene_id: str, scene_info:dict):
+def update_scene(scene_id: str, scene_info:dict)->dict:
     current_scene = query_collection(collection_name='scenes',query={'_id':scene_id})
     if current_scene == []:
         return None
@@ -149,6 +155,7 @@ def update_scene(scene_id: str, scene_info:dict):
         for k,v in scene_info.items():
             item_to_upsert[k] = v
         upsert_item(collection_name='scenes',item=item_to_upsert)
+        return item_to_upsert
         
     
 def get_scene(scene_id: str)->dict:

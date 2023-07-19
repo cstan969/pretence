@@ -7,7 +7,6 @@ const NpcCreator = () => {
     world_description: '',
     npc_name: '',
     npc_description: '',
-    Quests: ''
   };
 
   const [jsonData, setJsonData] = useState(initialJsonData);

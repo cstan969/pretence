@@ -158,8 +158,13 @@ class NpcUserInteraction():
 
     def _load_npc_in_world_prompt(self):
         world_json = get_world(world_name=self.world_name)[0]
-        world_npc_prompt = world_json['world_npc_prompt']
-        return """GAME INFORMATION: {world_npc_prompt}\n\n""".format(world_npc_prompt=world_json['world_npc_prompt'])
+        if 'world_npc_prompt' in world_json:
+            world_npc_prompt = world_json['world_npc_prompt']
+        elif 'world_description' in world_json:
+            world_npc_prompt = world_json['world_description']
+        else:
+            world_npc_prompt = ""
+        return """GAME INFORMATION: {world_npc_prompt}\n\n""".format(world_npc_prompt=world_npc_prompt)
     
     def _load_npc_prompt(self):
         prompt_info = json.dumps({k: v for k,v in self.npc_info.items() if k in ['personality','role']})

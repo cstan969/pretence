@@ -1,0 +1,48 @@
+.WorldCreator label,
+.WorldCreator input,
+.WorldCreator textarea,
+.WorldCreator button {
+  display: block;
+}
+
+.WorldCreator label {
+  margin: 10px 0;
+}
+
+.WorldCreator textarea,
+.WorldCreator input {
+  margin-bottom: 20px;
+}
+
+.WorldCreator .back-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.WorldCreator .update-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+.WorldCreator .editor {
+  position: relative;
+  padding: 20px;
+}
+
+.WorldCreator .input-group {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.WorldCreator .input-group label {
+  flex: 0 0 200px;
+}
+
+.WorldCreator .input-group textarea,
+.WorldCreator .input-group input {
+  flex: 1;
+  margin-bottom: 0;
+}

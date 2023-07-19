@@ -25,17 +25,19 @@ app.add_middleware(
 
 @app.post("/upsert_npc")
 async def upsert_npc(q: dict):
-    fncs.upsert_npc(
+    npc = fncs.upsert_npc(
         world_name=q['world_name'],
         npc_name=q['npc_name'],
-        npc_metadata=q['npc_metadata']
+        npc_metadata={k:v for k,v in q.items() if k not in ['world_name','npc_name']}
     )
-    return {"message": "NPC upserted successfully"}
+    return npc
 
 @app.post("/get_npcs_in_world")
 async def get_npcs_in_world(q:dict):
-    npcs = fncs.get_npcs_in_world(world_name=q['world_name'])
-    return {"npcs": [npc['npc_name'] for npc in npcs]}
+    world_name = q['world_name']
+    npcs = fncs.get_npcs_in_world(world_name=world_name)
+    # # return {"npcs": [npc['npc_name'] for npc in npcs]}
+    return npcs
 
 @app.get("/get_npc")
 async def get_npc(world_name: str, npc_name: str):
@@ -49,13 +51,13 @@ async def delete_npc(world_name: str, npc_name: str):
 
 @app.post("/upsert_world")
 async def upsert_world(q:dict):
-    fncs.upsert_world(world_name=q['world_name'])
-    return {"message": "World upserted successfully"}
+    return fncs.upsert_world(world_name=q['world_name'],data={k:v for k,v in q.items() if k not in ['world_name']})
 
 @app.get("/get_all_worlds")
 async def get_all_worlds():
     worlds = fncs.get_all_worlds()
-    return {"worlds": [world['world_name'] for world in worlds]}
+    # return {"worlds": [world['world_name'] for world in worlds]}
+    return {"worlds": worlds}
 
 @app.get("/get_world")
 async def get_world(world_name: str):
@@ -85,11 +87,31 @@ async def get_progress_of_user_in_game(q: dict):
     scene_id = fncs.get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
     return {"scene_id": scene_id}
 
-@app.get("/get_scene")
+@app.post("/get_scene")
 async def get_scene(q: dict):
     scene_id=q['scene_id']
     scene = fncs.get_scene(scene_id=scene_id)
     return {"scene": scene}
+
+@app.post("/update_scene")
+async def update_scene(q: dict):
+    upserted_item = fncs.update_scene(scene_id=q['_id'],scene_info={k:v for k,v in q.items() if k not in ['_id']})
+    return upserted_item
+
+@app.post("/insert_scene")
+async def insert_scene(q: dict):
+    scene = fncs.insert_scene(
+        world_name=q['world_name'],
+        scene_info={k:v for k,v in q.items() if k not in ['_id','world_name','previous_scene']},
+        previous_scene=q['previous_scene']
+    )
+    return scene
+
+
+@app.post("/get_all_scenes_in_order")
+async def get_all_scenes_in_order(q: dict):
+    scenes = fncs.get_all_scenes_in_order(world_name=q['world_name'])
+    return {'scenes': scenes}
 
 # if __name__ == '__main__':
 #     uvicorn.run(app,host='127.0.0.1', port=8002)
