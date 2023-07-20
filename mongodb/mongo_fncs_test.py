@@ -79,9 +79,30 @@ class mongo_fncs_unittests(TestCase):
         print(items)
 
 
+    def test_progress_user_to_next_scene(self):
+        progress_user_to_next_scene(world_name='NocturnalVeil',user_name='Carl5')
+
+
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
 # tc.test_collection_users()
 # tc.test_collection_worlds()
 # tc.test_collection_scenes()
-tc.test_get_scene_objectives_completed()
+# tc.test_get_scene_objectives_completed()
+tc.test_progress_user_to_next_scene()
+
+
+
+# def progress_user_to_next_scene(world_name:str, user_name:str):
+#     '''Progresses the user to the next scene in the game in the DB'''
+#     scene_id = get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
+#     next_scene = get_next_scene(scene_id=scene_id)
+#     next_scene_id = next_scene['_id']
+#     item_to_upsert = {
+#         '_id': '-'.join(['progress_of_user_in_game',world_name,user_name]),
+#         'world_name': world_name,
+#         'user_name': user_name,
+#         'scene_id': next_scene_id
+#     }
+#     # upsert_item(collection_name='progress_of_user_in_game',item=item_to_upsert)
+

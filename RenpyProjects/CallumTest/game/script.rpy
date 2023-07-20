@@ -7,23 +7,27 @@ init python:
     import api_requests
     class Game:
         def __init__(self):
-            # self.world_name = 'NocturnalVeil'
-            self.world_name='TraumaGame'
-            self.user_name = 'Carl4'
+            self.world_name = 'NocturnalVeil'
+            # self.world_name='TraumaGame'
+            self.user_name = 'Carl5'
             # self.scene_id = 'scenes-NocturnalVeil-07112023093300'
-            self.scene_id = 'scenes-TraumaGame-20230711145400' #self.current_scene()
-            self.npc_name = 'Callum' #self.get_npc_in_scene()
+            # self.scene_id = 'scenes-TraumaGame-20230711145400' #self.current_scene()
+            # self.npc_name = 'Callum' #self.get_npc_in_scene()
+            # self.npc_name = self.get_npc_in_scene()
             # self.npc_name = 'Forensic Detective'
 
         def get_progress_of_user_in_game(self):
             response = api_requests.get_progress_of_user_in_game(world_name=self.world_name,user_name=self.user_name)
             scene_id = response['scene_id']
             self.scene = api_requests.get_scene(scene_id=scene_id)['scene']
-            print(self.scene)
+            self.scene_id = self.scene['_id']
+            self.npc_name = self.get_npc_in_scene()
             return self.scene
 
         def get_npc_in_scene(self):
-            pass
+            npc = list(self.scene['NPCs'])[0]
+            print('npc: ', npc)
+            return npc
 
         def get_next_scene(self):
             pass
@@ -46,7 +50,10 @@ init python:
             api_requests.npc_text_to_speech(npc_message)
 
         def play_narration_intro(self):
+            print('into play_narration_intro')
             if 'narration_intro' in self.scene:
+                print('narration_intro in self.scene')
+                print(self.scene['narration_intro'])
                 api_requests.npc_text_to_speech(self.scene['narration_intro'])
 
         def play_narration_outro(self):

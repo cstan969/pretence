@@ -164,7 +164,7 @@ def get_scene(scene_id: str)->dict:
 
 
 def get_next_scene(scene_id: Optional[str]=None)->dict:
-    scenes = query_collection(collection_name='scenes',query={'_id':scene_id})
+    scenes = query_collection(collection_name='scenes',query={'previous_scene':scene_id})
     return None if len(scenes) == 0 else scenes[0]
     
 def get_all_scenes_in_order(world_name: str):

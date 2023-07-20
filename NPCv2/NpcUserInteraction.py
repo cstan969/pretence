@@ -111,8 +111,9 @@ class NpcUserInteraction():
             npc_emotional_response=response['npc_emotional_response'],
             # npc_emotional_state=final_emotional_state
             )
-        mark_objectives_completed(objectives_completed=response['objectives_completed'],scene_id=self.scene_id,user_name=self.user_name)
-        if all(val == 'completed' for val in response['objectives_completed'].values()):
+        # mark the objectives that've been completed.  The output is the DB item with full list of completed objectives from the database
+        updated_item = mark_objectives_completed(objectives_completed=response['objectives_completed'],scene_id=self.scene_id,user_name=self.user_name)
+        if all(val == 'completed' for val in updated_item['objectives_completed'].values()):
             #mark the scene as the current scene in the world that the user is on
             progress_user_to_next_scene(world_name=self.world_name,user_name=self.user_name)
             response['scene_completed'] = True

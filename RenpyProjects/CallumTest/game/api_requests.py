@@ -37,5 +37,5 @@ def get_progress_of_user_in_game(world_name: str, user_name: str):
 
 def get_scene(scene_id: str):
     '''grab the dictionary scene document given the scene_id'''
-    response = requests.get('http://localhost:8002/get_scene',json={'scene_id': scene_id})
+    response = requests.post('http://localhost:8002/get_scene',json={'scene_id': scene_id})
     return response.json()
