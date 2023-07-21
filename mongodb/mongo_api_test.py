@@ -89,3 +89,5 @@ async def get_user(user_name: str):
         return {"user": user}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+

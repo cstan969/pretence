@@ -36,7 +36,7 @@ class NpcUserInteraction():
         self.npc_name=npc_name
         self.user_name = user_name
         self.llm = ChatOpenAI(model='gpt-3.5-turbo')
-        self.npc_info = get_npc(world_name,npc_name)
+        self.npc = get_npc(world_name,npc_name)
 
     def calculate_new_emotional_state(self, npc_emotional_response: dict):
         '''
@@ -57,7 +57,7 @@ class NpcUserInteraction():
         final_emotional_state = {}
         for emotion, value in npc_emotional_response.items():
             if value != 0:
-                final_emotional_state[emotion] = initial_emotional_state[emotion] + npc_emotional_response[emotion] * self.npc_info['emotional_susceptibility'][emotion] / 10
+                final_emotional_state[emotion] = initial_emotional_state[emotion] + npc_emotional_response[emotion] * self.npc['emotional_susceptibility'][emotion] / 10
             else:
                 final_emotional_state[emotion] = max([initial_emotional_state[emotion] - 0.2,0])
         return final_emotional_state
@@ -111,8 +111,9 @@ class NpcUserInteraction():
             npc_emotional_response=response['npc_emotional_response'],
             # npc_emotional_state=final_emotional_state
             )
-        mark_objectives_completed(objectives_completed=response['objectives_completed'],scene_id=self.scene_id,user_name=self.user_name)
-        if all(val == 'completed' for val in response['objectives_completed'].values()):
+        # mark the objectives that've been completed.  The output is the DB item with full list of completed objectives from the database
+        updated_item = mark_objectives_completed(objectives_completed=response['objectives_completed'],scene_id=self.scene_id,user_name=self.user_name)
+        if all(val == 'completed' for val in updated_item['objectives_completed'].values()):
             #mark the scene as the current scene in the world that the user is on
             progress_user_to_next_scene(world_name=self.world_name,user_name=self.user_name)
             response['scene_completed'] = True
@@ -158,11 +159,17 @@ class NpcUserInteraction():
 
     def _load_npc_in_world_prompt(self):
         world_json = get_world(world_name=self.world_name)[0]
-        world_npc_prompt = world_json['world_npc_prompt']
-        return """GAME INFORMATION: {world_npc_prompt}\n\n""".format(world_npc_prompt=world_json['world_npc_prompt'])
+        if 'world_npc_prompt' in world_json:
+            world_npc_prompt = world_json['world_npc_prompt']
+        elif 'world_description' in world_json:
+            world_npc_prompt = world_json['world_description']
+        else:
+            world_npc_prompt = ""
+        return """GAME INFORMATION: {world_npc_prompt}\n\n""".format(world_npc_prompt=world_npc_prompt)
     
     def _load_npc_prompt(self):
-        prompt_info = json.dumps({k: v for k,v in self.npc_info.items() if k in ['personality','role']})
+        print('self.npc: ', self.npc)
+        prompt_info = json.dumps({k: v for k,v in self.npc.items() if k in ['personality','role']})
         starter_prompt = """Here is information pertaining to {npc_name}:\n""".format(npc_name=self.npc_name) + prompt_info
         return starter_prompt
     

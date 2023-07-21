@@ -25,17 +25,19 @@ app.add_middleware(
 
 @app.post("/upsert_npc")
 async def upsert_npc(q: dict):
-    fncs.upsert_npc(
+    npc = fncs.upsert_npc(
         world_name=q['world_name'],
         npc_name=q['npc_name'],
-        npc_metadata=q['npc_metadata']
+        npc_metadata={k:v for k,v in q.items() if k not in ['world_name','npc_name']}
     )
-    return {"message": "NPC upserted successfully"}
+    return npc
 
 @app.post("/get_npcs_in_world")
 async def get_npcs_in_world(q:dict):
-    npcs = fncs.get_npcs_in_world(world_name=q['world_name'])
-    return {"npcs": [npc['npc_name'] for npc in npcs]}
+    world_name = q['world_name']
+    npcs = fncs.get_npcs_in_world(world_name=world_name)
+    # # return {"npcs": [npc['npc_name'] for npc in npcs]}
+    return npcs
 
 @app.get("/get_npc")
 async def get_npc(world_name: str, npc_name: str):
@@ -49,13 +51,13 @@ async def delete_npc(world_name: str, npc_name: str):
 
 @app.post("/upsert_world")
 async def upsert_world(q:dict):
-    fncs.upsert_world(world_name=q['world_name'])
-    return {"message": "World upserted successfully"}
+    return fncs.upsert_world(world_name=q['world_name'],data={k:v for k,v in q.items() if k not in ['world_name']})
 
 @app.get("/get_all_worlds")
 async def get_all_worlds():
     worlds = fncs.get_all_worlds()
-    return {"worlds": [world['world_name'] for world in worlds]}
+    # return {"worlds": [world['world_name'] for world in worlds]}
+    return {"worlds": worlds}
 
 @app.get("/get_world")
 async def get_world(world_name: str):
@@ -64,14 +66,13 @@ async def get_world(world_name: str):
 
 @app.post("/upsert_user")
 async def upsert_user(q:dict):
-    fncs.upsert_user(
-        user_name=q['user_name'])
-    return {"message": "User upserted successfully"}
+    return fncs.upsert_user(user_name=q['user_name'])
 
 @app.get("/get_all_users")
 async def get_all_users():
     users = fncs.get_all_users()
-    return {"users": [user['user_name'] for user in users]}
+    return users
+    # return {"users": [user['user_name'] for user in users]}
 
 @app.get("/get_user")
 async def get_user(user_name: str):
@@ -85,11 +86,56 @@ async def get_progress_of_user_in_game(q: dict):
     scene_id = fncs.get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
     return {"scene_id": scene_id}
 
-@app.get("/get_scene")
+@app.post("/get_scene")
 async def get_scene(q: dict):
     scene_id=q['scene_id']
     scene = fncs.get_scene(scene_id=scene_id)
     return {"scene": scene}
 
-# if __name__ == '__main__':
-#     uvicorn.run(app,host='127.0.0.1', port=8002)
+@app.post("/update_scene")
+async def update_scene(q: dict):
+    upserted_item = fncs.update_scene(scene_id=q['_id'],scene_info={k:v for k,v in q.items() if k not in ['_id']})
+    return upserted_item
+
+@app.post("/insert_scene")
+async def insert_scene(q: dict):
+    scene = fncs.insert_scene(
+        world_name=q['world_name'],
+        scene_info={k:v for k,v in q.items() if k not in ['_id','world_name','previous_scene']},
+        previous_scene=q['previous_scene']
+    )
+    return scene
+
+
+@app.post("/get_all_scenes_in_order")
+async def get_all_scenes_in_order(q: dict):
+    scenes = fncs.get_all_scenes_in_order(world_name=q['world_name'])
+    return {'scenes': scenes}
+
+
+
+
+################################
+#####MULTI COLLECTION CALLS#####
+#####ALSO SORT OF RENPY STUAFF##
+################################
+
+# @app.post("/reset_game_for_user")
+# async def reset_game_for_user(q:dict):
+#     return fncs.reset_game_for_user(world_name=q['world_name'],user_name=q['user_name'])
+
+# @app.post("/set_renpy_init_state")
+# async def set_renpy_init_state(q:dict)->dict:
+#     return fncs.set_renpy_init_state(world_name=q['world_name'],user_name=q['user_name'])
+
+@app.get("/get_renpy_init_state")
+async def get_renpy_init_state()->dict:
+    return fncs.get_renpy_init_state()
+
+@app.post("/play_test_scene_in_renpy")
+async def play_test_scene_in_renpy(q:dict):
+    fncs.play_test_scene_in_renpy(world_name=q['world_name'],scene_id=q['scene_id'])
+
+@app.post("/play_world_in_renpy")
+async def play_world_in_renpy(q:dict):
+    fncs.play_world_in_renpy(world_name=q['world_name'],user_name=q['user_name'])

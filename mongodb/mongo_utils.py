@@ -21,6 +21,7 @@ def upsert_item(collection_name, item):
             item['last_updated'] = get_current_datetime_as_string()
             query = {'_id': item['_id']}
             collection.update_one(query, {'$set': item}, upsert=True)
+            return item
         finally:
             client.close()
 

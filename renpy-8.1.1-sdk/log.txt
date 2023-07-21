@@ -1,4 +1,4 @@
-Mon Jul 17 07:45:21 2023
+Fri Jul 21 09:25:00 2023
 Linux-5.19.0-46-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -33,7 +33,7 @@ Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.09s
+Interface start. took 0.08s
 
 Initializing gl2 renderer:
 primary display bounds: (1920, 0, 1920, 1080)
@@ -45,36 +45,3 @@ Version: b'4.6.0 NVIDIA 525.125.06'
 Display Info: None
 Screen sizes: virtual=(800, 600) physical=(800, 600) drawable=(800, 600)
 Maximum texture size: 4096x4096
-Traceback (most recent call last):
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/lib/py3-linux-x86_64/../../renpy.py", line 244, in <module>
-    main()
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/lib/py3-linux-x86_64/../../renpy.py", line 240, in main
-    renpy.bootstrap.bootstrap(renpy_base)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/bootstrap.py", line 275, in bootstrap
-    renpy.main.main()
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/main.py", line 670, in main
-    run(restart)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/main.py", line 144, in run
-    renpy.execution.run_context(True)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/execution.py", line 953, in run_context
-    context.run()
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/execution.py", line 596, in run
-    node.execute()
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 2259, in execute
-    self.call("execute")
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 2241, in call
-    return renpy.statements.call(method, parsed, *args, **kwargs)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/statements.py", line 342, in call
-    return method(parsed, *args, **kwargs)
-  File "renpy/common/000statements.rpy", line 670, in execute_call_screen
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/exports.py", line 3345, in call_screen
-    rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ui.py", line 299, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/core.py", line 3579, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/core.py", line 4313, in interact_core
-    ev = self.event_wait()
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/core.py", line 3123, in event_wait
-    ev = pygame.event.wait()
-KeyboardInterrupt
