@@ -66,14 +66,13 @@ async def get_world(world_name: str):
 
 @app.post("/upsert_user")
 async def upsert_user(q:dict):
-    fncs.upsert_user(
-        user_name=q['user_name'])
-    return {"message": "User upserted successfully"}
+    return fncs.upsert_user(user_name=q['user_name'])
 
 @app.get("/get_all_users")
 async def get_all_users():
     users = fncs.get_all_users()
-    return {"users": [user['user_name'] for user in users]}
+    return users
+    # return {"users": [user['user_name'] for user in users]}
 
 @app.get("/get_user")
 async def get_user(user_name: str):
@@ -113,5 +112,30 @@ async def get_all_scenes_in_order(q: dict):
     scenes = fncs.get_all_scenes_in_order(world_name=q['world_name'])
     return {'scenes': scenes}
 
-# if __name__ == '__main__':
-#     uvicorn.run(app,host='127.0.0.1', port=8002)
+
+
+
+################################
+#####MULTI COLLECTION CALLS#####
+#####ALSO SORT OF RENPY STUAFF##
+################################
+
+# @app.post("/reset_game_for_user")
+# async def reset_game_for_user(q:dict):
+#     return fncs.reset_game_for_user(world_name=q['world_name'],user_name=q['user_name'])
+
+# @app.post("/set_renpy_init_state")
+# async def set_renpy_init_state(q:dict)->dict:
+#     return fncs.set_renpy_init_state(world_name=q['world_name'],user_name=q['user_name'])
+
+@app.get("/get_renpy_init_state")
+async def get_renpy_init_state()->dict:
+    return fncs.get_renpy_init_state()
+
+@app.post("/play_test_scene_in_renpy")
+async def play_test_scene_in_renpy(q:dict):
+    fncs.play_test_scene_in_renpy(world_name=q['world_name'],scene_id=q['scene_id'])
+
+@app.post("/play_world_in_renpy")
+async def play_world_in_renpy(q:dict):
+    fncs.play_world_in_renpy(world_name=q['world_name'],user_name=q['user_name'])

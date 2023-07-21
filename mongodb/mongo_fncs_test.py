@@ -82,6 +82,11 @@ class mongo_fncs_unittests(TestCase):
     def test_progress_user_to_next_scene(self):
         progress_user_to_next_scene(world_name='NocturnalVeil',user_name='Carl5')
 
+    def test_play_test_scene_in_renpy(self):
+        world_name='NocturnalVeil'
+        scene_id='scenes-NocturnalVeil-07112023093300'
+        play_test_scene_in_renpy(world_name=world_name,scene_id=scene_id)
+
 
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
@@ -89,7 +94,8 @@ tc = mongo_fncs_unittests()
 # tc.test_collection_worlds()
 # tc.test_collection_scenes()
 # tc.test_get_scene_objectives_completed()
-tc.test_progress_user_to_next_scene()
+# tc.test_progress_user_to_next_scene()
+tc.test_play_test_scene_in_renpy()
 
 
 

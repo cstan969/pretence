@@ -36,7 +36,7 @@ class NpcUserInteraction():
         self.npc_name=npc_name
         self.user_name = user_name
         self.llm = ChatOpenAI(model='gpt-3.5-turbo')
-        self.npc_info = get_npc(world_name,npc_name)
+        self.npc = get_npc(world_name,npc_name)
 
     def calculate_new_emotional_state(self, npc_emotional_response: dict):
         '''
@@ -57,7 +57,7 @@ class NpcUserInteraction():
         final_emotional_state = {}
         for emotion, value in npc_emotional_response.items():
             if value != 0:
-                final_emotional_state[emotion] = initial_emotional_state[emotion] + npc_emotional_response[emotion] * self.npc_info['emotional_susceptibility'][emotion] / 10
+                final_emotional_state[emotion] = initial_emotional_state[emotion] + npc_emotional_response[emotion] * self.npc['emotional_susceptibility'][emotion] / 10
             else:
                 final_emotional_state[emotion] = max([initial_emotional_state[emotion] - 0.2,0])
         return final_emotional_state
@@ -168,7 +168,8 @@ class NpcUserInteraction():
         return """GAME INFORMATION: {world_npc_prompt}\n\n""".format(world_npc_prompt=world_npc_prompt)
     
     def _load_npc_prompt(self):
-        prompt_info = json.dumps({k: v for k,v in self.npc_info.items() if k in ['personality','role']})
+        print('self.npc: ', self.npc)
+        prompt_info = json.dumps({k: v for k,v in self.npc.items() if k in ['personality','role']})
         starter_prompt = """Here is information pertaining to {npc_name}:\n""".format(npc_name=self.npc_name) + prompt_info
         return starter_prompt
     

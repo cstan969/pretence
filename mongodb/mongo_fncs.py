@@ -3,6 +3,9 @@ from mongodb.mongo_utils import query_collection, upsert_item, delete_items, get
 # from mongodb.mongo_utils import query_collection, upsert_item, delete_items
 from datetime import datetime
 import pprint
+import os
+import subprocess
+from config import RENPY_SH_PATH
 
 #####USERS#####
 def upsert_user(user_name:str):
@@ -170,6 +173,7 @@ def get_next_scene(scene_id: Optional[str]=None)->dict:
 def get_all_scenes_in_order(world_name: str):
     ''''Return all of the scenes for some world in order'''
     scenes = query_collection(collection_name='scenes',query={'world_name':world_name})
+    print(scenes)
     if len(scenes) == 0:
         return []
     else:
@@ -250,3 +254,54 @@ def progress_user_to_next_scene(world_name:str, user_name:str):
     }
     upsert_item(collection_name='progress_of_user_in_game',item=item_to_upsert)
 
+def set_scene_the_user_is_in(world_name: str, user_name: str, scene_id: str):
+    item_to_upsert = {
+        '_id': '-'.join(['progress_of_user_in_game',world_name,user_name]),
+        'world_name': world_name,
+        'user_name': user_name,
+        'scene_id': scene_id
+    }
+    upsert_item(collection_name='progress_of_user_in_game',item=item_to_upsert)
+
+
+################################
+#####MULTI COLLECTION CALLS#####
+#####ALSO SORT OF RENPY STUAFF##
+################################
+
+def reset_game_for_user(world_name: str, user_name: str):
+    delete_items(collection_name='progress_of_user_in_game',query={'world_name':world_name,'user_name':user_name})
+    delete_items(collection_name='scene_objectives_completed',query={'world_name':world_name,'user_name':user_name})
+    delete_items(collection_name='user_npc_interactions',query={'world_name':world_name,'user_name':user_name})
+    return
+
+def set_renpy_init_state(world_name: str, user_name: str):
+    item_to_upsert = {
+        '_id': 'renpy_init_state',
+        'world_name': world_name,
+        'user_name': user_name
+    }
+    upsert_item(collection_name='renpy_init_state', item = item_to_upsert)
+
+
+def get_renpy_init_state():
+    items = query_collection(collection_name='renpy_init_state',query={'_id': 'renpy_init_state'})
+    print(items)
+    return None if items is None else items[0]
+
+def play_test_scene_in_renpy(world_name: str, scene_id: str):
+    user_name='James Thomas Stanhope'
+    reset_game_for_user(world_name=world_name, user_name=user_name)
+    set_renpy_init_state(world_name=world_name,user_name=user_name)
+    set_scene_the_user_is_in(world_name=world_name,user_name=user_name,scene_id=scene_id)
+    os.system('pkill renpy')
+    os.system(RENPY_SH_PATH + " &")
+    # subprocess.Popen(['pkill','renpy'])
+    # subprocess.Popen([RENPY_SH_PATH])
+
+def play_world_in_renpy(world_name: str, user_name: str):
+    set_renpy_init_state(world_name=world_name,user_name=user_name)
+    # subprocess.Popen(['pkill','renpy'])
+    # subprocess.Popen([RENPY_SH_PATH])
+    os.system('pkill renpy')
+    os.system(RENPY_SH_PATH + " &")

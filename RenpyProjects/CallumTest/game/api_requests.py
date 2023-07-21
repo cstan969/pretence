@@ -39,3 +39,8 @@ def get_scene(scene_id: str):
     '''grab the dictionary scene document given the scene_id'''
     response = requests.post('http://localhost:8002/get_scene',json={'scene_id': scene_id})
     return response.json()
+
+def get_renpy_init_state():
+    '''grab the renpy init state (e.g. user_name and world_name) from mongo db'''
+    response = requests.get('http://localhost:8002/get_renpy_init_state')
+    return response.json()
