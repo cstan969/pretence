@@ -59,10 +59,10 @@ async def get_all_worlds():
     # return {"worlds": [world['world_name'] for world in worlds]}
     return {"worlds": worlds}
 
-@app.get("/get_world")
-async def get_world(world_name: str):
-    world = fncs.get_world(world_name)
-    return {"world": world}
+@app.post("/get_world")
+async def get_world(q: dict)->dict:
+    world = fncs.get_world(q['world_name'])
+    return world
 
 @app.post("/upsert_user")
 async def upsert_user(q:dict):

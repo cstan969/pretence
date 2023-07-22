@@ -36,6 +36,7 @@ class NpcUserInteraction():
         self.npc_name=npc_name
         self.user_name = user_name
         self.llm = ChatOpenAI(model='gpt-3.5-turbo')
+        # self.llm = ChatOpenAI(model=NpcUserInteraction_model)
         self.npc = get_npc(world_name,npc_name)
 
     def calculate_new_emotional_state(self, npc_emotional_response: dict):
@@ -158,7 +159,7 @@ class NpcUserInteraction():
             return ""
 
     def _load_npc_in_world_prompt(self):
-        world_json = get_world(world_name=self.world_name)[0]
+        world_json = get_world(world_name=self.world_name)
         if 'world_npc_prompt' in world_json:
             world_npc_prompt = world_json['world_npc_prompt']
         elif 'world_description' in world_json:

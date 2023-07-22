@@ -11,6 +11,7 @@ port_allocations={
 'TTSAPI':8005
 }
 
+GPT4 = 'gpt-4'
 TURBO = 'gpt-3.5-turbo'
 VICUNA = 'vicuna-7b-1.1-16bit'
 STARCODER = 'starcoder'
@@ -18,7 +19,7 @@ STARCODER = 'starcoder'
 
 EXTRACTOR_MODEL= TURBO
 GameDesigner_model = TURBO
-NpcUserInteraction_model = TURBO
+NpcUserInteraction_model = GPT4
 NPCBUILDER_MODEL = LlamaCpp
 
 server = "localhost"

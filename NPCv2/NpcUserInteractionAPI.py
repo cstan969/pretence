@@ -27,7 +27,7 @@ async def get_conversation(q: dict)->dict:
     world_name=q['world_name']
     npc_name = q['npc_name']
     user_name = q['user_name']
-    user_interaction = NpcUserInteraction(world_name=q['world_name'],npc_name=npc_name,user_name=user_name)
+    user_interaction = NpcUserInteraction(world_name=world_name,npc_name=npc_name,user_name=user_name)
     conversation = user_interaction.get_conversation()
     return {"conversation": conversation}
 
@@ -43,5 +43,5 @@ async def message_npc_and_get_response(q: dict)->dict:
     return response
 
 
-if __name__ == '__main__':
-    uvicorn.run(app,host='127.0.0.1', port=8001)
+# if __name__ == '__main__':
+#     uvicorn.run(app,host='127.0.0.1', port=8001)

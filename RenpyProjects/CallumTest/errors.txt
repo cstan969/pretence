@@ -2,8 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 45: invalid syntax
-            if 'narration_outro' in self.scene
+File "game/script.rpy", line 105: expected statement.
+    break
+         ^
 
 Ren'Py Version: Ren'Py 8.1.1.23060707
-Wed Jul 12 22:35:23 2023
+Sat Jul 22 01:32:50 2023
