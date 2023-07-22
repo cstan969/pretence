@@ -50,12 +50,9 @@ npc:  Olivia Sinclair
 Olivia Sinclair
 into play_narration_intro
 narration_intro in self.scene
-intro narration placeholder for chapter 1 scene 2.
-Thank you.
-False
-I'm... *sniffle*... I'm... trying to... cope.
-False
-Thank you for your understanding. It's just... so hard... to lose him.
-False
-I... I was... here... when it happened. I... heard a... loud noise... and then... I found him... *sobs*
+intro narration placeholder fScreen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
+Maximum texture size: 4096x4096
+. loud noise... and then... I found him... *sobs*
 False
