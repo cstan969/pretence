@@ -147,6 +147,7 @@ const WorldCreator = () => {
         objectives: currentScene.objectives,
         NPCs: {
         ...currentScene.NPCs,
+        previous_scene: scenes.find(scene => scene.scene_name === currentScene.previous_scene)._id,
         [sceneNpcName]: {
           ...currentScene.NPCs[sceneNpcName],
           scene_npc_prompt: sceneNpcPrompt
@@ -168,7 +169,7 @@ const WorldCreator = () => {
     const newScene = { 
       world_name: currentWorld.world_name, 
       scene_name: currentScene.scene_name, 
-      previous_scene: currentScene.previous_scene,
+      previous_scene: scenes.find(scene => scene.scene_name === currentScene.previous_scene)._id,
       NPCs: {
         ...currentScene.NPCs,
         [sceneNpcName]: {
@@ -257,8 +258,9 @@ const WorldCreator = () => {
             <h1>Select a Scene:</h1>
             {scenes.map((scene) => (
                 <button key={scene._id} onClick={() => {
-                    setCurrentScene(scene);
-                    console.log(scene)
+                    const matchedScene = scenes.find(scene2 => scene2._id === scene.previous_scene);
+                    const previous_scene_name_from_id = matchedScene ? matchedScene.scene_name : '';
+                    setCurrentScene({...scene, previous_scene: previous_scene_name_from_id});
                     const npcName = scene.NPCs ? Object.keys(scene.NPCs)[0] : '';
                     const npcPrompt = scene.NPCs && scene.NPCs[npcName] ? scene.NPCs[npcName].scene_npc_prompt : '';
                     setSceneNpcName(npcName);
@@ -298,13 +300,13 @@ const WorldCreator = () => {
                     <div className="input-group">
                         <label>Previous Scene</label>
                         <select 
-                            value={currentScene.previous_scene || ''} 
-                            onChange={(e) => setCurrentScene({ ...currentScene, previous_scene: e.target.value })}>
-                            <option value="">Select previous scene</option>
-                            {scenes.map((scene, index) => (
-                            <option key={index} value={scene.scene_name}>{scene.scene_name}</option>
-                            ))}
-                        </select>
+                                value={currentScene.previous_scene || ''} 
+                                onChange={(e) => setCurrentScene({ ...currentScene, previous_scene: e.target.value })}>
+                                <option value="">Select previous scene</option>
+                                {scenes.map((scene, index) => (
+                                <option key={index} value={scene.scene_name}>{scene.scene_name}</option>
+                                ))}
+                            </select>
                     </div>
                     <div className="input-group">
                         <label>NPC Name</label>
@@ -369,6 +371,7 @@ const WorldCreator = () => {
                                 ))}
                             </select>
                         </div>
+
                         <div className="input-group">
                             <label>NPC Name</label>
                             <select 
