@@ -1,4 +1,4 @@
-Fri Jul 21 09:25:02 2023
+Sat Jul 22 02:11:29 2023
 Linux-5.19.0-46-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -10,7 +10,10 @@ Loading error handling. took 0.01s
 Loading script. took 0.03s
 Loading save slot metadata. took 0.01s
 Loading persistent. took 0.00s
-Running init code. took 0.04s
+into game init
+world_name:  NocturnalVeil
+self.world:  {'_id': 'worlds-NocturnalVeil', 'world_name': 'NocturnalVeil', 'last_updated': '2023-07-22 00:23:19', 'world_npc_prompt': 'Neo-Noir Crime Drama', 'world_description': 'In a sprawling metropolis plagued by corruption and shadows, players navigate a dark and mysterious world where alliances are fragile, secrets lurk around every corner, and the line between good and evil is blurred. As a skilled detective, they must unravel complex mysteries, confront formidable adversaries, and make critical choices that shape the destiny of the city. With immersive storytelling, atmospheric visuals, and a morally ambiguous atmosphere, the game plunges players into a gripping noir-inspired journey where truth and justice hang in the balance.', 'narration_intro_full': 'Welcome to "Nocturnal Veil," an enthralling noir-inspired visual novel set in the enigmatic metropolis of Newhaven. In this shadowy world, where secrets and corruption intertwine, you step into the shoes of a new detective, an outsider with a sharp mind and unyielding resolve, ready to navigate the city\'s murky underbelly.\n\nAs a rookie investigator, you find yourself thrown into the heart of darkness when a high-profile murder sends ripples through Newhaven. With alliances fragile and trust scarce, every decision you make will shape your investigation\'s destiny and the lives caught in a web of deceit. The secrets concealed by the city\'s nocturnal veil lie before you, waiting to be unraveled.\n\nIn "Nocturnal Veil," your choices carry weight, and the consequences of your actions will define the story\'s course. Will you chase the elusive truth or become entangled in the city\'s sinister undercurrents? Prepare to immerse yourself in a gripping narrative of mystery, suspense, and intriguing characters, as you embark on an unpredictable journey through the dark and enigmatic "Nocturnal Veil."', 'narration_intro': 'game narration intro placeholder', 'narration_outro': ''}
+Running init code. took 0.05s
 Loading analysis data. took 0.01s
 Analyze and compile ATL. took 0.00s
 Reloading save slot metadata. took 0.01s
@@ -27,7 +30,7 @@ Build styles took 0.00s
 Load screen analysis took 0.01s
 Analyze screens took 0.00s
 Save screen analysis took 0.00s
-Prepare screens took 0.02s
+Prepare screens took 0.03s
 Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
@@ -46,13 +49,40 @@ Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
 Maximum texture size: 4096x4096
-npc:  Olivia Sinclair
-Olivia Sinclair
+into world narration intro
+{'_id': 'worlds-NocturnalVeil', 'world_name': 'NocturnalVeil', 'last_updated': '2023-07-22 00:23:19', 'world_npc_prompt': 'Neo-Noir Crime Drama', 'world_description': 'In a sprawling metropolis plagued by corruption and shadows, players navigate a dark and mysterious world where alliances are fragile, secrets lurk around every corner, and the line between good and evil is blurred. As a skilled detective, they must unravel complex mysteries, confront formidable adversaries, and make critical choices that shape the destiny of the city. With immersive storytelling, atmospheric visuals, and a morally ambiguous atmosphere, the game plunges players into a gripping noir-inspired journey where truth and justice hang in the balance.', 'narration_intro_full': 'Welcome to "Nocturnal Veil," an enthralling noir-inspired visual novel set in the enigmatic metropolis of Newhaven. In this shadowy world, where secrets and corruption intertwine, you step into the shoes of a new detective, an outsider with a sharp mind and unyielding resolve, ready to navigate the city\'s murky underbelly.\n\nAs a rookie investigator, you find yourself thrown into the heart of darkness when a high-profile murder sends ripples through Newhaven. With alliances fragile and trust scarce, every decision you make will shape your investigation\'s destiny and the lives caught in a web of deceit. The secrets concealed by the city\'s nocturnal veil lie before you, waiting to be unraveled.\n\nIn "Nocturnal Veil," your choices carry weight, and the consequences of your actions will define the story\'s course. Will you chase the elusive truth or become entangled in the city\'s sinister undercurrents? Prepare to immerse yourself in a gripping narrative of mystery, suspense, and intriguing characters, as you embark on an unpredictable journey through the dark and enigmatic "Nocturnal Veil."', 'narration_intro': 'game narration intro placeholder', 'narration_outro': ''}
+Forensic Detective
 into play_narration_intro
 narration_intro in self.scene
-intro narration placeholder fScreen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
-Maximum texture size: 4096x4096
-. loud noise... and then... I found him... *sobs*
-False
+scene intro place holder
+
+Full traceback:
+  File "game/script.rpy", line 128, in script call
+    call run_scenes
+  File "game/script.rpy", line 110, in script
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "game/script.rpy", line 110, in <module>
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "game/script.rpy", line 41, in message_npc_and_get_response
+    response = api_requests.message_npc_and_get_response(
+  File "api_requests.py", line 26, in message_npc_and_get_response
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/models.py", line 897, in json
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/__init__.py", line 346, in loads
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 337, in decode
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 355, in raw_decode
+JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+While running game code:
+  File "game/script.rpy", line 128, in script call
+    call run_scenes
+  File "game/script.rpy", line 110, in script
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "game/script.rpy", line 110, in <module>
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "game/script.rpy", line 41, in message_npc_and_get_response
+    response = api_requests.message_npc_and_get_response(
+JSONDecodeError: Expecting value: line 1 column 1 (char 0)

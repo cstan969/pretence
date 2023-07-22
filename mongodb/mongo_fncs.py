@@ -36,7 +36,9 @@ def get_all_worlds():
     return query_collection(collection_name='worlds',query={})
 
 def get_world(world_name:str):
-    return query_collection(collection_name='worlds',query={'world_name':world_name})
+    print('world_name passed to get_world: ', world_name)
+    worlds = query_collection(collection_name='worlds',query={'world_name':world_name})
+    return None if worlds is None else worlds[0]
 
 
 #####NPCS#####

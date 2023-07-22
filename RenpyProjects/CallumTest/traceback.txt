@@ -1,26 +1,30 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 91, in script
+  File "game/script.rpy", line 128, in script call
+    call run_scenes
+  File "game/script.rpy", line 110, in script
     $ response, scene_completed = game.message_npc_and_get_response(user_input)
-  File "game/script.rpy", line 91, in <module>
+  File "game/script.rpy", line 110, in <module>
     $ response, scene_completed = game.message_npc_and_get_response(user_input)
-  File "game/script.rpy", line 37, in message_npc_and_get_response
+  File "game/script.rpy", line 41, in message_npc_and_get_response
     response = api_requests.message_npc_and_get_response(
 JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 91, in script
+  File "game/script.rpy", line 128, in script call
+    call run_scenes
+  File "game/script.rpy", line 110, in script
     $ response, scene_completed = game.message_npc_and_get_response(user_input)
   File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
     renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
   File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
     exec(bytecode, globals, locals)
-  File "game/script.rpy", line 91, in <module>
+  File "game/script.rpy", line 110, in <module>
     $ response, scene_completed = game.message_npc_and_get_response(user_input)
-  File "game/script.rpy", line 37, in message_npc_and_get_response
+  File "game/script.rpy", line 41, in message_npc_and_get_response
     response = api_requests.message_npc_and_get_response(
   File "api_requests.py", line 26, in message_npc_and_get_response
   File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/models.py", line 897, in json
@@ -32,4 +36,4 @@ JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 Linux-5.19.0-46-generic-x86_64-with-glibc2.35 x86_64
 Ren'Py 8.1.1.23060707
 CallumTest 1.0
-Thu Jul 20 13:22:49 2023
+Sat Jul 22 02:11:59 2023

@@ -44,3 +44,8 @@ def get_renpy_init_state():
     '''grab the renpy init state (e.g. user_name and world_name) from mongo db'''
     response = requests.get('http://localhost:8002/get_renpy_init_state')
     return response.json()
+
+def get_world(world_name: str):
+    '''grab the world from mongo db'''
+    response = requests.post('http://localhost:8002/get_world',json={'world_name': world_name})
+    return response.json()

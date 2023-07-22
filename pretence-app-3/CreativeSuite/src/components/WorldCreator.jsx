@@ -7,12 +7,22 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 
 const WorldCreator = () => {
-  const [worlds, setWorlds] = useState([]);
+  //user variables
   const [users, setUsers] = useState([]);
-  const [currentWorld, setCurrentWorld] = useState(null);
-  const [description, setDescription] = useState('');
-  const [newWorldName, setNewWorldName] = useState('');
   const [newUserName, setNewUserName] = useState('');
+  //world variables
+  const [worlds, setWorlds] = useState([]);
+  const [currentWorld, setCurrentWorld] = useState({
+    world_description: "",
+    narration_intro: "",
+    narration_outro: ""
+  });
+  const [worldDescription, setWorldDescription] = useState('');
+  const [worldNarrationIntro, setWorldNarrationIntro] = useState('');
+  const [worldNarrationOutro, setWorldNarrationOutro] = useState('');
+
+  const [newWorldName, setNewWorldName] = useState('');
+  
   const [showPopup, setShowPopup] = useState(false);
   const [showPopupNewUser, setShowPopupNewUser] = useState(false);
   const [editorOption, setEditorOption] = useState(null);
@@ -33,8 +43,10 @@ const WorldCreator = () => {
   const [newNpcName, setNewNpcName] = useState('');
   const [newNpcPersonality, setNewNpcPersonality] = useState('');
   const [isNewScene, setIsNewScene] = useState(true);
+  //play game as user variables
   const [playGameWorld, setPlayGameWorld] = useState('')
   const [playGameUser, setPlayGameUser] = useState('')
+  //play test world/scene variables
   const [playTestSceneWorld, setPlayTestSceneWorld] = useState('')
   const [playTestSceneScene, setPlayTestSceneScene] = useState('')
   const [playTestScenes, setPlayTestScenes] = useState([])
@@ -135,7 +147,12 @@ const WorldCreator = () => {
 
 
   const saveWorldChanges = () => {
-    const updatedWorld = {...currentWorld, world_description: description};
+    const updatedWorld = {
+        ...currentWorld,
+        world_description: worldDescription,
+        narration_intro: worldNarrationIntro,
+        narration_outro: worldNarrationOutro
+    };
     axios.post('http://127.0.0.1:8002/upsert_world/', updatedWorld)
       .then(res => console.log(res))
       .catch(err => console.log(err));
@@ -232,7 +249,15 @@ const WorldCreator = () => {
             <h1>{currentWorld.world_name}</h1>
             <div className="input-group">
               <label>World Description</label>
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
+              <textarea value={worldDescription} onChange={(e) => setWorldDescription(e.target.value)}></textarea>
+            </div>
+            <div className="input-group">
+              <label>Narration Intro</label>
+              <textarea value={worldNarrationIntro} onChange={(e) => setWorldNarrationIntro(e.target.value)}></textarea>
+            </div>
+            <div className="input-group">
+              <label>Narration Outro</label>
+              <textarea value={worldNarrationOutro} onChange={(e) => setWorldNarrationOutro(e.target.value)}></textarea>
             </div>
             <button className="update-button" onClick={saveWorldChanges}>Save Changes to World</button>
           </div>
@@ -463,7 +488,7 @@ const WorldCreator = () => {
     <div>
       <h1><span style={{ textDecoration: 'underline' }}>Select a world to edit</span></h1>
       {worlds.map((world) => (
-        <button key={world._id} onClick={() => {setCurrentWorld(world); setDescription(world.world_description)}}>
+        <button key={world._id} onClick={() => {setCurrentWorld(world); setWorldDescription(world.world_description)}}>
           {world.world_name}
         </button>
       ))}
