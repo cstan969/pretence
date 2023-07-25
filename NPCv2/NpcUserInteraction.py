@@ -33,6 +33,7 @@ class NpcUserInteraction():
     def __init__(self, world_name:str, scene_id:str, npc_name:str, user_name:str):
         self.world_name=world_name
         self.scene_id=scene_id
+        self.scene = get_scene(scene_id=scene_id)
         self.npc_name=npc_name
         self.user_name = user_name
         self.llm = ChatOpenAI(model='gpt-3.5-turbo')
@@ -102,6 +103,18 @@ class NpcUserInteraction():
         print('formatted_npc_response:')
         print(formatted_npc_response)
 
+        
+
+        # mark the objectives that've been completed.  The output is the DB item with full list of completed objectives from the database
+        updated_item = mark_objectives_completed(objectives_completed=response['objectives_completed'],scene_id=self.scene_id,user_name=self.user_name)
+        if all(val == 'completed' for val in updated_item['objectives_completed'].values()):
+            #mark the scene as the current scene in the world that the user is on
+            progress_user_to_next_scene(world_name=self.world_name,user_name=self.user_name)
+            response['scene_completed'] = True
+        else:
+            response['scene_completed'] = False
+
+
         #Save interaction to DB
         upsert_user_npc_interaction(
             world_name=self.world_name,
@@ -112,14 +125,6 @@ class NpcUserInteraction():
             npc_emotional_response=response['npc_emotional_response'],
             # npc_emotional_state=final_emotional_state
             )
-        # mark the objectives that've been completed.  The output is the DB item with full list of completed objectives from the database
-        updated_item = mark_objectives_completed(objectives_completed=response['objectives_completed'],scene_id=self.scene_id,user_name=self.user_name)
-        if all(val == 'completed' for val in updated_item['objectives_completed'].values()):
-            #mark the scene as the current scene in the world that the user is on
-            progress_user_to_next_scene(world_name=self.world_name,user_name=self.user_name)
-            response['scene_completed'] = True
-        else:
-            response['scene_completed'] = False
 
         return response
     
@@ -137,7 +142,7 @@ class NpcUserInteraction():
 
 
     def _load_generic_npc_prompt(self):
-        generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  I will be a player character and seek to achieve the objectives.""".format(npc_name=self.npc_name)
+        generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well.  I will be a player character and seek to achieve the objectives.""".format(npc_name=self.npc_name)
         return generic_npc_prompt
     
     def _load_npc_in_scene_prompt(self):
@@ -150,9 +155,26 @@ class NpcUserInteraction():
 
     def _load_scene_objectives(self):
         try:
-            scene_json = get_scene(scene_id=self.scene_id)
-            prompt = "Here are the objectives the protagonist needs to complete:\n"
-            prompt += str(scene_json['objectives'])
+            objectives = self.scene['objectives']
+            print('objectives: ', objectives)
+            completed_objectives = get_scene_objectives_completed(scene_id=self.scene_id,user_name=self.user_name)
+            print('completed_objectives: ', completed_objectives)
+            if completed_objectives is not None:
+                for index, objective_set in enumerate(objectives):
+                    if not all(completed_objectives.get(objective) == "completed" for objective in objective_set):
+                        objectives_available = objective_set
+                        objectives_unavailable = [obj for sublist in objectives[index:] for obj in sublist]
+                        break
+            else:
+                objectives_available = objectives[0]
+                objectives_unavailable = [obj for sublist in objectives[1:] for obj in sublist]
+
+            print('objectives: ', objectives)
+            print('completed_objectives: ', completed_objectives)
+            prompt = "Here are the objectives the protagonist currently needs to complete:\n"
+            prompt += str(objectives_available)
+            prompt += "\n\nHere are the objectives unavailable to the protagonist.  These objectives cannot be completed yet.\n"
+            prompt += str(objectives_unavailable)
             return prompt
         except Exception as e:
             print('exception: ', str(e))

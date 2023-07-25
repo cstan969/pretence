@@ -2,9 +2,13 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 105: expected statement.
-    break
-         ^
+File "game/script.rpy", line 121: end of line expected.
+    User "[user_input]" {nw}
+                        ^
+
+File "game/script.rpy", line 125: end of line expected.
+    Callum "[response]" {nw}
+                        ^
 
 Ren'Py Version: Ren'Py 8.1.1.23060707
-Sat Jul 22 01:32:50 2023
+Tue Jul 25 14:04:40 2023
