@@ -112,6 +112,9 @@ async def get_all_scenes_in_order(q: dict):
     scenes = fncs.get_all_scenes_in_order(world_name=q['world_name'])
     return {'scenes': scenes}
 
+@app.post("/get_scene_objectives_status")
+async def get_scene_objectives_status(q:dict):
+    return fncs.get_scene_objectives_status(scene_id=q['scene_id'],user_name=q['user_name'])
 
 
 

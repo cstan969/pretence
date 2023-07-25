@@ -185,11 +185,13 @@ def get_all_scenes_in_order(world_name: str):
         while cur_scene in previous_scene_dict:
             ordered_scenes.append(previous_scene_dict[cur_scene])
             cur_scene = previous_scene_dict[cur_scene]['_id']
+    print(ordered_scenes)
     return ordered_scenes
 
 def get_starting_scene_of_world(world_name: str):
     '''returns the starting scene for some world'''
-    scenes = query_collection(collection_name='scenes',query={'world_name':world_name, 'previous_scene': None})
+    scenes = get_all_scenes_in_order(world_name=world_name)
+    print('scenes in order: ', scenes)
     return scenes[0] if len(scenes)>0 else None
 
 def delete_scene(id:str):
@@ -201,27 +203,52 @@ def delete_scene(id:str):
 
 def mark_objectives_completed(objectives_completed: dict, scene_id: str, user_name: str):
     id = '-'.join(['scene_objectives_completed',scene_id,user_name])
+    world_name = query_collection(collection_name='scenes',query={'_id':scene_id})[0]['world_name']
     items = query_collection(collection_name='scene_objectives_completed', query={'_id': id})
     if items == []:
-        scene_objectives = query_collection(collection_name='scenes',query={'_id': scene_id})[0]['objectives']
-        item_to_upsert = {
-            '_id': id,
-            'scene_id': scene_id,
-            'user_name': user_name,
-            'objectives_completed': objectives_completed
-        }
-        upsert_item(collection_name='scene_objectives_completed',item=item_to_upsert)
+        scene_objectives = {objective: 'not_completed' for sublist in query_collection(collection_name='scenes',query={'_id': scene_id})[0]['objectives'] for objective in sublist}
     else:
-        item_to_upsert = items[0]
-        for obj, comp in objectives_completed.items():
-            if comp == "completed":
-                item_to_upsert['objectives_completed'][obj] = "completed"
-        upsert_item(collection_name='scene_objectives_completed',item=item_to_upsert)
+        scene_objectives = items[0]['objectives_completed']
+    for obj,comp in objectives_completed.items():
+        if comp == "completed" and obj in list(scene_objectives):
+            scene_objectives[obj]="completed"
+    item_to_upsert = {
+        '_id': id,
+        'world_name': world_name,
+        'scene_id': scene_id,
+        'user_name': user_name,
+        'objectives_completed': scene_objectives
+    }
+    upsert_item(collection_name='scene_objectives_completed',item=item_to_upsert)
     return item_to_upsert
 
 def get_scene_objectives_completed(scene_id: str, user_name: str):
     items = query_collection(collection_name='scene_objectives_completed', query={'_id':'-'.join(['scene_objectives_completed',scene_id,user_name])})
     return None if len(items)==0 else items[0]['objectives_completed']
+
+def get_scene_objectives_status(scene_id: str, user_name: str):
+    objectives = get_scene(scene_id=scene_id)['objectives']
+    print('objectives: ', objectives)
+    completed_objectives = get_scene_objectives_completed(scene_id=scene_id,user_name=user_name)
+    print('completed_objectives: ', completed_objectives)
+    if completed_objectives is not None:
+        objectives_completed = []
+        objectives_available = []
+        objectives_unavailable = []
+        for index, objective_set in enumerate(objectives):
+            print('objective_set: ', objective_set)
+            if not all(completed_objectives.get(objective) == "completed" for objective in objective_set):
+                objectives_available = objective_set
+                objectives_unavailable = [obj for sublist in objectives[index:] for obj in sublist]
+                objectives_completed.extend([obj for obj in objective_set if completed_objectives.get(obj) == "completed"])
+                break
+            else: #all objectives in set completed
+                objectives_completed.extend(objective_set)
+    else:
+        objectives_completed = []
+        objectives_available = objectives[0]
+        objectives_unavailable = [obj for sublist in objectives[1:] for obj in sublist]
+    return {'completed': objectives_completed,'available': objectives_available,'unavailable':objectives_unavailable}
 
 def delete_user_scene_objectives(scene_id: str, user_name:str):
     delete_items(collection_name='scenes',query={'_id':'-'.join(['scene_objectives_completed',scene_id,user_name])}) 
@@ -232,12 +259,16 @@ def delete_user_scene_objectives(scene_id: str, user_name:str):
 
 def get_progress_of_user_in_game(world_name: str, user_name: str)->str:
     '''Returns the scene_id that a user is up to for some world'''
+    print('world_name: ', world_name)
+    print('user_name: ', user_name)
     items = query_collection(collection_name='progress_of_user_in_game',query={'world_name': world_name,'user_name':user_name})
+    print(items)
     if len(items) > 0:
         return items[0]['scene_id']
     else:
         #return the first scene of the world
         starting_scene = get_starting_scene_of_world(world_name=world_name)
+        print(starting_scene)
         if starting_scene is not None:
             return starting_scene['_id']
         else:

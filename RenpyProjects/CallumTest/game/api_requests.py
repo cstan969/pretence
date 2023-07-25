@@ -49,3 +49,8 @@ def get_world(world_name: str):
     '''grab the world from mongo db'''
     response = requests.post('http://localhost:8002/get_world',json={'world_name': world_name})
     return response.json()
+
+def get_scene_objectives_status(scene_id: str, user_name: str):
+    '''grab the scene objectives status in the form of {'completed':[],'available':[],'unavailable':[]}'''
+    response = requests.post('http://localhost:8002/get_scene_objectives_status',json={'scene_id':scene_id,'user_name':user_name})
+    return response.json()

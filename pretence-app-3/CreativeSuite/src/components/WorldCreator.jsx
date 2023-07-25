@@ -13,6 +13,7 @@ const WorldCreator = () => {
   //world variables
   const [worlds, setWorlds] = useState([]);
   const [currentWorld, setCurrentWorld] = useState({
+    world_name: "",
     world_description: "",
     narration_intro: "",
     narration_outro: ""
@@ -51,22 +52,39 @@ const WorldCreator = () => {
   const [playTestSceneScene, setPlayTestSceneScene] = useState('')
   const [playTestScenes, setPlayTestScenes] = useState([])
 
+  const clearCurrentScene = () => {
+    setCurrentScene({
+      scene_name: "",
+      previous_scene: "",
+      NPCs: {},
+      objectives: [],
+      narration_intro: "",
+      narration_outro: ""
+    });
+    setSceneNpcName("");
+    setSceneNpcPrompt("");
+  };
+
 
   useEffect(() => {
     getAllWorlds()
     getAllUsers()
   }, []);
 
+
   const getAllWorlds = () => {
     axios.get('http://127.0.0.1:8002/get_all_worlds')
-      .then(res => setWorlds(res.data.worlds))
+      .then(res => {
+        console.log('worlds: ', res.data.worlds);
+        setWorlds(res.data.worlds);
+      })
       .catch(err => console.log(err));
   };
 
   const getAllUsers = () => {
     axios.get('http://127.0.0.1:8002/get_all_users')
     .then(res => {
-        // console.log(res.data)
+        console.log('users: ', res.data)
         setUsers(res.data);
     })
     .catch(err => console.log(err));
@@ -91,7 +109,7 @@ const WorldCreator = () => {
   }
 
   const createWorld = () => {
-    setCurrentWorld({world_name: newWorldName, world_description: '' });
+    setCurrentWorld({world_name: newWorldName, world_description: ''});
     setNewWorldName('');
     setShowPopup(false);
   };
@@ -116,6 +134,7 @@ const WorldCreator = () => {
  
 
   const updateScenes = () => {
+    console.log('currentWorld: ', currentWorld)
     if (currentWorld) {
         axios.post('http://127.0.0.1:8002/get_all_scenes_in_order/', { world_name: currentWorld.world_name })
           .then(res => setScenes(res.data.scenes))
@@ -133,7 +152,6 @@ const WorldCreator = () => {
     if (currentWorld) {
         axios.post('http://127.0.0.1:8002/get_npcs_in_world/', { world_name: currentWorld.world_name })  
           .then(res => {
-              console.log(res.data)
               setNpcs(res.data)   
           })
           .catch(err => console.log(err));
@@ -159,16 +177,20 @@ const WorldCreator = () => {
   };
 
   const saveScene = () => {
+    const previousScene = scenes.find(scene => scene.scene_name === currentScene.previous_scene);
+    const previousSceneId = previousScene ? previousScene._id : '';
     const updatedScene = {
         ...currentScene,
-        objectives: currentScene.objectives,
+        // objectives: currentScene.objectives,
+        objectives: currentScene.objectives.map(objective => [...objective]),
+        previous_scene: previousSceneId === '' ? null : previousSceneId,
         NPCs: {
         ...currentScene.NPCs,
-        previous_scene: scenes.find(scene => scene.scene_name === currentScene.previous_scene)._id,
         [sceneNpcName]: {
           ...currentScene.NPCs[sceneNpcName],
           scene_npc_prompt: sceneNpcPrompt
         }}}
+    console.log('updatedScene: ', updatedScene)
     axios.post('http://127.0.0.1:8002/update_scene/', updatedScene)
       .then(res => console.log(res))
       .catch(err => console.log(err));
@@ -203,7 +225,7 @@ const WorldCreator = () => {
         console.log(res);
         setCurrentScene({
           scene_name: "",
-          previous_scene: "",
+          previous_scene: null,
           NPCs: {},
           objectives: [],
           narration_intro: "",
@@ -228,10 +250,10 @@ const WorldCreator = () => {
   }
 
   // After picking a world you have to pick an Editor
-  if (currentWorld && editorOption === null) {
+  if (currentWorld._id && editorOption === null) {
     return (
       <div>
-        <button onClick={() => setCurrentWorld(null)}>Back</button>
+        <button onClick={() => setCurrentWorld({world_name: "",world_description: "",narration_intro: "",narration_outro: ""})}>Back</button>
         <h1>{currentWorld.world_name}</h1>
         <button onClick={() => setEditorOption('world')}>World Editor</button>
         <button onClick={handleSceneEditor}>Scene Editor</button>
@@ -267,19 +289,32 @@ const WorldCreator = () => {
 
   // the scene editor
   if (editorOption === 'scene') {
-    const addNewObjective = () => {
-        setCurrentScene({ ...currentScene, objectives: [...currentScene.objectives, ''] });
-    };
-
-    const handleObjectiveChange = (index, newObjective) => {
-        let objectives = [...currentScene.objectives];
-        objectives[index] = newObjective;
-        setCurrentScene({ ...currentScene, objectives });
-    };
-
+    function handleObjectiveChange(listIndex, index, newValue) {
+      const updatedObjectives = [...currentScene.objectives];
+      updatedObjectives[listIndex][index] = newValue;
+      setCurrentScene({ ...currentScene, objectives: updatedObjectives });
+  }
+  
+  function removeObjective(listIndex, index) {
+      const updatedObjectives = [...currentScene.objectives];
+      updatedObjectives[listIndex].splice(index, 1);
+      setCurrentScene({ ...currentScene, objectives: updatedObjectives });
+  }
+  
+  function addNewObjective(listIndex) {
+      const updatedObjectives = [...currentScene.objectives];
+      updatedObjectives[listIndex].push("");
+      setCurrentScene({ ...currentScene, objectives: updatedObjectives });
+  }
+  
+  function addNewObjectiveSet() {
+      const updatedObjectives = [...currentScene.objectives, []];
+      setCurrentScene({ ...currentScene, objectives: updatedObjectives });
+  }
+  
     return (
         <div className="WorldCreator">
-            <button onClick={() => setEditorOption(null)}>Back</button>
+            <button onClick={() => {setEditorOption(null); clearCurrentScene()}}>Back</button>
             <h1>Select a Scene:</h1>
             {scenes.map((scene) => (
                 <button key={scene._id} onClick={() => {
@@ -298,7 +333,7 @@ const WorldCreator = () => {
             <button onClick={() => {
                 setCurrentScene({
                     scene_name: "",
-                    previous_scene: "",
+                    previous_scene: null,
                     NPCs: {},
                     objectives: [],
                     narration_intro: "",
@@ -336,9 +371,9 @@ const WorldCreator = () => {
                     <div className="input-group">
                         <label>NPC Name</label>
                         <select 
-                            value={currentScene.npc_name || ''} 
+                            value={currentScene.npc_name || 'Select NPC'} 
                             onChange={(e) => setCurrentScene({ ...currentScene, npc_name: e.target.value })}>
-                            <option value="">Select NPC</option>
+                            {/* <option value="">Select NPC</option> */}
                             {npcs.map((npc, index) => (
                             <option key={index} value={npc.npc_name}>{npc.npc_name}</option>
                             ))}
@@ -348,24 +383,27 @@ const WorldCreator = () => {
                         <label>Scene NPC Prompt</label>
                         <textarea value={sceneNpcPrompt} onChange={(e) => setSceneNpcPrompt(e.target.value)}></textarea>
                     </div>
-                    {currentScene.objectives.map((objective, index) => (
-                    <div key={index} className="input-group">
-                        <label>Objective {index + 1}</label>
-                        <input
-                        type="text"
-                        value={objective}
-                        onChange={(e) => handleObjectiveChange(index, e.target.value)}
-                        />
-                        <FontAwesomeIcon
-                            icon={faTrash}
-                            onClick={() => {
-                                const updatedObjectives = [...currentScene.objectives];
-                                updatedObjectives.splice(index, 1);
-                                setCurrentScene({ ...currentScene, objectives: updatedObjectives });
-                        }}/>
-                    </div>
+                    {currentScene.objectives.map((objectiveList, listIndex) => (
+                      <div key={`list-${listIndex}`}>
+                          <h3>Objective Set {listIndex + 1}</h3>
+                          {objectiveList.map((objective, index) => (
+                              <div key={`objective-${listIndex}-${index}`} className="input-group">
+                                  <label>Objective {index + 1}</label>
+                                  <input
+                                      type="text"
+                                      value={objective}
+                                      onChange={(e) => handleObjectiveChange(listIndex, index, e.target.value)}
+                                  />
+                                  <FontAwesomeIcon
+                                      icon={faTrash}
+                                      onClick={() => removeObjective(listIndex, index)}
+                                  />
+                              </div>
+                          ))}
+                          <button onClick={() => addNewObjective(listIndex)}>Add New Objective</button>
+                      </div>
                     ))}
-                    <button onClick={addNewObjective}>Add New Objective</button>
+                    <button onClick={addNewObjectiveSet}>Add New Objective Set</button>
                     <div className="input-group">
                         <label>Narration Intro</label>
                         <textarea value={currentScene.narration_intro || ''} onChange={(e) => setCurrentScene({ ...currentScene, narration_intro: e.target.value })}></textarea>
@@ -400,9 +438,9 @@ const WorldCreator = () => {
                         <div className="input-group">
                             <label>NPC Name</label>
                             <select 
-                                value={currentScene.npc_name || ''} 
+                                value={currentScene.npc_name || 'Select NPC'} 
                                 onChange={(e) => setCurrentScene({ ...currentScene, npc_name: e.target.value })}>
-                                <option value="">Select NPC</option>
+                                {/* <option value="">Select NPC</option> */}
                                 {npcs.map((npc, index) => (
                                 <option key={index} value={npc.npc_name}>{npc.npc_name}</option>
                                 ))}
@@ -412,24 +450,27 @@ const WorldCreator = () => {
                             <label>Scene NPC Prompt</label>
                             <textarea value={sceneNpcPrompt} onChange={(e) => setSceneNpcPrompt(e.target.value)}></textarea>
                         </div>
-                        {currentScene.objectives.map((objective, index) => (
-                        <div key={index} className="input-group">
-                            <label>Objective {index + 1}</label>
-                            <input
-                            type="text"
-                            value={objective}
-                            onChange={(e) => handleObjectiveChange(index, e.target.value)}
-                            />
-                            <FontAwesomeIcon
-                                icon={faTrash}
-                                onClick={() => {
-                                    const updatedObjectives = [...currentScene.objectives];
-                                    updatedObjectives.splice(index, 1);
-                                    setCurrentScene({ ...currentScene, objectives: updatedObjectives });
-                            }}/>
-                        </div>
+                        {currentScene.objectives.map((objectiveList, listIndex) => (
+                          <div key={`list-${listIndex}`}>
+                              <h3>Objective Set {listIndex + 1}</h3>
+                              {objectiveList.map((objective, index) => (
+                                  <div key={`objective-${listIndex}-${index}`} className="input-group">
+                                      <label>Objective {index + 1}</label>
+                                      <input
+                                          type="text"
+                                          value={objective}
+                                          onChange={(e) => handleObjectiveChange(listIndex, index, e.target.value)}
+                                      />
+                                      <FontAwesomeIcon
+                                          icon={faTrash}
+                                          onClick={() => removeObjective(listIndex, index)}
+                                      />
+                                  </div>
+                              ))}
+                              <button onClick={() => addNewObjective(listIndex)}>Add New Objective</button>
+                          </div>
                         ))}
-                        <button onClick={addNewObjective}>Add New Objective</button>
+                        <button onClick={addNewObjectiveSet}>Add New Objective Set</button>
                         <div className="input-group">
                             <label>Narration Intro</label>
                             <textarea value={currentScene.narration_intro || ''} onChange={(e) => setCurrentScene({ ...currentScene, narration_intro: e.target.value })}></textarea>

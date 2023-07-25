@@ -3,6 +3,7 @@ define Callum = Character("Callum", voice='en-us')
 define Narrator = Character("Narrator")
 
 image callum_image = "images/callum.jpeg"
+image top_right_text = ParameterizedText(xalign=0.98,yalign=0.0)
 
 init python:
     import api_requests
@@ -24,6 +25,7 @@ init python:
             response = api_requests.get_progress_of_user_in_game(world_name=self.world_name,user_name=self.user_name)
             scene_id = response['scene_id']
             self.scene = api_requests.get_scene(scene_id=scene_id)['scene']
+            print(self.scene)
             self.scene_id = self.scene['_id']
             self.npc_name = self.get_npc_in_scene()
             print(self.npc_name)
@@ -78,6 +80,15 @@ init python:
             if 'narration_outro' in self.world:
                 api_requests.npc_text_to_speech(self.world['narration_outro'])
 
+        def get_scene_objectives_status(self):
+            objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
+            lines = ["--{s}" + o + "{/s}" for o in objective_status['completed']]
+            lines.extend(["--" + o for o in objective_status['available']])
+            display_text = '\n'.join(lines)
+            print(display_text)
+            print('objective_status: ', objective_status)
+            return display_text
+
     game = Game()
             
 
@@ -90,6 +101,9 @@ label run_scenes:
     #setup the background
     show callum_image
     $ renpy.pause(1)
+    $ objective_txt = game.get_scene_objectives_status()
+    show top_right_text "[objective_txt]"
+
     
     #setup the sprite
     # $ image_filepath = "images/callum.jpeg"
@@ -104,11 +118,13 @@ label run_scenes:
     $ user_input = None
     while True:
         $ user_input = renpy.input("Enter your message: ")
-        User "[user_input]"
+        User "[user_input]{nw}"
 
         if user_input is not None and user_input != "":
             $ response, scene_completed = game.message_npc_and_get_response(user_input)
             Callum "[response]"
+            $ objective_txt = game.get_scene_objectives_status()
+            show top_right_text "[objective_txt]"
             $ game.npc_text_to_speech(response)
             if scene_completed:
                 $ outro_narration = game.scene['narration_outro']
@@ -122,12 +138,15 @@ label run_scenes:
 
 label start:
     #intro game narration
-    $ intro_narration = game.world['narration_intro']
-    Narrator "[intro_narration]"
-    $ game.play_world_narration_intro()
+    if 'narration_intro' in game.world:
+        $ intro_narration = game.world['narration_intro']
+        Narrator "[intro_narration]"
+        $ game.play_world_narration_intro()
     call run_scenes
-    $ outro_narration = game.world['narration_outro']
-    Narrator "[outro_narration]"
-    $ game.play_world_narration_outro()
+    #outro game narration
+    if 'narration_outro' in game.world:
+        $ outro_narration = game.world['narration_outro']
+        Narrator "[outro_narration]"
+        $ game.play_world_narration_outro()
 
     return

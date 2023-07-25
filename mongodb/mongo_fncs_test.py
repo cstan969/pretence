@@ -87,6 +87,20 @@ class mongo_fncs_unittests(TestCase):
         scene_id='scenes-NocturnalVeil-07112023093300'
         play_test_scene_in_renpy(world_name=world_name,scene_id=scene_id)
 
+    def test_get_progress_of_user_in_game(self):
+        world_name='TraumaGame'
+        user_name='James Thomas Stanhope'
+        get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
+
+    def test_get_all_scenes_in_order(self):
+        world_name='TraumaGame'
+        get_all_scenes_in_order(world_name=world_name)
+
+    def test_get_scene_objectives_status(self):
+        scene_id = 'scenes-TraumaGame-20230711145400'
+        user_name='Carl5'
+        obj_status = get_scene_objectives_status(scene_id=scene_id,user_name=user_name)
+        pprint.pprint(obj_status)
 
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
@@ -95,20 +109,9 @@ tc = mongo_fncs_unittests()
 # tc.test_collection_scenes()
 # tc.test_get_scene_objectives_completed()
 # tc.test_progress_user_to_next_scene()
-tc.test_play_test_scene_in_renpy()
+# tc.test_play_test_scene_in_renpy()
+# tc.test_get_progress_of_user_in_game()
+# tc.test_get_all_scenes_in_order()
+tc.test_get_scene_objectives_status()
 
-
-
-# def progress_user_to_next_scene(world_name:str, user_name:str):
-#     '''Progresses the user to the next scene in the game in the DB'''
-#     scene_id = get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
-#     next_scene = get_next_scene(scene_id=scene_id)
-#     next_scene_id = next_scene['_id']
-#     item_to_upsert = {
-#         '_id': '-'.join(['progress_of_user_in_game',world_name,user_name]),
-#         'world_name': world_name,
-#         'user_name': user_name,
-#         'scene_id': next_scene_id
-#     }
-#     # upsert_item(collection_name='progress_of_user_in_game',item=item_to_upsert)
 
