@@ -5,7 +5,6 @@ import '../styles/WorldCreator.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
-import { FilePicker } from 'evergreen-ui';
 import SceneBackgroundImageFileSelector from '../components/SceneBackgroundImageFileSelector';
 import SceneMusicFileSelector from './SceneMusicFileSelector.jsx';
 
