@@ -200,10 +200,13 @@ def delete_scene(id:str):
 def set_scene_background_image_filepath(scene_id: str, file):
     scene = get_scene(scene_id=scene_id)
     world_name = scene['world_name']
-    renpy_path = "/home/carl/Pretence/RenpyProjects/CallumTest/game"
+    renpy_path = os.path.join(os.getenv('PRETENCE_PATH'),'RenpyProjects','CallumTest','game')
     renpy_filepath = os.path.join(renpy_path,'images',world_name,file.filename)
     db_filepath = f"{world_name}/{file.filename}"
     os.makedirs(os.path.dirname(renpy_filepath),exist_ok=True)
+    os.makedirs(os.path.dirname(db_filepath),exist_ok=True)
+    print(renpy_filepath)
+    print(db_filepath)
     with open(renpy_filepath,'wb') as f:
         shutil.copyfileobj(file.file, f)
     with open(db_filepath,'wb') as f:
@@ -214,10 +217,13 @@ def set_scene_background_image_filepath(scene_id: str, file):
 def set_scene_music_filepath(scene_id: str, file):
     scene = get_scene(scene_id=scene_id)
     world_name = scene['world_name']
-    renpy_path = "/home/carl/Pretence/RenpyProjects/CallumTest/game"
+    renpy_path = os.path.join(os.getenv('PRETENCE_PATH'),'RenpyProjects','CallumTest','game')
     renpy_filepath = os.path.join(renpy_path,'audio',world_name,file.filename)
     db_filepath = f"{world_name}/{file.filename}"
+    print(renpy_filepath)
+    print(db_filepath)
     os.makedirs(os.path.dirname(renpy_filepath),exist_ok=True)
+    os.makedirs(os.path.dirname(db_filepath),exist_ok=True)
     with open(renpy_filepath,'wb') as f:
         shutil.copyfileobj(file.file, f)
     with open(db_filepath,'wb') as f:

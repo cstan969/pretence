@@ -114,7 +114,7 @@ label run_scenes:
     # $ music = game.music_filepath
     if 'background_image_filepath' in game.scene:
         $ scene_image_default = game.scene['background_image_filepath']
-    show scene_image
+        show scene_image
 
     if 'music_filepath' in game.scene:
         $ music_path = game.scene['music_filepath']
