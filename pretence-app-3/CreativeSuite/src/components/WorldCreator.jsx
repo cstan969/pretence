@@ -5,6 +5,9 @@ import '../styles/WorldCreator.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
+import { FilePicker } from 'evergreen-ui';
+import SceneBackgroundImageFileSelector from '../components/SceneBackgroundImageFileSelector';
+import SceneMusicFileSelector from './SceneMusicFileSelector.jsx';
 
 const WorldCreator = () => {
   //user variables
@@ -34,7 +37,9 @@ const WorldCreator = () => {
     NPCs: {},
     objectives: [],
     narration_intro: "",
-    narration_outro: ""
+    narration_outro: "",
+    background_image_filepath: "",
+    music_filepath: ""
   });
   const [npcs, setNpcs] = useState([]);
   const [currentNpc, setCurrentNpc] = useState(null);
@@ -59,7 +64,9 @@ const WorldCreator = () => {
       NPCs: {},
       objectives: [],
       narration_intro: "",
-      narration_outro: ""
+      narration_outro: "",
+      background_image_filepath: "",
+      music_filepath: ""
     });
     setSceneNpcName("");
     setSceneNpcPrompt("");
@@ -75,7 +82,6 @@ const WorldCreator = () => {
   const getAllWorlds = () => {
     axios.get('http://127.0.0.1:8002/get_all_worlds')
       .then(res => {
-        console.log('worlds: ', res.data.worlds);
         setWorlds(res.data.worlds);
       })
       .catch(err => console.log(err));
@@ -84,7 +90,6 @@ const WorldCreator = () => {
   const getAllUsers = () => {
     axios.get('http://127.0.0.1:8002/get_all_users')
     .then(res => {
-        console.log('users: ', res.data)
         setUsers(res.data);
     })
     .catch(err => console.log(err));
@@ -181,7 +186,6 @@ const WorldCreator = () => {
     const previousSceneId = previousScene ? previousScene._id : '';
     const updatedScene = {
         ...currentScene,
-        // objectives: currentScene.objectives,
         objectives: currentScene.objectives.map(objective => [...objective]),
         previous_scene: previousSceneId === '' ? null : previousSceneId,
         NPCs: {
@@ -217,7 +221,9 @@ const WorldCreator = () => {
         }},
       objectives: currentScene.objectives,
       narration_intro: currentScene.narration_intro,
-      narration_outro: currentScene.narration_outro
+      narration_outro: currentScene.narration_outro,
+      background_image_filepath: currentScene.background_image_filepath,
+      music_filepath: currentScene.music_filepath
     };
     console.log(newScene)
     axios.post('http://127.0.0.1:8002/insert_scene/', newScene)
@@ -229,7 +235,9 @@ const WorldCreator = () => {
           NPCs: {},
           objectives: [],
           narration_intro: "",
-          narration_outro: ""
+          narration_outro: "",
+          background_image_filepath: "",
+          music_filepath: ""
         });
         handleSceneEditor();
       })
@@ -253,7 +261,7 @@ const WorldCreator = () => {
   if (currentWorld._id && editorOption === null) {
     return (
       <div>
-        <button onClick={() => setCurrentWorld({world_name: "",world_description: "",narration_intro: "",narration_outro: ""})}>Back</button>
+        <button onClick={() => setCurrentWorld({world_name: "",world_description: "",narration_intro: "",narration_outro: "",background_image_filepath: "",music_filepath: ""})}>Back</button>
         <h1>{currentWorld.world_name}</h1>
         <button onClick={() => setEditorOption('world')}>World Editor</button>
         <button onClick={handleSceneEditor}>Scene Editor</button>
@@ -411,6 +419,14 @@ const WorldCreator = () => {
                     <div className="input-group">
                         <label>Narration Outro</label>
                         <textarea value={currentScene.narration_outro || ''} onChange={(e) => setCurrentScene({ ...currentScene, narration_outro: e.target.value })}></textarea>
+                    </div>
+                    <div className="input-group">
+                        <label>Background Image Filepath</label>
+                        <SceneBackgroundImageFileSelector scene_id={currentScene._id} defaultFileName={currentScene.background_image_filepath}/>
+                    </div>
+                    <div className="input-group">
+                        <label>Music Filepath</label>
+                        <SceneMusicFileSelector scene_id={currentScene._id} defaultFileName={currentScene.music_filepath}/>
                     </div>
                     <button onClick={saveScene}>Save Updates to Scene</button>
                     </div>

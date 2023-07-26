@@ -2,13 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 121: end of line expected.
-    User "[user_input]" {nw}
-                        ^
-
-File "game/script.rpy", line 125: end of line expected.
-    Callum "[response]" {nw}
-                        ^
+File "game/script.rpy", line 124: play requires a file
+    play scene_music
+                    ^
 
 Ren'Py Version: Ren'Py 8.1.1.23060707
-Tue Jul 25 14:04:40 2023
+Tue Jul 25 21:52:03 2023

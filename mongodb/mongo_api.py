@@ -1,9 +1,11 @@
-from fastapi import FastAPI
 from mongo_utils import query_collection, upsert_item, delete_items
+from fastapi import FastAPI, File, UploadFile
+
 import mongo_fncs as fncs
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 import pprint
+import shutil
 
 
 
@@ -106,7 +108,14 @@ async def insert_scene(q: dict):
     )
     return scene
 
+@app.post("/set_scene_background_image_filepath")
+async def set_scene_background_image_filepath(scene_id: str, file: UploadFile = File(...)):
+    return fncs.set_scene_background_image_filepath(scene_id=scene_id,file=file)
 
+@app.post("/set_scene_music_filepath")
+async def set_scene_music_filepath(scene_id: str, file: UploadFile = File(...)):
+    return fncs.set_scene_music_filepath(scene_id=scene_id,file=file)
+    
 @app.post("/get_all_scenes_in_order")
 async def get_all_scenes_in_order(q: dict):
     scenes = fncs.get_all_scenes_in_order(world_name=q['world_name'])

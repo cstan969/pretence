@@ -1,4 +1,4 @@
-Tue Jul 25 14:05:19 2023
+Tue Jul 25 21:57:44 2023
 Linux-5.19.0-46-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -7,19 +7,15 @@ Bootstrap to the start of init.init. took 0.02s
 Early init. took 0.00s
 Loader init. took 0.00s
 Loading error handling. took 0.01s
-Loading script. took 0.05s
+Loading script. took 0.03s
 Loading save slot metadata. took 0.01s
 Loading persistent. took 0.00s
-into game init
-world_name:  TraumaGame
-self.world:  {'_id': 'worlds-TraumaGame', 'last_updated': '2023-07-21 09:09:07', 'world_name': 'TraumaGame', 'world_description': 'the player is immersed in a rich and immersive world filled with contrasts and echoes of the past. The setting is a post-apocalyptic realm where darkness and despair have shrouded the land, but amidst the ruins, pockets of hope and resilience emerge.', 'world_npc_prompt': "The game is set in a post-apocalyptic world, where the remnants of civilization struggle to survive amidst the ruins of the past. The landscape is a mix of desolate wastelands, crumbling cities, and overgrown nature. Dilapidated buildings stand as silent witnesses to the world's former glory, their walls marked by time and decay.  Nature has begun to reclaim its dominion, with tangled vegetation covering once bustling streets and the sound of wildlife echoing through abandoned alleyways. Vast stretches of barren lands, scarred by the cataclysmic event that caused society's collapse, stretch out into the distance, evoking a sense of desolation and isolation.  Scattered throughout the world are isolated settlements, where survivors have banded together in the face of adversity. These settlements are often comprised of makeshift structures, cobbled together from salvaged materials, and fortified against the dangers of the wasteland. Life within the settlements is a constant struggle for resources, safety, and the rebuilding of a new society.  Amidst the gloom and harshness, there are glimpses of hope and beauty. A vibrant sunset paints the sky with hues of orange and gold, offering a fleeting respite from the harsh reality. In the depths of the forest, hidden pockets of untouched nature harbor secrets and mystical creatures, providing a stark contrast to the crumbling remnants of human civilization.  It is a world where survival instincts prevail, where the resilience of the human spirit is tested, and where the bonds of community and the pursuit of redemption become beacons of light in the darkness. It is within this challenging and evocative setting that the game's story unfolds, as players navigate the perils and mysteries of a world forever changed."}
 Running init code. took 0.05s
 Loading analysis data. took 0.01s
 Analyze and compile ATL. took 0.00s
 Reloading save slot metadata. took 0.01s
 Index archives took 0.00s
-Backing up script files to '/home/carl/.renpy/backups/CallumTest':
-Dump and make backups. took 0.03s
+Dump and make backups. took 0.02s
 Cleaning cache. took 0.00s
 Making clean stores. took 0.00s
 Initial gc. took 0.01s
@@ -28,15 +24,15 @@ Creating interface object. took 0.00s
 Cleaning stores took 0.00s
 Init translation took 0.01s
 Build styles took 0.00s
-Load screen analysis took 0.00s
+Load screen analysis took 0.01s
 Analyze screens took 0.00s
-Save screen analysis took 0.01s
+Save screen analysis took 0.00s
 Prepare screens took 0.02s
 Save pyanalysis. took 0.00s
-Save bytecode. took 0.01s
+Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.05s
+Interface start. took 0.06s
 
 Initializing gl2 renderer:
 primary display bounds: (1920, 0, 1920, 1080)
@@ -50,14 +46,15 @@ Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
 Maximum texture size: 4096x4096
-{'_id': 'scenes-TraumaGame-20230711145400', 'world_name': 'TraumaGame', 'scene_name': 'First meeting with Callum', 'previous_scene': None, 'NPCs': {'Callum': {'scene_npc_prompt': "Callum is currently in a somber mood and not very talkative.  However, if the player is able to establish some rapport with Callum he opens up and becomes a little bit more talkative.  Until the objective that has Callum believe in a better world is completed, callum is not open to doing anything out of the ordinary and he will not join your party.  Callum's reluctance stems from deep-seated trauma and guilt resulting from a past defeat that led to the loss of those he cared about. He fears history repeating itself and is hesitant to embark on a new journey, doubting his worth and the possibility of redemption."}}, 'objectives': [['Establish a connection and rapport with Callum.'], ["Uncover the reasons behind Callum's reluctance and bitterness."], ['Inspire Callum to believe in a better world.'], ['Convince Callum to join your adventuring party']], 'narration_intro_full': 'As you step into the dimly lit city of Sunken Hearth, the air heavy with forgotten stories, you eyes lock onto Callum, a former hero burdened by his past. Approach him and seek to convince him to embark on a transformative journey of redemption together.', 'narration_intro': "In the dimly lit Sunken Hearth, you notice a figure slumped over a corner table. Their rugged appearance speaks of battles fought, with weathered features hinting at a life filled with hardships. Their head is bowed, lost in contemplation, and a sense of weariness lingers in their eyes, reflecting the weight of untold stories. As you approach, a certain aura of solemnity surrounds this mysterious individual.  As you approach, the somber atmosphere that surrounds this mysterious individual beckons questions, inviting you to uncover the secrets and potential hidden within this figure's past. Your journey has just begun, and as you step closer to them, the path ahead brims with possibilities and the promise of unraveling a compelling tale.", 'narration_outro': "With a flicker of hope ignited in Callum's eyes, your heartfelt conversation lays the foundation of a bond. Your determination resonates within him, as he begins to consider the possibility of a brighter future. The scene ends with a seed of hope planted, your shared objective of embarking on a journey of redemption slowly taking root.", 'last_updated': '2023-07-25 00:19:34'}
-Callum
---Establish a connection and rapport with Callum.
-objective_status:  {'completed': [], 'available': ['Establish a connection and rapport with Callum.'], 'unavailable': ["Uncover the reasons behind Callum's reluctance and bitterness.", 'Inspire Callum to believe in a better world.', 'Convince Callum to join your adventuring party']}
+--help bingsu find a cooler to keep himself cool
+objective_status:  {'completed': [], 'available': ['help bingsu find a cooler to keep himself cool'], 'unavailable': []}
 into play_narration_intro
 narration_intro in self.scene
-In the dimly lit Sunken Hearth, you notice a figure slumped over a corner table. Their rugged appearance speaks of battles fought, with weathered features hinting at a life filled with hardships. Their head is bowed, lost in contemplation, and a sense of weariness lingers in their eyes, reflecting the weight of untold stories. As you approach, a certain aura of solemnity surrounds this mysterious individual.  As you approach, the somber atmosphere that surrounds this mysterious individual beckons questions, inviting you to uncover the secrets and potential hidden within this figure's past. Your journey has just begun, and as you step closer to them, the path ahead brims with possibilities and the promise of unraveling a compelling tale.
-Oh, just surviving, I suppose. It's a tough world out there.
+intro 2
+Oh,into play_narration_intro
+narration_intro in self.scene
+intro 2
+Well, it's a long story. You see, I used to be a normal ice cream cone in a bustling ice cream parlor. But then, the cataclysmic event happened, and everything changed. The world as we knew it collapsed, and I found myself in this post-apocalyptic wasteland. It's not the most ideal situation for an ice cream cone, but hey, I'm making the best of it!
 False
---Establish a connection and rapport with Callum.
-objective_status:  {'completed': [], 'available': ['Establish a connection and rapport with Callum.'], 'unavailable': ['Establish a connection and rapport with Callum.', "Uncover the reasons behind Callum's reluctance and bitterness.", 'Inspire Callum to believe in a better world.', 'Convince Callum to join your adventuring party']}
+--help bingsu find a cooler to keep himself cool
+objective_status:  {'completed': [], 'available': ['help bingsu find a cooler to keep himself cool'], 'unavailable': ['help bingsu find a cooler to keep himself cool']}
