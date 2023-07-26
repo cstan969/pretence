@@ -37,7 +37,11 @@ class NpcUserInteraction():
         self.npc_name=npc_name
         self.user_name = user_name
         self.llm = ChatOpenAI(model='gpt-3.5-turbo')
+        # self.llm = ChatOpenAI(model='gpt-4')
         # self.llm = ChatOpenAI(model=NpcUserInteraction_model)
+        print('init npc user interaction')
+        print('world_name: ', world_name)
+        print('npc_name: ', npc_name)
         self.npc = get_npc(world_name,npc_name)
 
     def calculate_new_emotional_state(self, npc_emotional_response: dict):

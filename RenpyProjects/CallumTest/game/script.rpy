@@ -2,15 +2,13 @@
 define Callum = Character("Callum", voice='en-us')
 define Narrator = Character("Narrator")
 
+#Dynamic Variables
 default scene_image_default = "TraumaGame/callum.jpeg"
 image scene_image = "[scene_image_default]"
-
-# default music_default = "synthesized_audio.mp3"
-# define scene_music = "[music_default]"
-
-
-
 image top_right_text = ParameterizedText(xalign=0.98,yalign=0.0)
+
+default NPCNAME = "Callum"
+define NPC_CHARACTER = Character("[NPCNAME]")
 
 init python:
     import api_requests
@@ -34,6 +32,7 @@ init python:
             response = api_requests.get_progress_of_user_in_game(world_name=self.world_name,user_name=self.user_name)
             scene_id = response['scene_id']
             self.scene = api_requests.get_scene(scene_id=scene_id)['scene']
+            print('self.scene: ', self.scene)
             self.scene_id = self.scene['_id']
             # if 'background_image_filepath' in list(self.scene):
             #     self.background_image_filepath = os.path.join(PRETENCE_PATH,'mongodb',self.scene['background_image_filepath'])
@@ -100,8 +99,6 @@ init python:
             lines = ["--{s}" + o + "{/s}" for o in objective_status['completed']]
             lines.extend(["--" + o for o in objective_status['available']])
             display_text = '\n'.join(lines)
-            print(display_text)
-            print('objective_status: ', objective_status)
             return display_text
 
     game = Game()
@@ -122,7 +119,7 @@ label run_scenes:
     if 'music_filepath' in game.scene:
         $ music_path = game.scene['music_filepath']
         play music music_path
-    # play music "audio/synthesized_audio.mp3"
+
     $ renpy.pause(1)
     $ objective_txt = game.get_scene_objectives_status()
     show top_right_text "[objective_txt]"
@@ -132,9 +129,11 @@ label run_scenes:
     # $ image_filepath = "images/callum.jpeg"
     
     # read the intro narration
-    $ intro_narration = game.scene['narration_intro']
-    Narrator "[intro_narration]"
-    $ game.play_scene_narration_intro()
+    if 'narration_intro' in game.scene:
+        $ intro_narration = game.scene['narration_intro']
+        $ game.play_scene_narration_intro()
+        Narrator "[intro_narration]"
+        
 
 
     #talk to the NPC and fulfill the objectives 
@@ -146,9 +145,9 @@ label run_scenes:
         if user_input is not None and user_input != "":
             $ response, scene_completed = game.message_npc_and_get_response(user_input)
             Callum "[response]"
+            $ game.npc_text_to_speech(response)
             $ objective_txt = game.get_scene_objectives_status()
             show top_right_text "[objective_txt]"
-            $ game.npc_text_to_speech(response)
             if scene_completed:
                 $ outro_narration = game.scene['narration_outro']
                 Narrator "[outro_narration]"

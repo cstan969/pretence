@@ -194,7 +194,6 @@ const WorldCreator = () => {
           ...currentScene.NPCs[sceneNpcName],
           scene_npc_prompt: sceneNpcPrompt
         }}}
-    console.log('updatedScene: ', updatedScene)
     axios.post('http://127.0.0.1:8002/update_scene/', updatedScene)
       .then(res => console.log(res))
       .catch(err => console.log(err));
@@ -377,16 +376,18 @@ const WorldCreator = () => {
                             </select>
                     </div>
                     <div className="input-group">
-                        <label>NPC Name</label>
-                        <select 
-                            value={currentScene.npc_name || 'Select NPC'} 
-                            onChange={(e) => setCurrentScene({ ...currentScene, npc_name: e.target.value })}>
-                            {/* <option value="">Select NPC</option> */}
-                            {npcs.map((npc, index) => (
-                            <option key={index} value={npc.npc_name}>{npc.npc_name}</option>
-                            ))}
-                        </select>
-                    </div>
+                            <label>NPC Name</label>
+                            <select 
+                                value={currentScene.npc_name || 'Select NPC'} 
+                                onChange={(e) => {
+                                  setCurrentScene({ ...currentScene, npc_name: e.target.value });
+                                  setSceneNpcName(e.target.value);}}>
+                                {/* <option value="">Select NPC</option> */}
+                                {npcs.map((npc, index) => (
+                                <option key={index} value={npc.npc_name}>{npc.npc_name}</option>
+                                ))}
+                            </select>
+                        </div>
                     <div className="input-group">
                         <label>Scene NPC Prompt</label>
                         <textarea value={sceneNpcPrompt} onChange={(e) => setSceneNpcPrompt(e.target.value)}></textarea>
@@ -455,7 +456,9 @@ const WorldCreator = () => {
                             <label>NPC Name</label>
                             <select 
                                 value={currentScene.npc_name || 'Select NPC'} 
-                                onChange={(e) => setCurrentScene({ ...currentScene, npc_name: e.target.value })}>
+                                onChange={(e) => {
+                                  setCurrentScene({ ...currentScene, npc_name: e.target.value });
+                                  setSceneNpcName(e.target.value);}}>
                                 {/* <option value="">Select NPC</option> */}
                                 {npcs.map((npc, index) => (
                                 <option key={index} value={npc.npc_name}>{npc.npc_name}</option>

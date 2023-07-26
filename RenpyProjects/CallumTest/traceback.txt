@@ -1,73 +1,47 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
-While loading <renpy.display.im.Image object ('images/callum.jpeg') at 0x7f30c662db50>:
-  File "renpy/common/00gamemenu.rpy", line 170, in script
-    $ ui.interact()
-  File "renpy/common/00gamemenu.rpy", line 170, in <module>
-    $ ui.interact()
-OSError: Couldn't find file 'images/callum.jpeg'.
+While running game code:
+  File "game/script.rpy", line 168, in script call
+    $ game.play_world_narration_outro()
+  File "game/script.rpy", line 135, in script
+    #talk to the NPC and fulfill the objectives
+  File "game/script.rpy", line 168, in script call
+    $ game.play_world_narration_outro()
+  File "game/script.rpy", line 135, in script
+    #talk to the NPC and fulfill the objectives
+  File "game/script.rpy", line 135, in <module>
+    #talk to the NPC and fulfill the objectives
+KeyError: 'narration_intro'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "renpy/common/00gamemenu.rpy", line 170, in script
-    $ ui.interact()
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/bootstrap.py", line 275, in bootstrap
+    renpy.main.main()
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/main.py", line 670, in main
+    run(restart)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/main.py", line 144, in run
+    renpy.execution.run_context(True)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/execution.py", line 953, in run_context
+    context.run()
+  File "game/script.rpy", line 168, in script call
+    $ game.play_world_narration_outro()
+  File "game/script.rpy", line 135, in script
+    #talk to the NPC and fulfill the objectives
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/future/utils/__init__.py", line 444, in raise_
+  File "game/script.rpy", line 168, in script call
+    $ game.play_world_narration_outro()
+  File "game/script.rpy", line 135, in script
+    #talk to the NPC and fulfill the objectives
   File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
     renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
   File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
     exec(bytecode, globals, locals)
-  File "renpy/common/00gamemenu.rpy", line 170, in <module>
-    $ ui.interact()
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ui.py", line 299, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/core.py", line 3579, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/core.py", line 4172, in interact_core
-    self.draw_screen(root_widget, fullscreen_video, (not fullscreen_video) or video_frame_drawn)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/core.py", line 2779, in draw_screen
-    surftree = renpy.display.render.render_screen(
-  File "render.pyx", line 492, in renpy.display.render.render_screen
-  File "render.pyx", line 266, in renpy.display.render.render
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/layout.py", line 886, in render
-    surf = render(child, width, height, cst, cat)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 266, in renpy.display.render.render
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/transition.py", line 371, in render
-    return render(self.new_widget, width, height, st, at)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 266, in renpy.display.render.render
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/layout.py", line 886, in render
-    surf = render(child, width, height, cst, cat)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 266, in renpy.display.render.render
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/layout.py", line 886, in render
-    surf = render(child, width, height, cst, cat)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 266, in renpy.display.render.render
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/transform.py", line 909, in render
-    return RenderTransform(self).render(width, height, st, at)
-  File "accelerator.pyx", line 979, in renpy.display.accelerator.RenderTransform.render
-  File "accelerator.pyx", line 404, in renpy.display.accelerator.RenderTransform.render_child
-  File "render.pyx", line 266, in renpy.display.render.render
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/image.py", line 513, in render
-    return wrap_render(self.target, width, height, st, at)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/image.py", line 316, in wrap_render
-    rend = render(child, w, h, st, at)
-  File "render.pyx", line 170, in renpy.display.render.render
-  File "render.pyx", line 266, in renpy.display.render.render
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/im.py", line 676, in render
-    return cache.get(self, render=True)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/im.py", line 330, in get
-    surf = image.load()
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/im.py", line 803, in load
-    raise e
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/display/im.py", line 757, in load
-    filelike = renpy.loader.load(self.filename, directory="images")
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/loader.py", line 833, in load
-    raise IOError("Couldn't find file '%s'." % name)
-OSError: Couldn't find file 'images/callum.jpeg'.
+  File "game/script.rpy", line 135, in <module>
+    #talk to the NPC and fulfill the objectives
+KeyError: 'narration_intro'
 
 Linux-5.19.0-46-generic-x86_64-with-glibc2.35 x86_64
 Ren'Py 8.1.1.23060707
 CallumTest 1.0
-Tue Jul 25 21:31:13 2023
+Wed Jul 26 10:53:32 2023
