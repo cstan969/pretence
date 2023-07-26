@@ -5,7 +5,9 @@ from datetime import datetime
 import pprint
 import os
 import subprocess
+import shutil
 from config import RENPY_SH_PATH
+
 
 #####USERS#####
 def upsert_user(user_name:str):
@@ -175,7 +177,6 @@ def get_next_scene(scene_id: Optional[str]=None)->dict:
 def get_all_scenes_in_order(world_name: str):
     ''''Return all of the scenes for some world in order'''
     scenes = query_collection(collection_name='scenes',query={'world_name':world_name})
-    print(scenes)
     if len(scenes) == 0:
         return []
     else:
@@ -185,7 +186,6 @@ def get_all_scenes_in_order(world_name: str):
         while cur_scene in previous_scene_dict:
             ordered_scenes.append(previous_scene_dict[cur_scene])
             cur_scene = previous_scene_dict[cur_scene]['_id']
-    print(ordered_scenes)
     return ordered_scenes
 
 def get_starting_scene_of_world(world_name: str):
@@ -196,6 +196,35 @@ def get_starting_scene_of_world(world_name: str):
 
 def delete_scene(id:str):
     delete_items(collection_name='scenes',query={'_id':id}) 
+
+def set_scene_background_image_filepath(scene_id: str, file):
+    scene = get_scene(scene_id=scene_id)
+    world_name = scene['world_name']
+    renpy_path = "/home/carl/Pretence/RenpyProjects/CallumTest/game"
+    renpy_filepath = os.path.join(renpy_path,'images',world_name,file.filename)
+    db_filepath = f"{world_name}/{file.filename}"
+    os.makedirs(os.path.dirname(renpy_filepath),exist_ok=True)
+    with open(renpy_filepath,'wb') as f:
+        shutil.copyfileobj(file.file, f)
+    with open(db_filepath,'wb') as f:
+        shutil.copyfileobj(file.file, f)
+    scene['background_image_filepath'] = db_filepath
+    upsert_item(collection_name='scenes',item=scene)
+
+def set_scene_music_filepath(scene_id: str, file):
+    scene = get_scene(scene_id=scene_id)
+    world_name = scene['world_name']
+    renpy_path = "/home/carl/Pretence/RenpyProjects/CallumTest/game"
+    renpy_filepath = os.path.join(renpy_path,'audio',world_name,file.filename)
+    db_filepath = f"{world_name}/{file.filename}"
+    os.makedirs(os.path.dirname(renpy_filepath),exist_ok=True)
+    with open(renpy_filepath,'wb') as f:
+        shutil.copyfileobj(file.file, f)
+    with open(db_filepath,'wb') as f:
+        shutil.copyfileobj(file.file, f)
+    scene['music_filepath'] = db_filepath
+    upsert_item(collection_name='scenes',item=scene)
+
 
 ###################################
 #####SCENE_OBJECTIVES_COMPLETED#####

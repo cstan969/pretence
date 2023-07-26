@@ -1,39 +1,47 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 145, in script call
-    call run_scenes
-  File "game/script.rpy", line 104, in script
-    $ objective_txt = game.get_scene_objectives_status()
-  File "game/script.rpy", line 104, in <module>
-    $ objective_txt = game.get_scene_objectives_status()
-  File "game/script.rpy", line 84, in get_scene_objectives_status
-    objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+  File "game/script.rpy", line 168, in script call
+    $ game.play_world_narration_outro()
+  File "game/script.rpy", line 135, in script
+    #talk to the NPC and fulfill the objectives
+  File "game/script.rpy", line 168, in script call
+    $ game.play_world_narration_outro()
+  File "game/script.rpy", line 135, in script
+    #talk to the NPC and fulfill the objectives
+  File "game/script.rpy", line 135, in <module>
+    #talk to the NPC and fulfill the objectives
+KeyError: 'narration_intro'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 145, in script call
-    call run_scenes
-  File "game/script.rpy", line 104, in script
-    $ objective_txt = game.get_scene_objectives_status()
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/bootstrap.py", line 275, in bootstrap
+    renpy.main.main()
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/main.py", line 670, in main
+    run(restart)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/main.py", line 144, in run
+    renpy.execution.run_context(True)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/execution.py", line 953, in run_context
+    context.run()
+  File "game/script.rpy", line 168, in script call
+    $ game.play_world_narration_outro()
+  File "game/script.rpy", line 135, in script
+    #talk to the NPC and fulfill the objectives
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/future/utils/__init__.py", line 444, in raise_
+  File "game/script.rpy", line 168, in script call
+    $ game.play_world_narration_outro()
+  File "game/script.rpy", line 135, in script
+    #talk to the NPC and fulfill the objectives
   File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
     renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
   File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
     exec(bytecode, globals, locals)
-  File "game/script.rpy", line 104, in <module>
-    $ objective_txt = game.get_scene_objectives_status()
-  File "game/script.rpy", line 84, in get_scene_objectives_status
-    objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-  File "api_requests.py", line 56, in get_scene_objectives_status
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/models.py", line 897, in json
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/__init__.py", line 346, in loads
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 337, in decode
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 355, in raw_decode
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+  File "game/script.rpy", line 135, in <module>
+    #talk to the NPC and fulfill the objectives
+KeyError: 'narration_intro'
 
 Linux-5.19.0-46-generic-x86_64-with-glibc2.35 x86_64
 Ren'Py 8.1.1.23060707
 CallumTest 1.0
-Mon Jul 24 23:12:04 2023
+Wed Jul 26 10:53:32 2023

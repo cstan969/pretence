@@ -5,6 +5,9 @@ import '../styles/WorldCreator.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
+import { FilePicker } from 'evergreen-ui';
+import SceneBackgroundImageFileSelector from '../components/SceneBackgroundImageFileSelector';
+import SceneMusicFileSelector from './SceneMusicFileSelector.jsx';
 
 const WorldCreator = () => {
   //user variables
@@ -34,7 +37,9 @@ const WorldCreator = () => {
     NPCs: {},
     objectives: [],
     narration_intro: "",
-    narration_outro: ""
+    narration_outro: "",
+    background_image_filepath: "",
+    music_filepath: ""
   });
   const [npcs, setNpcs] = useState([]);
   const [currentNpc, setCurrentNpc] = useState(null);
@@ -59,7 +64,9 @@ const WorldCreator = () => {
       NPCs: {},
       objectives: [],
       narration_intro: "",
-      narration_outro: ""
+      narration_outro: "",
+      background_image_filepath: "",
+      music_filepath: ""
     });
     setSceneNpcName("");
     setSceneNpcPrompt("");
@@ -75,7 +82,6 @@ const WorldCreator = () => {
   const getAllWorlds = () => {
     axios.get('http://127.0.0.1:8002/get_all_worlds')
       .then(res => {
-        console.log('worlds: ', res.data.worlds);
         setWorlds(res.data.worlds);
       })
       .catch(err => console.log(err));
@@ -84,7 +90,6 @@ const WorldCreator = () => {
   const getAllUsers = () => {
     axios.get('http://127.0.0.1:8002/get_all_users')
     .then(res => {
-        console.log('users: ', res.data)
         setUsers(res.data);
     })
     .catch(err => console.log(err));
@@ -181,7 +186,6 @@ const WorldCreator = () => {
     const previousSceneId = previousScene ? previousScene._id : '';
     const updatedScene = {
         ...currentScene,
-        // objectives: currentScene.objectives,
         objectives: currentScene.objectives.map(objective => [...objective]),
         previous_scene: previousSceneId === '' ? null : previousSceneId,
         NPCs: {
@@ -190,7 +194,6 @@ const WorldCreator = () => {
           ...currentScene.NPCs[sceneNpcName],
           scene_npc_prompt: sceneNpcPrompt
         }}}
-    console.log('updatedScene: ', updatedScene)
     axios.post('http://127.0.0.1:8002/update_scene/', updatedScene)
       .then(res => console.log(res))
       .catch(err => console.log(err));
@@ -217,7 +220,9 @@ const WorldCreator = () => {
         }},
       objectives: currentScene.objectives,
       narration_intro: currentScene.narration_intro,
-      narration_outro: currentScene.narration_outro
+      narration_outro: currentScene.narration_outro,
+      background_image_filepath: currentScene.background_image_filepath,
+      music_filepath: currentScene.music_filepath
     };
     console.log(newScene)
     axios.post('http://127.0.0.1:8002/insert_scene/', newScene)
@@ -229,7 +234,9 @@ const WorldCreator = () => {
           NPCs: {},
           objectives: [],
           narration_intro: "",
-          narration_outro: ""
+          narration_outro: "",
+          background_image_filepath: "",
+          music_filepath: ""
         });
         handleSceneEditor();
       })
@@ -253,7 +260,7 @@ const WorldCreator = () => {
   if (currentWorld._id && editorOption === null) {
     return (
       <div>
-        <button onClick={() => setCurrentWorld({world_name: "",world_description: "",narration_intro: "",narration_outro: ""})}>Back</button>
+        <button onClick={() => setCurrentWorld({world_name: "",world_description: "",narration_intro: "",narration_outro: "",background_image_filepath: "",music_filepath: ""})}>Back</button>
         <h1>{currentWorld.world_name}</h1>
         <button onClick={() => setEditorOption('world')}>World Editor</button>
         <button onClick={handleSceneEditor}>Scene Editor</button>
@@ -369,16 +376,18 @@ const WorldCreator = () => {
                             </select>
                     </div>
                     <div className="input-group">
-                        <label>NPC Name</label>
-                        <select 
-                            value={currentScene.npc_name || 'Select NPC'} 
-                            onChange={(e) => setCurrentScene({ ...currentScene, npc_name: e.target.value })}>
-                            {/* <option value="">Select NPC</option> */}
-                            {npcs.map((npc, index) => (
-                            <option key={index} value={npc.npc_name}>{npc.npc_name}</option>
-                            ))}
-                        </select>
-                    </div>
+                            <label>NPC Name</label>
+                            <select 
+                                value={currentScene.npc_name || 'Select NPC'} 
+                                onChange={(e) => {
+                                  setCurrentScene({ ...currentScene, npc_name: e.target.value });
+                                  setSceneNpcName(e.target.value);}}>
+                                {/* <option value="">Select NPC</option> */}
+                                {npcs.map((npc, index) => (
+                                <option key={index} value={npc.npc_name}>{npc.npc_name}</option>
+                                ))}
+                            </select>
+                        </div>
                     <div className="input-group">
                         <label>Scene NPC Prompt</label>
                         <textarea value={sceneNpcPrompt} onChange={(e) => setSceneNpcPrompt(e.target.value)}></textarea>
@@ -412,6 +421,14 @@ const WorldCreator = () => {
                         <label>Narration Outro</label>
                         <textarea value={currentScene.narration_outro || ''} onChange={(e) => setCurrentScene({ ...currentScene, narration_outro: e.target.value })}></textarea>
                     </div>
+                    <div className="input-group">
+                        <label>Background Image Filepath</label>
+                        <SceneBackgroundImageFileSelector scene_id={currentScene._id} defaultFileName={currentScene.background_image_filepath}/>
+                    </div>
+                    <div className="input-group">
+                        <label>Music Filepath</label>
+                        <SceneMusicFileSelector scene_id={currentScene._id} defaultFileName={currentScene.music_filepath}/>
+                    </div>
                     <button onClick={saveScene}>Save Updates to Scene</button>
                     </div>
                 </div>
@@ -439,7 +456,9 @@ const WorldCreator = () => {
                             <label>NPC Name</label>
                             <select 
                                 value={currentScene.npc_name || 'Select NPC'} 
-                                onChange={(e) => setCurrentScene({ ...currentScene, npc_name: e.target.value })}>
+                                onChange={(e) => {
+                                  setCurrentScene({ ...currentScene, npc_name: e.target.value });
+                                  setSceneNpcName(e.target.value);}}>
                                 {/* <option value="">Select NPC</option> */}
                                 {npcs.map((npc, index) => (
                                 <option key={index} value={npc.npc_name}>{npc.npc_name}</option>

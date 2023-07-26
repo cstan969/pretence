@@ -2,33 +2,47 @@
 define Callum = Character("Callum", voice='en-us')
 define Narrator = Character("Narrator")
 
-image callum_image = "images/callum.jpeg"
+#Dynamic Variables
+default scene_image_default = "TraumaGame/callum.jpeg"
+image scene_image = "[scene_image_default]"
 image top_right_text = ParameterizedText(xalign=0.98,yalign=0.0)
+
+default NPCNAME = "Callum"
+define NPC_CHARACTER = Character("[NPCNAME]")
 
 init python:
     import api_requests
+    import os
+    import shutil
+    PRETENCE_PATH = os.getenv('PRETENCE_PATH')
     class Game:
         def __init__(self):
-            print('into game init')
             self.get_renpy_init_state()
             self.final_scene = False
+            self.background_image_filepath = ""
+            self.music_filpath = ""
 
         def get_renpy_init_state(self):
             response = api_requests.get_renpy_init_state()
             self.world_name = response['world_name']
             self.user_name = response['user_name']
-            print('world_name: ', self.world_name)
             self.world = api_requests.get_world(world_name=self.world_name)
-            print('self.world: ', self.world)
 
         def get_progress_of_user_in_game(self):
             response = api_requests.get_progress_of_user_in_game(world_name=self.world_name,user_name=self.user_name)
             scene_id = response['scene_id']
             self.scene = api_requests.get_scene(scene_id=scene_id)['scene']
-            print(self.scene)
+            print('self.scene: ', self.scene)
             self.scene_id = self.scene['_id']
+            # if 'background_image_filepath' in list(self.scene):
+            #     self.background_image_filepath = os.path.join(PRETENCE_PATH,'mongodb',self.scene['background_image_filepath'])
+            #     print(self.background_image_filepath)
+                # shutil.copy(self.background_image_filepath,os.path.join('/home/carl/Pretence/RenpyProjects','CallumTest','game','images','scene.jpg'))
+            
+            #     print('self.bgifp: ', self.background_image_filepath)
+            # if self.scene['music_filepath']:
+            #     self.music_filepath = os.path.join(PRETENCE_PATH,'mongodb',self.scene['music_filepath'])
             self.npc_name = self.get_npc_in_scene()
-            print(self.npc_name)
             return self.scene
 
         def get_npc_in_scene(self):
@@ -85,21 +99,27 @@ init python:
             lines = ["--{s}" + o + "{/s}" for o in objective_status['completed']]
             lines.extend(["--" + o for o in objective_status['available']])
             display_text = '\n'.join(lines)
-            print(display_text)
-            print('objective_status: ', objective_status)
             return display_text
 
     game = Game()
+
             
 
 
 label run_scenes:
-
     #get the new scene that we're in
     $ game.get_progress_of_user_in_game()
 
-    #setup the background
-    show callum_image
+
+    # $ music = game.music_filepath
+    if 'background_image_filepath' in game.scene:
+        $ scene_image_default = game.scene['background_image_filepath']
+    show scene_image
+
+    if 'music_filepath' in game.scene:
+        $ music_path = game.scene['music_filepath']
+        play music music_path
+
     $ renpy.pause(1)
     $ objective_txt = game.get_scene_objectives_status()
     show top_right_text "[objective_txt]"
@@ -109,9 +129,11 @@ label run_scenes:
     # $ image_filepath = "images/callum.jpeg"
     
     # read the intro narration
-    $ intro_narration = game.scene['narration_intro']
-    Narrator "[intro_narration]"
-    $ game.play_scene_narration_intro()
+    if 'narration_intro' in game.scene:
+        $ intro_narration = game.scene['narration_intro']
+        $ game.play_scene_narration_intro()
+        Narrator "[intro_narration]"
+        
 
 
     #talk to the NPC and fulfill the objectives 
@@ -123,9 +145,9 @@ label run_scenes:
         if user_input is not None and user_input != "":
             $ response, scene_completed = game.message_npc_and_get_response(user_input)
             Callum "[response]"
+            $ game.npc_text_to_speech(response)
             $ objective_txt = game.get_scene_objectives_status()
             show top_right_text "[objective_txt]"
-            $ game.npc_text_to_speech(response)
             if scene_completed:
                 $ outro_narration = game.scene['narration_outro']
                 Narrator "[outro_narration]"

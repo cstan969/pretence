@@ -7,13 +7,11 @@ scene_id="scenes-TraumaGame-20230711145400"
 
 base_url = 'http://localhost:8001'
 def message_npc_and_get_response(world_name, scene_id, npc_name, user_name, user_message):
-    # npc_user_interaction = {
-    #     'world_name': 'NocturnalVeil',
-    #     'scene_id': 'scenes-NocturnalVeil-07112023093300',
-    #     "npc_name": "Forensic Detective",
-    #     "user_name": "Carl",
-    #     "user_message": user_input
-    # }
+    print(world_name)
+    print(scene_id)
+    print(npc_name)
+    print(user_name)
+    print(user_message)
     npc_user_interaction = {
         'world_name': world_name,
         'scene_id': scene_id,
