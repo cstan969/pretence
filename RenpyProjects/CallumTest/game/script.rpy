@@ -1,6 +1,6 @@
 ﻿define User = Character("User")
 define Callum = Character("Callum", voice='en-us')
-define Narrator = Character("Narrator")
+define Narrator = Character("Narrator", what_slow_cps=30)
 
 #Dynamic Variables
 default scene_image_default = "TraumaGame/callum.jpeg"
@@ -116,7 +116,7 @@ label run_scenes:
         $ scene_image_default = game.scene['background_image_filepath']
         show scene_image
 
-    if 'music_filepath' in game.scene:
+    if 'music_filepath' in game.scene and game.scene['music_filepath'] != '':
         $ music_path = game.scene['music_filepath']
         play music music_path
 
@@ -131,8 +131,8 @@ label run_scenes:
     # read the intro narration
     if 'narration_intro' in game.scene:
         $ intro_narration = game.scene['narration_intro']
-        $ game.play_scene_narration_intro()
         Narrator "[intro_narration]"
+        # $ game.play_scene_narration_intro()
         
 
 
@@ -160,15 +160,17 @@ label run_scenes:
 
 label start:
     #intro game narration
-    if 'narration_intro' in game.world:
-        $ intro_narration = game.world['narration_intro']
-        Narrator "[intro_narration]"
-        $ game.play_world_narration_intro()
+    #ADD GAME INTRO BACKGROUND
+    # if 'narration_intro' in game.world:
+    #     $ intro_narration = game.world['narration_intro']
+    #     $ renpy.pause(1)
+    #     # Narrator "[intro_narration]"
+    #     $ game.play_world_narration_intro()
     call run_scenes
     #outro game narration
     if 'narration_outro' in game.world:
         $ outro_narration = game.world['narration_outro']
-        Narrator "[outro_narration]"
+        # Narrator "[outro_narration]"
         $ game.play_world_narration_outro()
 
     return

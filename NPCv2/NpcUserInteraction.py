@@ -19,7 +19,8 @@ from mongodb.mongo_fncs import (
     get_scene,
     get_scene_objectives_completed,
     mark_objectives_completed,
-    progress_user_to_next_scene
+    progress_user_to_next_scene,
+    get_scene_objectives_status
 )
 from config import NpcUserInteraction_model
 from langchain import PromptTemplate, LLMChain
@@ -69,10 +70,14 @@ class NpcUserInteraction():
         return final_emotional_state
         
     def get_conversation(self):
+        # convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name)
+        # if convo is None:
+        #     return self.user_name + ": hello\n" + self.npc_name + ": hello"
         convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name)
         if convo is None:
-            return self.user_name + ": hello\n" + self.npc_name + ": hello"
-        return convo
+            return "Player" + ": hello\n" + self.npc_name + ": hello"
+        else:
+            return convo.replace(self.user_name,'Player')
 
     def message_npc_and_get_response(self, user_message):
         '''Assemble the prompt and query the NPC to get a response'''
@@ -84,22 +89,25 @@ class NpcUserInteraction():
 
 
         #Add the message to the conversation stored as part of this class
-        formatted_user_message = '\n' + self.user_name + ': ' + user_message + '\n' + self.npc_name + ': '
+        # formatted_user_message = '\n' + self.user_name + ': ' + user_message + '\n' + self.npc_name + ': '
+        formatted_user_message = '\n' + "Player" + ': ' + user_message + '\n' + self.npc_name + ': '
+
         prompt += formatted_user_message      
 
 
         template = """Question: {question}
         Answer: Provide the answer to my question as a dict where the keys are user_message, npc_response, npc_emotional_response, and objectives_completed. \
-            user_message should simply be the user's last message (string)
-            npc_response should simply be the npc's response (string)
+            user_message should simply be the player's last message (string)
+            npc_response should simply be the npc's response to the player's last message (string)
             npc_emotional_response should be a dict with keys [drunk, angry, trusting, motivated, sad, happy, afraid, compassionate] and values from 0-10 where 10 indicates a strong emotional response and 0 indicates no response.
-            objectives_completed should be a dictionary of objectives as given in the question with values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed.
+            objectives_completed should be a dictionary of objectives as given in the question with values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player during this dialog step.
             The entire output should simply be a JSON dict"""
     
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
         response = llm_chain.run(prompt)
         print('---response---')
+        print(response)
         response = json.loads(response)
         pprint.pprint(response)
         npc_response = response['npc_response']
@@ -135,10 +143,10 @@ class NpcUserInteraction():
     
     def _get_prompt(self):
         prompt_assembly_fncs_in_order = [
-            self._load_generic_npc_prompt(), #role of the NPC generically
-            self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
+            self._load_generic_npc_prompt(), #role of any NPC generically
             self._load_scene_objectives(), # the objectives of the scene for the protagonist to meet
             self._load_npc_prompt(), # summarization of the NPC (personality etc)
+            self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
             self._load_npc_in_world_prompt(), # role of the NPC in the world
             self._load_conversation_prompt(), # conversation of user with NPC
         ]
@@ -146,39 +154,44 @@ class NpcUserInteraction():
 
 
     def _load_generic_npc_prompt(self):
-        generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well.  I will be a player character and seek to achieve the objectives.""".format(npc_name=self.npc_name)
+        generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well.  I will be the player and seek to achieve the objectives.""".format(npc_name=self.npc_name)
         return generic_npc_prompt
     
     def _load_npc_in_scene_prompt(self):
         scene_json = get_scene(scene_id=self.scene_id)
-        pprint.pprint(scene_json)
+        prompt = """HERE IS INFORMATION ABOUT THE SCENE:\n"""
         try:
-            return scene_json['NPCs'][self.npc_name]['scene_npc_prompt']
+            prompt += scene_json['NPCs'][self.npc_name]['scene_npc_prompt'] + "\n"
+            print(prompt)
+            return prompt
         except:
             return ""
 
     def _load_scene_objectives(self):
         try:
-            objectives = self.scene['objectives']
-            print('objectives: ', objectives)
-            completed_objectives = get_scene_objectives_completed(scene_id=self.scene_id,user_name=self.user_name)
-            print('completed_objectives: ', completed_objectives)
-            if completed_objectives is not None:
-                for index, objective_set in enumerate(objectives):
-                    if not all(completed_objectives.get(objective) == "completed" for objective in objective_set):
-                        objectives_available = objective_set
-                        objectives_unavailable = [obj for sublist in objectives[index:] for obj in sublist]
-                        break
-            else:
-                objectives_available = objectives[0]
-                objectives_unavailable = [obj for sublist in objectives[1:] for obj in sublist]
-
-            print('objectives: ', objectives)
-            print('completed_objectives: ', completed_objectives)
+            scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
+            # objectives = self.scene['objectives']
+            # print('objectives: ', objectives)
+            # completed_objectives = get_scene_objectives_completed(scene_id=self.scene_id,user_name=self.user_name)
+            # print('completed_objectives: ', completed_objectives)
+            # if completed_objectives is None:
+            #     objectives_available = objectives[0]
+            #     objectives_unavailable = [obj for sublist in objectives[1:] for obj in sublist]
+            # else:
+            #     for index, objective_set in enumerate(objectives):
+            #         if not all(completed_objectives.get(objective) == "completed" for objective in objective_set):
+            #             objectives_available = objective_set
+            #             objectives_unavailable = [obj for sublist in objectives[index:] for obj in sublist]
+            #             break
+            
+            # print('objectives: ', objectives)
+            # print('completed_objectives: ', completed_objectives)
+            # prompt = "Here are the completed objectives:\n"
+            # prompt += str(scene_objectives_status['completed'])
             prompt = "Here are the objectives the protagonist currently needs to complete:\n"
-            prompt += str(objectives_available)
+            prompt += str(scene_objectives_status['available'])
             prompt += "\n\nHere are the objectives unavailable to the protagonist.  These objectives cannot be completed yet.\n"
-            prompt += str(objectives_unavailable)
+            prompt += str(scene_objectives_status['unavailable'])
             return prompt
         except Exception as e:
             print('exception: ', str(e))
@@ -192,6 +205,8 @@ class NpcUserInteraction():
             world_npc_prompt = world_json['world_description']
         else:
             world_npc_prompt = ""
+        if world_npc_prompt == "":
+            return ""
         return """GAME INFORMATION: {world_npc_prompt}\n\n""".format(world_npc_prompt=world_npc_prompt)
     
     def _load_npc_prompt(self):

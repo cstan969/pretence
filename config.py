@@ -1,6 +1,6 @@
 from langchain.llms.llamacpp import LlamaCpp
-
-RENPY_SH_PATH = '/home/carl/pretence/renpy-8.1.1-sdk/renpy.sh'
+import os
+RENPY_SH_PATH = os.path.join(os.getenv('PRETENCE_PATH'),'renpy-8.1.1-sdk','renpy.sh')
 
 port_allocations={
 # 'Vicuna':8000,
