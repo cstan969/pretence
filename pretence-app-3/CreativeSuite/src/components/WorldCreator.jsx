@@ -45,6 +45,11 @@ const WorldCreator = () => {
   const [npcPersonality, setNpcPersonality] = useState('');
   const [sceneNpcName, setSceneNpcName] = useState('');
   const [sceneNpcPrompt, setSceneNpcPrompt] = useState('');
+  const sceneNPCs = {
+    [sceneNpcName]: {
+      scene_npc_prompt: sceneNpcPrompt
+    }
+  };
   const [newNpcName, setNewNpcName] = useState('');
   const [newNpcPersonality, setNewNpcPersonality] = useState('');
   const [isNewScene, setIsNewScene] = useState(true);
@@ -114,8 +119,10 @@ const WorldCreator = () => {
 
   const createWorld = () => {
     setCurrentWorld({world_name: newWorldName, world_description: ''});
+    setWorlds(prevWorlds => [...prevWorlds, currentWorld])
     setNewWorldName('');
     setShowPopup(false);
+    axios.post('http://127.0.0.1:8002/upsert_world',{'world_name': newWorldName})
   };
 
   const createUser = () => {
@@ -183,16 +190,22 @@ const WorldCreator = () => {
   const saveScene = () => {
     const previousScene = scenes.find(scene => scene.scene_name === currentScene.previous_scene);
     const previousSceneId = previousScene ? previousScene._id : '';
+    console.log(currentScene)
+    console.log(sceneNpcName)
+    console.log(sceneNpcPrompt)
     const updatedScene = {
         ...currentScene,
         objectives: currentScene.objectives.map(objective => [...objective]),
         previous_scene: previousSceneId === '' ? null : previousSceneId,
-        NPCs: {
-        ...currentScene.NPCs,
-        [sceneNpcName]: {
-          ...currentScene.NPCs[sceneNpcName],
-          scene_npc_prompt: sceneNpcPrompt
-        }}}
+        NPCs: sceneNPCs
+        // NPCs: { sceneNpcName: {scene_npc_prompt: sceneNpcPrompt}}
+        // NPCs: { 
+        // ...currentScene.NPCs,
+        // [sceneNpcName]: {
+        //   ...currentScene.NPCs[sceneNpcName],
+        //   scene_npc_prompt: sceneNpcPrompt
+        // }}
+      }
     axios.post('http://127.0.0.1:8002/update_scene/', updatedScene)
       .then(res => console.log(res))
       .catch(err => console.log(err));
@@ -207,16 +220,19 @@ const WorldCreator = () => {
   }
 
   const createNewScene = () => {
+    console.log('into CreateNewScene')
+    const foundScene = scenes.find(scene => scene.scene_name === currentScene.previous_scene);
     const newScene = { 
       world_name: currentWorld.world_name, 
       scene_name: currentScene.scene_name, 
-      previous_scene: scenes.find(scene => scene.scene_name === currentScene.previous_scene)._id,
-      NPCs: {
-        ...currentScene.NPCs,
-        [sceneNpcName]: {
-          ...currentScene.NPCs[sceneNpcName],
-          scene_npc_prompt: sceneNpcPrompt
-        }},
+      previous_scene: foundScene ? foundScene._id : null,
+      NPCs: { sceneNpcName: {scene_npc_prompt: sceneNpcPrompt}},
+      // NPCs: {
+      //   ...currentScene.NPCs,
+      //   [sceneNpcName]: {
+      //     ...currentScene.NPCs[sceneNpcName],
+      //     scene_npc_prompt: sceneNpcPrompt
+      //   }},
       objectives: currentScene.objectives,
       narration_intro: currentScene.narration_intro,
       narration_outro: currentScene.narration_outro,

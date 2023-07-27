@@ -266,24 +266,30 @@ def get_scene_objectives_status(scene_id: str, user_name: str):
     print('objectives: ', objectives)
     completed_objectives = get_scene_objectives_completed(scene_id=scene_id,user_name=user_name)
     print('completed_objectives: ', completed_objectives)
-    if completed_objectives is not None:
+    if completed_objectives is None:
+        objectives_completed = []
+        objectives_available = objectives[0]
+        objectives_unavailable = [obj for sublist in objectives[1:] for obj in sublist]
+    else:
         objectives_completed = []
         objectives_available = []
         objectives_unavailable = []
         for index, objective_set in enumerate(objectives):
             print('objective_set: ', objective_set)
-            if not all(completed_objectives.get(objective) == "completed" for objective in objective_set):
-                objectives_available = objective_set
-                objectives_unavailable = [obj for sublist in objectives[index:] for obj in sublist]
-                objectives_completed.extend([obj for obj in objective_set if completed_objectives.get(obj) == "completed"])
-                break
-            else: #all objectives in set completed
+            #if all objectives completed, extend the objectives completed list
+            if all(completed_objectives.get(objective) == "completed" for objective in objective_set): 
                 objectives_completed.extend(objective_set)
-    else:
-        objectives_completed = []
-        objectives_available = objectives[0]
-        objectives_unavailable = [obj for sublist in objectives[1:] for obj in sublist]
-    return {'completed': objectives_completed,'available': objectives_available,'unavailable':objectives_unavailable}
+            else:
+                objectives_completed.extend([obj for obj in objective_set if completed_objectives.get(obj) == "completed"])
+                objectives_available = [obj for obj in objective_set if completed_objectives.get(obj) == "not_completed"]
+                if index+1 < len(objectives):
+                    objectives_unavailable = [obj for sublist in objectives[index+1:] for obj in sublist]
+                else:
+                    objectives_unavailable = []
+                break
+    output = {'completed': objectives_completed,'available': objectives_available,'unavailable':objectives_unavailable}
+    print(output)
+    return output
 
 def delete_user_scene_objectives(scene_id: str, user_name:str):
     delete_items(collection_name='scenes',query={'_id':'-'.join(['scene_objectives_completed',scene_id,user_name])}) 
@@ -313,14 +319,15 @@ def progress_user_to_next_scene(world_name:str, user_name:str):
     '''Progresses the user to the next scene in the game in the DB'''
     scene_id = get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
     next_scene = get_next_scene(scene_id=scene_id)
-    next_scene_id = next_scene['_id']
-    item_to_upsert = {
-        '_id': '-'.join(['progress_of_user_in_game',world_name,user_name]),
-        'world_name': world_name,
-        'user_name': user_name,
-        'scene_id': next_scene_id
-    }
-    upsert_item(collection_name='progress_of_user_in_game',item=item_to_upsert)
+    if next_scene is not None:
+        next_scene_id = next_scene['_id']
+        item_to_upsert = {
+            '_id': '-'.join(['progress_of_user_in_game',world_name,user_name]),
+            'world_name': world_name,
+            'user_name': user_name,
+            'scene_id': next_scene_id
+        }
+        upsert_item(collection_name='progress_of_user_in_game',item=item_to_upsert)
 
 def set_scene_the_user_is_in(world_name: str, user_name: str, scene_id: str):
     item_to_upsert = {
