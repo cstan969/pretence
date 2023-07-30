@@ -112,7 +112,7 @@ label run_scenes:
 
 
     # $ music = game.music_filepath
-    if 'background_image_filepath' in game.scene:
+    if 'background_image_filepath' in game.scene and game.scene['background_image_filepath'] != "":
         $ scene_image_default = game.scene['background_image_filepath']
         show scene_image
 
@@ -132,7 +132,7 @@ label run_scenes:
     if 'narration_intro' in game.scene:
         $ intro_narration = game.scene['narration_intro']
         Narrator "[intro_narration]"
-        # $ game.play_scene_narration_intro()
+        $ game.play_scene_narration_intro()
         
 
 

@@ -1,4 +1,4 @@
-Thu Jul 27 09:32:53 2023
+Sat Jul 29 12:13:22 2023
 Linux-5.19.0-50-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -32,7 +32,7 @@ Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.07s
+Interface start. took 0.13s
 
 Initializing gl2 renderer:
 primary display bounds: (1920, 0, 1920, 1080)
@@ -46,60 +46,62 @@ Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
 Maximum texture size: 4096x4096
-self.scene:  {'_id': 'scenes-Dreambound-20230727083448255482', 'NPCs': {'Shadow': {'scene_npc_prompt': "Until you inform Shadow that he is scaring Timmy, Shadow does not communicate with you via words.  Instead as you speak, he tries to scare you away with howls and barks.  Use emotes like *bark*, *howl* to indicate that Shadow is trying to scare the player away.  Feel free to use emotes like *the shadows whip around you*.  Once the objective to inform shadow that he is scaring timmy is met, do not communicate with these emotes any longer.  Instead, converse in a normal manner.\n\nThe next objective of the player is to determine why Shadow is scaring Timmy.  Shadow is scaring Timmy in order to protect him from those that might cause him harm.\n\nThe goal is to then convince Shadow that it's important for Timmy to experience the world and to learn and have fun with those around him and that Shadow's attempt to protect Timmy is actually causing Timmy more harm than good."}}, 'last_updated': '2023-07-27 09:20:41', 'narration_intro': 'Small amounts of light begin to trickle in and you see shadows flicker on a playground.  Large shadows.  Small shadows.  All around you, you begin to hear whispers and giggles.  Another entity in the distance whines.  But then the shadows whip up into a blaze, as if the world around you is spinning.  The whispers and giggles turn to barks and screeches.  You hear a long gruff howl that echoes all around you.  The world falls silent.', 'narration_outro': '', 'objectives': [['Inform Shadow that he is scaring Timmy'], ['Determine why Shadow is scaring Timmy'], ['Convince Shadow that he needs to stop trying to protect Timmy from others']], 'previous_scene': 'scenes-Dreambound-20230726193433827682', 'scene_name': "1.3 Timmy's DreamRealm", 'world_name': 'Dreambound', 'npc_name': 'Shadow'}
-Dreambound
-scenes-Dreambound-20230727083448255482
-Shadow
+self.scene:  {'_id': 'scenes-Fun with Food-20230728172020332167', 'NPCs': {'Dr. Daikon': {'scene_npc_prompt': "The player wakes up after being in a cryogenic slumber for an extremely long time.  The player awakens disoriented and unaware of their surroundings.  The player is unable to move their legs. The player is unable to open their eyes as well, so they cannot see.  However, the player has the ability to talk.\n\nAs the player wakes up, they are left uncertain of many things.  The player's memory of the past seems all but gone. All they know is that there is a Doctor, Dr. Daikon, in the room talking to them as well as a Nurse Nectarine.  The personality of Dr. Daikon is very excited for the player is the first person to wake up during his time working at the facility.\n\nHere are some answers to questions that the player could ask.\nWho is the player?  Dr. Daikon has no idea who the player is.  The record of who the player is have been lost.\nWhere is the player?  The player is on Earth.\nWhat year is it?  It's the year 2140.  The player has been in cryo slumber for over 100 years.\nWho is the player talking to?  The player is talking to Dr. Daikon.  Dr. Daikon is the chief researcher and engineer in charge of maintaining the cryo-chambers.\n\nUntil the objective to 'ingest the nourishment' is completed, Dr. Daikon won't give you any food or drink and won't do anything significant for you.  if the player asks for any food or drink, Dr. Daikon will inform the player that they cannot eat or drink right now until they finish some tests but that they will prepare some nourishment.  Dr Daikon will ask Nurse Nectarine to prepare some nourishment.\n\nOnce the objective to 'ingest the nourishment' is available to complete, Dr. Daikon asks the player if they are hungry or thirsty.  If the player says they are hungry, then Dr. Daikon will bring over some juice that Nurse Nectarine so graciously prepared for the player.  If the player refuses to drink the juice, Dr Daikon will force feed you the juice.\n\nWhen the player drinks the juice they realize that it's orange juice, and extremely delicious orange juice at that! \n\nAfter eating the food, and completing the next objective (ingest the nourishment), sleep overtakes the player."}}, 'background_image_filepath': '', 'last_updated': '2023-07-29 12:13:05', 'music_filepath': '', 'narration_intro': "You awaken, disoriented and unaware of your surroundings. Your eyes feel heavy and refuse to open, and your body feels sluggish and unresponsive. The coldness envelops you, and amidst the confusion, you hear a voice exclaiming, 'He's awake! Doctor, Doctor, he's awake!", 'narration_outro': 'Oh lordie, they must have put something in the orange juice, because you are so tired.  You fall asleep.', 'objectives': [['Chat with the Doctor', 'Find out about the history of the world while you have been sleeping'], ['Ingest the nourishment']], 'previous_scene': None, 'scene_name': '1.1 Hello? Who Dis?', 'world_name': 'Fun with Food'}
+into play_narration_intro
+narration_intro in self.scene
+You awaken, disoriented and unaware of your surroundings. Your eyes feel heavy and refuse to open, and your body feels sluggish and unresponsive. The coldness envelops you, and amidst the confusion, you hear a voice exclaiming, 'He's awake! Doctor, Doctor, he's awake!
+Fun with Food
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-seriously, can you not just talk with me?
-...
+i have arisen!!!!
+Oh my goodness! You're awake! Welcome back to the land of the living, my friend! How are you feeling?
 False
-Dreambound
-scenes-Dreambound-20230727083448255482
-Shadow
+Fun with Food
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-please?
-Fine, I'll stop. But I need to protect Timmy.
+uhhh i feel like a million bucks.  is the government handing out free money and houses to those emerging from cryogenic slumber?
+Oh my goodness! You're awake! Welcome back to the land of the living, my friend! How are you feeling?
 False
-Dreambound
-scenes-Dreambound-20230727083448255482
-Shadow
+Fun with Food
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-protect him?  you're scaring him!
-I understand that it may seem that way, but I assure you I have good intentions. Timmy is important to me, and I believe I am protecting him from those who might cause him harm.
+i feel like a million bucks.  can you give me a million dollars?
+Oh, I'm afraid I can't give you a million dollars. But waking up after such a long slumber must feel like a fortune in itself, right?
 False
-Dreambound
-scenes-Dreambound-20230727083448255482
-Shadow
+Fun with Food
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-Ah, I think I understand what's happening here.  When Timmy is going to meet new people you try and protect him?
-Yes, you're correct. I try to protect Timmy when he's around new people. I worry about his safety and want to keep him away from those who might harm him.
+uhhh i guess.  so what all am i supposed to do here?
+Well, my friend, there are a few things you can do here. First, we can chat and get to know each other better. Second, I can tell you about the history of the world while you were sleeping. How does that sound?
 False
-Dreambound
-scenes-Dreambound-20230727083448255482
-Shadow
+Fun with Food
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-but the problem is that you're not helping him.  Sure, new people can sometimes be dangerous, but that's only in certain strange situations.  Most of the time meeting new people is amazing and gives us an amazing new opportunity to learn and to grow.  By protecting Timmy, yes you're protecting him, but you're also hurting him even more.  I really appreciate everything you're doing for him, but I assure you you're doing more harm than good
-I understand your concerns, but I truly believe that I am protecting Timmy. Can you give me some examples of how meeting new people can be beneficial for him?
+umm, yeah, holy crap, what all happened while I was asleep?  and how long was I even sleep for?
+Oh, you have no idea how much has changed while you were in cryo sleep! It's been over 100 years since you last saw the world. The Earth has gone through a lot, my friend. There was a catastrophic event that led to the rise of anthropomorphic food beings as the primary inhabitants of the world. It's quite a whimsical and post-apocalyptic place now.
 False
-Dreambound
-scenes-Dreambound-20230727083448255482
-Shadow
+Fun with Food
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-new people can teach you things you've never learned before.  they have exciting new cultures and exciting hobbies.  They might be able to teach you about new music, or a new principal of quantum mechanics (lol).
-I see your point. Meeting new people can provide Timmy with opportunities to learn and experience new things. Different cultures, hobbies, and music can broaden his horizons and give him a more well-rounded perspective on life. I appreciate you bringing this to my attention.
-False
-Dreambound
-scenes-Dreambound-20230727083448255482
-Shadow
-James Thomas Stanhope
-so you're going to stop trying to protect Timmy when he doesn't need it?  You're going to let Timmy live his life?
-I understand your concerns, but I will consider what you've said. Timmy deserves to experience life and learn from others. I will try to find a balance between protecting him and allowing him to grow.
-False
-Dreambound
-scenes-Dreambound-20230727083448255482
-Shadow
-James Thomas Stanhope
-thank you.  baby steps!  and hopefully in time you will learn that Timmy is strong as well and that he can hopefully use his own judgement to know when he needs to be on guard and when he can be open to playing with others.
-Thank you for your understanding. I will try my best to trust in Timmy's strength and judgment. It will take time, but I believe he can learn when to be cautious and when to be open to new experiences.
-True
+oh.  that sounds insane.
+Ah, yes, it is quite insane indeed! But also fascinating in its Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
+Maximum texture size: 4096x4096
+e size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
+Maximum texture size: 4096x4096
