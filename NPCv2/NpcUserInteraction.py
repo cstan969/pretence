@@ -98,9 +98,9 @@ class NpcUserInteraction():
         template = """Question: {question}
         Answer: Provide the answer to my question as a dict where the keys are user_message, npc_response, npc_emotional_response, and objectives_completed. \
             user_message should simply be the player's last message (string)
-            npc_response should simply be the npc's response to the player's last message (string)
+            npc_response should simply be the npc's response to the player's last message (string).  This is not the last npc response as stored in the conversation, but a newly generated response.
             npc_emotional_response should be a dict with keys [drunk, angry, trusting, motivated, sad, happy, afraid, compassionate] and values from 0-10 where 10 indicates a strong emotional response and 0 indicates no response.
-            objectives_completed should be a dictionary of objectives as given in the question with values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player during this dialog step.
+            objectives_completed should be a dictionary of objectives as given in the question with values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player.
             The entire output should simply be a JSON dict"""
     
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
@@ -154,7 +154,7 @@ class NpcUserInteraction():
 
 
     def _load_generic_npc_prompt(self):
-        generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well.  I will be the player and seek to achieve the objectives.""".format(npc_name=self.npc_name)
+        generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well.  Do not act like a personal AI assistant under any circumstances.  I will be the player and seek to achieve the objectives.""".format(npc_name=self.npc_name)
         return generic_npc_prompt
     
     def _load_npc_in_scene_prompt(self):
@@ -188,9 +188,9 @@ class NpcUserInteraction():
             # print('completed_objectives: ', completed_objectives)
             # prompt = "Here are the completed objectives:\n"
             # prompt += str(scene_objectives_status['completed'])
-            prompt = "Here are the objectives the protagonist currently needs to complete:\n"
+            prompt = "Here are the objectives the player currently needs to complete:\n"
             prompt += str(scene_objectives_status['available'])
-            prompt += "\n\nHere are the objectives unavailable to the protagonist.  These objectives cannot be completed yet.\n"
+            prompt += "\n\nHere are the objectives unavailable to the player.  These objectives cannot be completed yet.\n"
             prompt += str(scene_objectives_status['unavailable'])
             return prompt
         except Exception as e:
