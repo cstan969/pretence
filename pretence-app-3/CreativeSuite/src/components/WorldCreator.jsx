@@ -43,6 +43,7 @@ const WorldCreator = () => {
   const [npcs, setNpcs] = useState([]);
   const [currentNpc, setCurrentNpc] = useState(null);
   const [npcPersonality, setNpcPersonality] = useState('');
+  const [npcKnowledge, setNpcKnowledge] = useState('');
   const [sceneNpcName, setSceneNpcName] = useState('');
   const [sceneNpcPrompt, setSceneNpcPrompt] = useState('');
   const sceneNPCs = {
@@ -212,7 +213,7 @@ const WorldCreator = () => {
   }
 
   const saveNpc = () => {
-    const updatedNpc = {...currentNpc, personality: npcPersonality}
+    const updatedNpc = {...currentNpc, personality: npcPersonality, knowledge: npcKnowledge}
     console.log(updatedNpc)
     axios.post('http://127.0.0.1:8002/upsert_npc/',updatedNpc)
     .then(res=>console.log(res))
@@ -527,17 +528,28 @@ const WorldCreator = () => {
             <button onClick={() => setEditorOption(null)}>Back</button>
             <h1>Select a NPC:</h1>
             {npcs.map((npc) => (
-                <button key={npc._id} onClick={() => {setCurrentNpc(npc); setNpcPersonality(npc.personality !== undefined ? npc.personality : '')}}>
+                <button key={npc._id} onClick={() => {
+                  setCurrentNpc(npc);
+                  setNpcPersonality(npc.personality !== undefined ? npc.personality : '');
+                  setNpcKnowledge(npc.knowledge != undefined ? npc.knowledge : '')}}>
                 {npc.npc_name}
                 </button>
             ))}
-            <button onClick={() => {setCurrentNpc(null); setNpcPersonality('');}}>Create a new NPC</button>
+            <button onClick={() => {
+              setCurrentNpc(null);
+              setNpcPersonality('');
+              setNpcKnowledge('');
+              }}>Create a new NPC</button>
             {currentNpc ? (
             <div>
                 <h1>{currentNpc.npc_name}</h1>
                 <div className="input-group">
                 <label>Personality</label>
-                <textarea value={npcPersonality} onChange={(e) => setNpcPersonality(e.target.value)}></textarea>
+                <textarea value={npcPersonality} onChange={(e) => {setNpcPersonality(e.target.value)}}></textarea>
+                </div>
+                <div className="input-group">
+                <label>Knowledge</label>
+                <textarea value={npcKnowledge} onChange={(e) => {setNpcKnowledge(e.target.value)}}></textarea>
                 </div>
                 <button onClick={saveNpc}>Save Updates to NPC</button>
             </div>
