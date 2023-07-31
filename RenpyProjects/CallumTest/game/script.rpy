@@ -34,14 +34,6 @@ init python:
             self.scene = api_requests.get_scene(scene_id=scene_id)['scene']
             print('self.scene: ', self.scene)
             self.scene_id = self.scene['_id']
-            # if 'background_image_filepath' in list(self.scene):
-            #     self.background_image_filepath = os.path.join(PRETENCE_PATH,'mongodb',self.scene['background_image_filepath'])
-            #     print(self.background_image_filepath)
-                # shutil.copy(self.background_image_filepath,os.path.join('/home/carl/Pretence/RenpyProjects','CallumTest','game','images','scene.jpg'))
-            
-            #     print('self.bgifp: ', self.background_image_filepath)
-            # if self.scene['music_filepath']:
-            #     self.music_filepath = os.path.join(PRETENCE_PATH,'mongodb',self.scene['music_filepath'])
             self.npc_name = self.get_npc_in_scene()
             return self.scene
 
@@ -97,7 +89,7 @@ init python:
         def get_scene_objectives_status(self):
             objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
             lines = ["--{s}" + o + "{/s}" for o in objective_status['completed']]
-            lines.extend(["--" + o for o in objective_status['available']])
+            # lines.extend(["--" + o for o in objective_status['available']])
             display_text = '\n'.join(lines)
             return display_text
 

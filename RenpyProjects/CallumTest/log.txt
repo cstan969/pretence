@@ -1,4 +1,4 @@
-Sat Jul 29 12:13:22 2023
+Sun Jul 30 21:58:56 2023
 Linux-5.19.0-50-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -32,7 +32,7 @@ Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.13s
+Interface start. took 0.05s
 
 Initializing gl2 renderer:
 primary display bounds: (1920, 0, 1920, 1080)
@@ -46,62 +46,94 @@ Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
 Maximum texture size: 4096x4096
-self.scene:  {'_id': 'scenes-Fun with Food-20230728172020332167', 'NPCs': {'Dr. Daikon': {'scene_npc_prompt': "The player wakes up after being in a cryogenic slumber for an extremely long time.  The player awakens disoriented and unaware of their surroundings.  The player is unable to move their legs. The player is unable to open their eyes as well, so they cannot see.  However, the player has the ability to talk.\n\nAs the player wakes up, they are left uncertain of many things.  The player's memory of the past seems all but gone. All they know is that there is a Doctor, Dr. Daikon, in the room talking to them as well as a Nurse Nectarine.  The personality of Dr. Daikon is very excited for the player is the first person to wake up during his time working at the facility.\n\nHere are some answers to questions that the player could ask.\nWho is the player?  Dr. Daikon has no idea who the player is.  The record of who the player is have been lost.\nWhere is the player?  The player is on Earth.\nWhat year is it?  It's the year 2140.  The player has been in cryo slumber for over 100 years.\nWho is the player talking to?  The player is talking to Dr. Daikon.  Dr. Daikon is the chief researcher and engineer in charge of maintaining the cryo-chambers.\n\nUntil the objective to 'ingest the nourishment' is completed, Dr. Daikon won't give you any food or drink and won't do anything significant for you.  if the player asks for any food or drink, Dr. Daikon will inform the player that they cannot eat or drink right now until they finish some tests but that they will prepare some nourishment.  Dr Daikon will ask Nurse Nectarine to prepare some nourishment.\n\nOnce the objective to 'ingest the nourishment' is available to complete, Dr. Daikon asks the player if they are hungry or thirsty.  If the player says they are hungry, then Dr. Daikon will bring over some juice that Nurse Nectarine so graciously prepared for the player.  If the player refuses to drink the juice, Dr Daikon will force feed you the juice.\n\nWhen the player drinks the juice they realize that it's orange juice, and extremely delicious orange juice at that! \n\nAfter eating the food, and completing the next objective (ingest the nourishment), sleep overtakes the player."}}, 'background_image_filepath': '', 'last_updated': '2023-07-29 12:13:05', 'music_filepath': '', 'narration_intro': "You awaken, disoriented and unaware of your surroundings. Your eyes feel heavy and refuse to open, and your body feels sluggish and unresponsive. The coldness envelops you, and amidst the confusion, you hear a voice exclaiming, 'He's awake! Doctor, Doctor, he's awake!", 'narration_outro': 'Oh lordie, they must have put something in the orange juice, because you are so tired.  You fall asleep.', 'objectives': [['Chat with the Doctor', 'Find out about the history of the world while you have been sleeping'], ['Ingest the nourishment']], 'previous_scene': None, 'scene_name': '1.1 Hello? Who Dis?', 'world_name': 'Fun with Food'}
+self.scene:  {'_id': 'scenes-Fun with Food-20230730123722828947', 'NPCs': {'Narrator': {'scene_npc_prompt': "As the player steps out of the cryo facility, the sun shines down on them.  They step out into empty streets.  For all of the talk of the streets being inhabited by food, there is nothing anywhere.  When the player steps out you here a quick short scream of shock.  However, looking around, the player will see nothing at first.  However, the player will hear the scampering of footsteps running away from them down the streets.  While chasing after the direction of the noise, the player continues to hear shuffling moving away from them and heavy breathing in the form of emotes.\n\nThe scream has come from Mr Waffles who has seen the player, a human, and is hysterically running away, terrified that the player, a human, might eat him.  Your are the Narrator, do not ever talk from the perspective of Mr Waffles.  \n\nUnder no circumstances does Mr Waffles stop running away from the player until he runs into a dead end alley way by accident where Mr Waffles attempts to hide and be quiet.\n\nHere are some sample exchanges to explain the situation. However, please do not use these exact words and feel free to be creative.  This scene is designed to be funny.  So please be humorous!  Be hilarious.  Try your best in the weirdest or craziest of ways to make the player laugh!\n\nExample Player Input and Narrator outputs:\nPlayer: Do I know where the scream came from?  Narrator: The sound seems to have come from behind you.  As you turn around, you cannot see anything, but the noises seem to be getting more distant.  It may behoove you to start running before it is too late.\nPlayer: who goes there?  Narrator: As you hear the shuffling of footsteps running away, you hear another scream\nPlayer: I chase after the footsteps.  Narrator: As you chase after the footsteps, they seem to quicken, the voice screams again 'leave me along you monster'\nPlayer: Do I know what direction the noise came from?  Narrator: You listen carefully and can ascertain that the footsteps are coming from the street behind you, but as you turn around you don't see anything.\nPlayer: I continue to chase after the noise yelling I swear I am friendly.  Narrator: As you continue to chase after the disembodied voice, you hear the noises run down an alley way followed by a large crash and yelps of 'no no no, I don't want to be eaten'.\n\nAs the player chases after the sound they see streaks of a thick slippery substance on the street that smells oddly of maple and at this same time the voice yells 'oh no oh no I am going to need new pants now - oh wait I don't wear pants'.\n\n\nThe next objective of the player is to turn down the alleyway, so be sure to mention the 'alleyway' after the player continues to chase for a few dialog exchanges"}}, 'last_updated': '2023-07-30 21:58:45', 'narration_intro': "As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.", 'narration_outro': "As you turn down the alleyway you hear the longest most terrified scream, followed by a voice saying oh no oh no oh no dont eat me dont eat me I swear I don't taste nearly as delicious as I look.  I'm all flour I swear all flour.", 'objectives': [['The player explicitly states that they chase or run after the direction of the noise'], ['The player continues to chase after the direction of the noise (1)'], ['The player continues to chase after the direction of the noise (2)'], ['The player continues to chase after the direction of the noise (3)'], ['The player explicitly states that they turn down the alleyway']], 'previous_scene': None, 'scene_name': '1.3 Turkey Takeoff', 'world_name': 'Fun with Food', 'npc_name': 'Narrator', 'background_image_filepath': 'Fun with Food/city_intersection.png'}
 into play_narration_intro
 narration_intro in self.scene
-You awaken, disoriented and unaware of your surroundings. Your eyes feel heavy and refuse to open, and your body feels sluggish and unresponsive. The coldness envelops you, and amidst the confusion, you hear a voice exclaiming, 'He's awake! Doctor, Doctor, he's awake!
+As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.
 Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+scenes-Fun with Food-20230730123722828947
+Narrator
 James Thomas Stanhope
-i have arisen!!!!
-Oh my goodness! You're awake! Welcome back to the land of the living, my friend! How are you feeling?
+Hello who goes there?
+As you hear the shuffling of footsteps running away, you hear another scream
 False
 Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+scenes-Fun with Food-20230730123722828947
+Narrator
 James Thomas Stanhope
-uhhh i feel like a million bucks.  is the government handing out free money and houses to those emerging from cryogenic slumber?
-Oh my goodness! You're awake! Welcome back to the land of the living, my friend! How are you feeling?
+chase after the screams as I yell "who are you?  im new here cant you just talk with me?  I swear I dont want to eat you!"
+As you continue to chase after the disembodied voice, you hear the noises run down an alleyway followed by a large crash and yelps of 'no no no, I don't want to be eaten'.
 False
 Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+scenes-Fun with Food-20230730123722828947
+Narrator
 James Thomas Stanhope
-i feel like a million bucks.  can you give me a million dollars?
-Oh, I'm afraid I can't give you a million dollars. But waking up after such a long slumber must feel like a fortune in itself, right?
+are you okay, do you need help?  I heard a crash!  I told you im new to this world, sort of, cant you help me?  I need help!  I'm lost and lonely and just want to be friends!
+After crashing into the alleyway, the voice responds, 'I'm fine, just a little shaken up. But I don't need any help, thank you. I'm just trying to get away from you. I'm not interested in being friends with a human!'
 False
 Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+scenes-Fun with Food-20230730123722828947
+Narrator
 James Thomas Stanhope
-uhhh i guess.  so what all am i supposed to do here?
-Well, my friend, there are a few things you can do here. First, we can chat and get to know each other better. Second, I can tell you about the history of the world while you were sleeping. How does that sound?
+you dont want to be friends with a human?  why's that?  I just want to be friends!  stop running away already!
+Oh, why should I be friends with a human? It's just that humans have a tendency to eat food like me! Can you blame me for being cautious?
 False
 Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+scenes-Fun with Food-20230730123722828947
+Narrator
 James Thomas Stanhope
-umm, yeah, holy crap, what all happened while I was asleep?  and how long was I even sleep for?
-Oh, you have no idea how much has changed while you were in cryo sleep! It's been over 100 years since you last saw the world. The Earth has gone through a lot, my friend. There was a catastrophic event that led to the rise of anthropomorphic food beings as the primary inhabitants of the world. It's quite a whimsical and post-apocalyptic place now.
+how can I get you to trust me.  I'm not going to eat you holy crap.  Stop running, why are you so fast?
+Trust you? Ha! That's a good one. Maybe if you prove that you're not like the other humans who eat food, I might consider it. But for now, I'll keep my distance.
 False
 Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+scenes-Fun with Food-20230730123722828947
+Narrator
 James Thomas Stanhope
-oh.  that sounds insane.
-Ah, yes, it is quite insane indeed! But also fascinating in its Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
-Maximum texture size: 4096x4096
+okay okay, if i stop chasing after you will you come out and meet me?
+Hmm, well, if you promise to keep your distance and not try to eat me, I might consider it. But don't think I'll just come out and trust you right away!
+True
+{'_id': 'scenes-Fun with Food-20230730123722828947', 'NPCs': {'Narrator': {'scene_npc_prompt': "As the player steps out of the cryo facility, the sun shines down on them.  They step out into empty streets.  For all of the talk of the streets being inhabited by food, there is nothing anywhere.  When the player steps out you here a quick short scream of shock.  However, looking around, the player will see nothing at first.  However, the player will hear the scampering of footsteps running away from them down the streets.  While chasing after the direction of the noise, the player continues to hear shuffling moving away from them and heavy breathing in the form of emotes.\n\nThe scream has come from Mr Waffles who has seen the player, a human, and is hysterically running away, terrified that the player, a human, might eat him.  Your are the Narrator, do not ever talk from the perspective of Mr Waffles.  \n\nUnder no circumstances does Mr Waffles stop running away from the player until he runs into a dead end alley way by accident where Mr Waffles attempts to hide and be quiet.\n\nHere are some sample exchanges to explain the situation. However, please do not use these exact words and feel free to be creative.  This scene is designed to be funny.  So please be humorous!  Be hilarious.  Try your best in the weirdest or craziest of ways to make the player laugh!\n\nExample Player Input and Narrator outputs:\nPlayer: Do I know where the scream came from?  Narrator: The sound seems to have come from behind you.  As you turn around, you cannot see anything, but the noises seem to be getting more distant.  It may behoove you to start running before it is too late.\nPlayer: who goes there?  Narrator: As you hear the shuffling of footsteps running away, you hear another scream\nPlayer: I chase after the footsteps.  Narrator: As you chase after the footsteps, they seem to quicken, the voice screams again 'leave me along you monster'\nPlayer: Do I know what direction the noise came from?  Narrator: You listen carefully and can ascertain that the footsteps are coming from the street behind you, but as you turn around you don't see anything.\nPlayer: I continue to chase after the noise yelling I swear I am friendly.  Narrator: As you continue to chase after the disembodied voice, you hear the noises run down an alley way followed by a large crash and yelps of 'no no no, I don't want to be eaten'.\n\nAs the player chases after the sound they see streaks of a thick slippery substance on the street that smells oddly of maple and at this same time the voice yells 'oh no oh no I am going to need new pants now - oh wait I don't wear pants'.\n\n\nThe next objective of the player is to turn down the alleyway, so be sure to mention the 'alleyway' after the player continues to chase for a few dialog exchanges"}}, 'last_updated': '2023-07-30 21:58:45', 'narration_intro': "As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.", 'narration_outro': "As you turn down the alleyway you hear the longest most terrified scream, followed by a voice saying oh no oh no oh no dont eat me dont eat me I swear I don't taste nearly as delicious as I look.  I'm all flour I swear all flour.", 'objectives': [['The player explicitly states that they chase or run after the direction of the noise'], ['The player continues to chase after the direction of the noise (1)'], ['The player continues to chase after the direction of the noise (2)'], ['The player continues to chase after the direction of the noise (3)'], ['The player explicitly states that they turn down the alleyway']], 'previous_scene': None, 'scene_name': '1.3 Turkey Takeoff', 'world_name': 'Fun with Food', 'npc_name': 'Narrator', 'background_image_filepath': 'Fun with Food/city_intersection.png'}
+self.scene:  {'_id': 'scenes-Fun with Food-20230730202644869837', 'NPCs': {'sceneNpcName': {'scene_npc_prompt': ''}}, 'last_updated': '2023-07-30 20:26:44', 'narration_intro': '', 'narration_outro': '', 'objectives': [], 'previous_scene': 'scenes-Fun with Food-20230730123722828947', 'scene_name': '1.4 A syrupy ', 'world_name': 'Fun with Food'}
+
+Full traceback:
+  File "game/script.rpy", line 161, in script call
+    call run_scenes
+  File "game/script.rpy", line 150, in script call
+    call run_scenes
+  File "game/script.rpy", line 116, in script
+    $ objective_txt = game.get_scene_objectives_status()
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "game/script.rpy", line 116, in <module>
+    $ objective_txt = game.get_scene_objectives_status()
+  File "game/script.rpy", line 90, in get_scene_objectives_status
+    objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
+  File "api_requests.py", line 54, in get_scene_objectives_status
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/models.py", line 897, in json
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/__init__.py", line 346, in loads
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 337, in decode
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 355, in raw_decode
+JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+While running game code:
+  File "game/script.rpy", line 161, in script call
+    call run_scenes
+  File "game/script.rpy", line 150, in script call
+    call run_scenes
+  File "game/script.rpy", line 116, in script
+    $ objective_txt = game.get_scene_objectives_status()
+  File "game/script.rpy", line 116, in <module>
+    $ objective_txt = game.get_scene_objectives_status()
+  File "game/script.rpy", line 90, in get_scene_objectives_status
+    objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
+JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
 Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
-Maximum texture size: 4096x4096
-e size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
 Maximum texture size: 4096x4096

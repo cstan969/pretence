@@ -70,14 +70,37 @@ class NpcUserInteraction():
         return final_emotional_state
         
     def get_conversation(self):
-        # convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name)
-        # if convo is None:
-        #     return self.user_name + ": hello\n" + self.npc_name + ": hello"
         convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name)
         if convo is None:
             return "Player" + ": hello\n" + self.npc_name + ": hello"
         else:
             return convo.replace(self.user_name,'Player')
+        
+    def get_objective_completion(self):
+        '''given the current conversation with the current npc, figure out which objectives are completed for the current scene'''
+        convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name).replace(self.user_name,'Player')
+        scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
+        print(scene_objectives_status)
+        template = """Question: {question}
+        Answer: For a given conversation and given list of conversational objectives, tell me which conversational objectives have been completed. \
+        The output should simply be a JSON dict with one key 'objectives_completed'.  The value of that key should be another dict with keys that are the objectives as given in the list of objectives and the values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player."""
+        prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
+        llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
+
+
+        prompt = """These are the conversational objectives that have yet to be completed by the player.\nCONVERSATIONAL OBJECTIVES:\n{objectives}\n
+        This is the conversation between the player and the NPC so far.\nCONVERSATION:\n{conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
+        print(prompt)
+        response = llm_chain.run(prompt)
+        print(response)
+        response = json.loads(response)
+        print('--START v2 decouple objective response--')
+        pprint.pprint(response)
+        print('--END 2 decouple objective response--')
+        return response
+
+
+
 
     def message_npc_and_get_response(self, user_message):
         '''Assemble the prompt and query the NPC to get a response'''
@@ -96,11 +119,10 @@ class NpcUserInteraction():
 
 
         template = """Question: {question}
-        Answer: Provide the answer to my question as a dict where the keys are user_message, npc_response, npc_emotional_response, and objectives_completed. \
-            user_message should simply be the player's last message (string)
-            npc_response should simply be the npc's response to the player's last message (string).  This is not the last npc response as stored in the conversation, but a newly generated response.
-            npc_emotional_response should be a dict with keys [drunk, angry, trusting, motivated, sad, happy, afraid, compassionate] and values from 0-10 where 10 indicates a strong emotional response and 0 indicates no response.
-            objectives_completed should be a dictionary of objectives as given in the question with values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player.
+        Answer: Provide the answer to my question as a dict where the keys are 'user_message', 'npc_response', and 'npc_emotional_response'. \
+            'user_message' should simply be the player's last message (string)
+            'npc_response' should simply be the npc's response to the player's last message (string).  This is not the last npc response as stored in the conversation, but a newly generated response.
+            'npc_emotional_response' should be a dict with keys [drunk, angry, trusting, motivated, sad, happy, afraid, compassionate] and values from 0-10 where 10 indicates a strong emotional response and 0 indicates no response.
             The entire output should simply be a JSON dict"""
     
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
@@ -109,7 +131,6 @@ class NpcUserInteraction():
         print('---response---')
         print(response)
         response = json.loads(response)
-        pprint.pprint(response)
         npc_response = response['npc_response']
         formatted_npc_response = npc_response
         print('formatted_npc_response:')
@@ -117,14 +138,7 @@ class NpcUserInteraction():
 
         
 
-        # mark the objectives that've been completed.  The output is the DB item with full list of completed objectives from the database
-        updated_item = mark_objectives_completed(objectives_completed=response['objectives_completed'],scene_id=self.scene_id,user_name=self.user_name)
-        if all(val == 'completed' for val in updated_item['objectives_completed'].values()):
-            #mark the scene as the current scene in the world that the user is on
-            progress_user_to_next_scene(world_name=self.world_name,user_name=self.user_name)
-            response['scene_completed'] = True
-        else:
-            response['scene_completed'] = False
+        
 
 
         #Save interaction to DB
@@ -137,6 +151,22 @@ class NpcUserInteraction():
             npc_emotional_response=response['npc_emotional_response'],
             # npc_emotional_state=final_emotional_state
             )
+        
+        #hit the LLM to get objective completion
+        response['objectives_completed'] = self.get_objective_completion()['objectives_completed']
+        pprint.pprint(response)
+
+        # self.get_objective_completion()
+
+        # mark the objectives that've been completed.  The output is the DB item with full list of completed objectives from the database
+        updated_item = mark_objectives_completed(objectives_completed=response['objectives_completed'],scene_id=self.scene_id,user_name=self.user_name)
+        print('updated_completion_item: ', updated_item)
+        if all(val == 'completed' for val in updated_item['objectives_completed'].values()):
+            #mark the scene as the current scene in the world that the user is on
+            progress_user_to_next_scene(world_name=self.world_name,user_name=self.user_name)
+            response['scene_completed'] = True
+        else:
+            response['scene_completed'] = False
 
         return response
     
@@ -154,7 +184,11 @@ class NpcUserInteraction():
 
 
     def _load_generic_npc_prompt(self):
-        generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well.  Do not act like a personal AI assistant under any circumstances.  I will be the player and seek to achieve the objectives.""".format(npc_name=self.npc_name)
+        if self.npc_name == "Narrator":
+            generic_npc_prompt = """ROLE: Act like a narrator for this video game.  I, the player, will type messages as a way of interacting with the world.  I want you to respond with what I see, or what happens in the environment around me.  Do not act like a personal AI assistant under any circumstances.  I will be the player and seek to achieve the objectives.  For instance, if I say that I am going somewhere, describe the scenery as I pass by.  If I listen for sounds, tell me what I hear.""".format(npc_name=self.npc_name)
+        else:
+            generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well.  Do not act like a personal AI assistant under any circumstances.  I will be the player and seek to achieve the objectives.""".format(npc_name=self.npc_name)
+        generic_npc_prompt += "  Be sure to not repeat previous responses that you have given."
         return generic_npc_prompt
     
     def _load_npc_in_scene_prompt(self):
@@ -170,25 +204,9 @@ class NpcUserInteraction():
     def _load_scene_objectives(self):
         try:
             scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-            # objectives = self.scene['objectives']
-            # print('objectives: ', objectives)
-            # completed_objectives = get_scene_objectives_completed(scene_id=self.scene_id,user_name=self.user_name)
-            # print('completed_objectives: ', completed_objectives)
-            # if completed_objectives is None:
-            #     objectives_available = objectives[0]
-            #     objectives_unavailable = [obj for sublist in objectives[1:] for obj in sublist]
-            # else:
-            #     for index, objective_set in enumerate(objectives):
-            #         if not all(completed_objectives.get(objective) == "completed" for objective in objective_set):
-            #             objectives_available = objective_set
-            #             objectives_unavailable = [obj for sublist in objectives[index:] for obj in sublist]
-            #             break
-            
-            # print('objectives: ', objectives)
-            # print('completed_objectives: ', completed_objectives)
-            # prompt = "Here are the completed objectives:\n"
-            # prompt += str(scene_objectives_status['completed'])
-            prompt = "Here are the objectives the player currently needs to complete:\n"
+            prompt = "Here are the objectives that have been completed by the player:\n"
+            prompt += str(scene_objectives_status['completed'])
+            prompt += "\n\nHere are the objectives available to the player:\n"
             prompt += str(scene_objectives_status['available'])
             prompt += "\n\nHere are the objectives unavailable to the player.  These objectives cannot be completed yet.\n"
             prompt += str(scene_objectives_status['unavailable'])
@@ -211,9 +229,16 @@ class NpcUserInteraction():
     
     def _load_npc_prompt(self):
         print('self.npc: ', self.npc)
-        prompt_info = json.dumps({k: v for k,v in self.npc.items() if k in ['personality','role']})
-        starter_prompt = """Here is information pertaining to {npc_name}:\n""".format(npc_name=self.npc_name) + prompt_info
-        return starter_prompt
+        if 'personality' in list(self.npc):
+            prompt = f"The personality of {self.npc_name} is: {self.npc['personality']}"
+        else:
+            prompt = ""
+        if 'knowledge' in list(self.npc):
+            prompt += f"Here is knowledge that {self.npc_name} is aware of: {self.npc['knowledge']}"
+        return prompt
+        # prompt_info = json.dumps({k: v for k,v in self.npc.items() if k in ['personality']})
+        # starter_prompt = """Here is information pertaining to {npc_name}:\n""".format(npc_name=self.npc_name) + prompt_info
+        # return starter_prompt
     
     def _load_conversation_prompt(self):
         prompt = "----------\nHere is the conversation so far.\nCONVERSATION:\n"

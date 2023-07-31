@@ -32,6 +32,7 @@ def upsert_world(world_name:str, data: dict):
     item = data
     item['world_name'] = world_name
     item['_id'] = '-'.join([collection_name,world_name])
+    upsert_npc(world_name=world_name, npc_name='Narrator')
     return upsert_item(collection_name=collection_name,item=item)
 
 def get_all_worlds():
@@ -44,12 +45,13 @@ def get_world(world_name:str):
 
 
 #####NPCS#####
-def upsert_npc(world_name:str, npc_name:str, npc_metadata:dict):
+def upsert_npc(world_name:str, npc_name:str, npc_metadata:Optional[dict]=None):
     npc = get_npc(world_name=world_name, npc_name=npc_name)
     item = {} if npc is None else npc
     collection_name = 'npcs'
-    for k,v in npc_metadata.items():
-        item[k] = v
+    if npc_metadata is not None:
+        for k,v in npc_metadata.items():
+            item[k] = v
     item['world_name']=world_name
     item['npc_name']=npc_name
     item['_id']='-'.join([collection_name,world_name,npc_name])
@@ -177,6 +179,8 @@ def get_next_scene(scene_id: Optional[str]=None)->dict:
 def get_all_scenes_in_order(world_name: str):
     ''''Return all of the scenes for some world in order'''
     scenes = query_collection(collection_name='scenes',query={'world_name':world_name})
+    print([scene['_id'] for scene in scenes])
+    print([scene['previous_scene'] for scene in scenes])
     if len(scenes) == 0:
         return []
     else:

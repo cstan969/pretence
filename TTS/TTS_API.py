@@ -25,6 +25,7 @@ app.add_middleware(
 async def text_to_speech(q: dict)->dict:
     print(q)
     text = q['text']
+    text.replace('\"','')
     os.system("""mimic3 --remote --voice 'en_UK/apope_low' \"{text}\"""".format(text=text))
     return {}
 
