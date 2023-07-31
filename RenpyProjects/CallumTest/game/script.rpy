@@ -89,7 +89,7 @@ init python:
         def get_scene_objectives_status(self):
             objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
             lines = ["--{s}" + o + "{/s}" for o in objective_status['completed']]
-            lines.extend(["--" + o for o in objective_status['available']])
+            # lines.extend(["--" + o for o in objective_status['available']])
             display_text = '\n'.join(lines)
             return display_text
 

@@ -70,9 +70,6 @@ class NpcUserInteraction():
         return final_emotional_state
         
     def get_conversation(self):
-        # convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name)
-        # if convo is None:
-        #     return self.user_name + ": hello\n" + self.npc_name + ": hello"
         convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name)
         if convo is None:
             return "Player" + ": hello\n" + self.npc_name + ": hello"
@@ -81,7 +78,7 @@ class NpcUserInteraction():
         
     def get_objective_completion(self):
         '''given the current conversation with the current npc, figure out which objectives are completed for the current scene'''
-        convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name)
+        convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name).replace(self.user_name,'Player')
         scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
         print(scene_objectives_status)
         template = """Question: {question}
@@ -91,9 +88,11 @@ class NpcUserInteraction():
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
 
 
-        prompt = """CONVERSATIONAL OBJECTIVES:{objectives}\n\nCONVERSATION:\n{conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
+        prompt = """These are the conversational objectives that have yet to be completed by the player.\nCONVERSATIONAL OBJECTIVES:\n{objectives}\n
+        This is the conversation between the player and the NPC so far.\nCONVERSATION:\n{conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
         print(prompt)
         response = llm_chain.run(prompt)
+        print(response)
         response = json.loads(response)
         print('--START v2 decouple objective response--')
         pprint.pprint(response)
@@ -185,7 +184,11 @@ class NpcUserInteraction():
 
 
     def _load_generic_npc_prompt(self):
-        generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well.  Do not act like a personal AI assistant under any circumstances.  I will be the player and seek to achieve the objectives.""".format(npc_name=self.npc_name)
+        if self.npc_name == "Narrator":
+            generic_npc_prompt = """ROLE: Act like a narrator for this video game.  I, the player, will type messages as a way of interacting with the world.  I want you to respond with what I see, or what happens in the environment around me.  Do not act like a personal AI assistant under any circumstances.  I will be the player and seek to achieve the objectives.  For instance, if I say that I am going somewhere, describe the scenery as I pass by.  If I listen for sounds, tell me what I hear.""".format(npc_name=self.npc_name)
+        else:
+            generic_npc_prompt = """ROLE: Act like an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well.  Do not act like a personal AI assistant under any circumstances.  I will be the player and seek to achieve the objectives.""".format(npc_name=self.npc_name)
+        generic_npc_prompt += "  Be sure to not repeat previous responses that you have given."
         return generic_npc_prompt
     
     def _load_npc_in_scene_prompt(self):

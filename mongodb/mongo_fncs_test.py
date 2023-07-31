@@ -93,7 +93,7 @@ class mongo_fncs_unittests(TestCase):
         get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
 
     def test_get_all_scenes_in_order(self):
-        world_name='TraumaGame'
+        world_name='Fun with Food'
         get_all_scenes_in_order(world_name=world_name)
 
     def test_get_scene_objectives_status(self):
@@ -111,7 +111,7 @@ tc = mongo_fncs_unittests()
 # tc.test_progress_user_to_next_scene()
 # tc.test_play_test_scene_in_renpy()
 # tc.test_get_progress_of_user_in_game()
-# tc.test_get_all_scenes_in_order()
-tc.test_get_scene_objectives_status()
+tc.test_get_all_scenes_in_order()
+# tc.test_get_scene_objectives_status()
 
 

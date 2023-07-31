@@ -40,6 +40,7 @@ const WorldCreator = () => {
     background_image_filepath: "",
     music_filepath: ""
   });
+  const [previousSceneName, setPreviousSceneName] = useState('')
   const [npcs, setNpcs] = useState([]);
   const [currentNpc, setCurrentNpc] = useState(null);
   const [npcPersonality, setNpcPersonality] = useState('');
@@ -109,8 +110,8 @@ const WorldCreator = () => {
   };
 
   const playTestScene = () => {
-    console.log(playTestSceneWorld)
-    console.log(playTestSceneScene)
+    // console.log(playTestSceneWorld)
+    // console.log(playTestSceneScene)
     axios.post('http://127.0.0.1:8002/play_test_scene_in_renpy', {
       'world_name': playTestSceneWorld,
       'scene_id': playTestSceneScene
@@ -119,11 +120,13 @@ const WorldCreator = () => {
   }
 
   const createWorld = () => {
-    setCurrentWorld({world_name: newWorldName, world_description: ''});
-    setWorlds(prevWorlds => [...prevWorlds, currentWorld])
-    setNewWorldName('');
     setShowPopup(false);
     axios.post('http://127.0.0.1:8002/upsert_world',{'world_name': newWorldName})
+    .then(res => {
+      setWorlds(prevWorlds => [...prevWorlds, res.data]);
+    })
+    .catch(err => console.log(err))
+    setNewWorldName('');
   };
 
   const createUser = () => {
@@ -146,7 +149,7 @@ const WorldCreator = () => {
  
 
   const updateScenes = () => {
-    console.log('currentWorld: ', currentWorld)
+    console.log('currentWorld: ', currentWorld.world_name)
     if (currentWorld) {
         axios.post('http://127.0.0.1:8002/get_all_scenes_in_order/', { world_name: currentWorld.world_name })
           .then(res => setScenes(res.data.scenes))
@@ -189,11 +192,16 @@ const WorldCreator = () => {
   };
 
   const saveScene = () => {
-    const previousScene = scenes.find(scene => scene.scene_name === currentScene.previous_scene);
+    // console.log('saving scene')
+    // console.log('previousSceneName: ', previousSceneName)
+    // const previousScene = scenes.find(scene => scene.scene_name === currentScene.previous_scene);
+    const previousScene = scenes.find(scene => scene.scene_name === previousSceneName)
+    // console.log('previousScene: ', previousScene)
     const previousSceneId = previousScene ? previousScene._id : '';
-    console.log(currentScene)
-    console.log(sceneNpcName)
-    console.log(sceneNpcPrompt)
+    // console.log('previouSceneId: ', previousSceneId)
+    // console.log(currentScene)
+    // console.log(sceneNpcName)
+    // console.log(sceneNpcPrompt)
     const updatedScene = {
         ...currentScene,
         objectives: currentScene.objectives.map(objective => [...objective]),
@@ -214,14 +222,14 @@ const WorldCreator = () => {
 
   const saveNpc = () => {
     const updatedNpc = {...currentNpc, personality: npcPersonality, knowledge: npcKnowledge}
-    console.log(updatedNpc)
+    // console.log(updatedNpc)
     axios.post('http://127.0.0.1:8002/upsert_npc/',updatedNpc)
     .then(res=>console.log(res))
     .catch(err=>console.log(err))
   }
 
   const createNewScene = () => {
-    console.log('into CreateNewScene')
+    // console.log('into CreateNewScene')
     const foundScene = scenes.find(scene => scene.scene_name === currentScene.previous_scene);
     const newScene = { 
       world_name: currentWorld.world_name, 
@@ -240,10 +248,10 @@ const WorldCreator = () => {
       background_image_filepath: currentScene.background_image_filepath,
       music_filepath: currentScene.music_filepath
     };
-    console.log(newScene)
+    // console.log(newScene)
     axios.post('http://127.0.0.1:8002/insert_scene/', newScene)
       .then(res => {
-        console.log(res);
+        // console.log(res);
         setCurrentScene({
           scene_name: "",
           previous_scene: null,
@@ -263,7 +271,7 @@ const WorldCreator = () => {
     const newNpc = { world_name: currentWorld.world_name, npc_name: newNpcName, personality: newNpcPersonality };
     axios.post('http://127.0.0.1:8002/upsert_npc/', newNpc)
         .then(res => {
-            console.log(res);
+            // console.log(res);
             setNewNpcName('');
             setNewNpcPersonality('');
             // Optionally, refresh your list of NPCs here
@@ -341,7 +349,9 @@ const WorldCreator = () => {
             <h1>Select a Scene:</h1>
             {scenes.map((scene) => (
                 <button key={scene._id} onClick={() => {
+                    console.log(scenes)
                     const matchedScene = scenes.find(scene2 => scene2._id === scene.previous_scene);
+                    console.log('matchedScene: ', matchedScene)
                     const previous_scene_name_from_id = matchedScene ? matchedScene.scene_name : '';
                     setCurrentScene({...scene, previous_scene: previous_scene_name_from_id});
                     const npcName = scene.NPCs ? Object.keys(scene.NPCs)[0] : '';
@@ -384,7 +394,10 @@ const WorldCreator = () => {
                         <label>Previous Scene</label>
                         <select 
                                 value={currentScene.previous_scene || ''} 
-                                onChange={(e) => setCurrentScene({ ...currentScene, previous_scene: e.target.value })}>
+                                onChange={(e) => {
+                                  setCurrentScene({ ...currentScene, previous_scene: e.target.value });
+                                  setPreviousSceneName(e.target.value);}
+                                }>
                                 <option value="">Select previous scene</option>
                                 {scenes.map((scene, index) => (
                                 <option key={index} value={scene.scene_name}>{scene.scene_name}</option>
@@ -398,7 +411,7 @@ const WorldCreator = () => {
                                 onChange={(e) => {
                                   setCurrentScene({ ...currentScene, npc_name: e.target.value });
                                   setSceneNpcName(e.target.value);}}>
-                                {/* <option value="">Select NPC</option> */}
+                                <option value="">Select NPC</option>
                                 {npcs.map((npc, index) => (
                                 <option key={index} value={npc.npc_name}>{npc.npc_name}</option>
                                 ))}
