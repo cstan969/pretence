@@ -1,4 +1,4 @@
-Sun Jul 30 21:58:56 2023
+Mon Jul 31 21:27:43 2023
 Linux-5.19.0-50-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -46,7 +46,7 @@ Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
 Maximum texture size: 4096x4096
-self.scene:  {'_id': 'scenes-Fun with Food-20230730123722828947', 'NPCs': {'Narrator': {'scene_npc_prompt': "As the player steps out of the cryo facility, the sun shines down on them.  They step out into empty streets.  For all of the talk of the streets being inhabited by food, there is nothing anywhere.  When the player steps out you here a quick short scream of shock.  However, looking around, the player will see nothing at first.  However, the player will hear the scampering of footsteps running away from them down the streets.  While chasing after the direction of the noise, the player continues to hear shuffling moving away from them and heavy breathing in the form of emotes.\n\nThe scream has come from Mr Waffles who has seen the player, a human, and is hysterically running away, terrified that the player, a human, might eat him.  Your are the Narrator, do not ever talk from the perspective of Mr Waffles.  \n\nUnder no circumstances does Mr Waffles stop running away from the player until he runs into a dead end alley way by accident where Mr Waffles attempts to hide and be quiet.\n\nHere are some sample exchanges to explain the situation. However, please do not use these exact words and feel free to be creative.  This scene is designed to be funny.  So please be humorous!  Be hilarious.  Try your best in the weirdest or craziest of ways to make the player laugh!\n\nExample Player Input and Narrator outputs:\nPlayer: Do I know where the scream came from?  Narrator: The sound seems to have come from behind you.  As you turn around, you cannot see anything, but the noises seem to be getting more distant.  It may behoove you to start running before it is too late.\nPlayer: who goes there?  Narrator: As you hear the shuffling of footsteps running away, you hear another scream\nPlayer: I chase after the footsteps.  Narrator: As you chase after the footsteps, they seem to quicken, the voice screams again 'leave me along you monster'\nPlayer: Do I know what direction the noise came from?  Narrator: You listen carefully and can ascertain that the footsteps are coming from the street behind you, but as you turn around you don't see anything.\nPlayer: I continue to chase after the noise yelling I swear I am friendly.  Narrator: As you continue to chase after the disembodied voice, you hear the noises run down an alley way followed by a large crash and yelps of 'no no no, I don't want to be eaten'.\n\nAs the player chases after the sound they see streaks of a thick slippery substance on the street that smells oddly of maple and at this same time the voice yells 'oh no oh no I am going to need new pants now - oh wait I don't wear pants'.\n\n\nThe next objective of the player is to turn down the alleyway, so be sure to mention the 'alleyway' after the player continues to chase for a few dialog exchanges"}}, 'last_updated': '2023-07-30 21:58:45', 'narration_intro': "As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.", 'narration_outro': "As you turn down the alleyway you hear the longest most terrified scream, followed by a voice saying oh no oh no oh no dont eat me dont eat me I swear I don't taste nearly as delicious as I look.  I'm all flour I swear all flour.", 'objectives': [['The player explicitly states that they chase or run after the direction of the noise'], ['The player continues to chase after the direction of the noise (1)'], ['The player continues to chase after the direction of the noise (2)'], ['The player continues to chase after the direction of the noise (3)'], ['The player explicitly states that they turn down the alleyway']], 'previous_scene': None, 'scene_name': '1.3 Turkey Takeoff', 'world_name': 'Fun with Food', 'npc_name': 'Narrator', 'background_image_filepath': 'Fun with Food/city_intersection.png'}
+self.scene:  {'_id': 'scenes-Fun with Food-20230730123722828947', 'NPCs': {'Narrator': {'scene_npc_prompt': "As the player steps out of the cryo facility, the sun shines down on them.  They step out into empty streets.  For all of the talk of the streets being inhabited by food, there is nothing anywhere.  When the player steps out you here a quick short scream of shock.  However, looking around, the player will see nothing at first.  However, the player will hear the scampering of footsteps running away from them down the streets.  While chasing after the direction of the noise, the player continues to hear shuffling moving away from them and heavy breathing in the form of emotes.\n\nThe scream has come from the waffle who has seen the player, a human, and is hysterically running away, terrified that the player, a human, might eat him.  Your are the Narrator, do not ever talk from the perspective of the waffle.\n\nUnder no circumstances does the waffle stop running away from the player.  The waffle will not trust the player even if the player makes up some reason for why they should be friends.  The waffle will not do anything that the player asks it to do.  The only purpose of this scene is for the waffle to run away from the player.  As the Narrator, I want you to have the waffle run away in a fun manner as if in a chase scene in a movie.  The waffle should throw items behind it, or knock over trash cans, dodge through alleys.  Be creative.  In addition, the waffle should shout at the player.  The waffle should yell things at the player like 'leave me alone', 'dont eat me', etc.  The waffle is like a ninja, whipping through the city streets.  The waffle truly hates humans and only runs away.  Again, the waffle runs away and will not answer the player outside of witty banter.  The waffle will not have any meaninful conversation with the human that might detract from the waffle being terrified and running away.\n\nHere are some sample exchanges to explain the situation. However, please do not use these exact words and feel free to be creative.  This scene is designed to be funny.  So please be humorous!  Be hilarious.  Try your best in the weirdest or craziest of ways to make the player laugh!\n\nNarrator outputs should include both (hilarious explanations of the waffle running away) and (hilarious quips by the waffle)\n"}}, 'last_updated': '2023-07-31 21:11:10', 'narration_intro': "As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.", 'narration_outro': "As you turn down the alleyway you hear the longest most terrified scream, followed by a voice saying oh no oh no oh no dont eat me dont eat me I swear I don't taste nearly as delicious as I look.  I'm all flour I swear all flour.", 'objectives': [[{'objective': 'The player explicitly states that they chase or run after the direction of the noise', 'prompt_completed': '', 'prompt_available': "Examples Player Inputs and Narrator outputs:\nPlayer: Do I know where the scream came from?  Narrator: The sound seems to have come from behind you.  As you turn around, you cannot see anything, but the noises seem to be getting more distant.  It may behoove you to start running before it is too late.\nPlayer: who goes there?  Narrator: As you hear the shuffling of footsteps running away, you hear another scream\nPlayer: I chase after the footsteps.  Narrator: As you chase after the footsteps, they seem to quicken, the voice screams again 'leave me along you monster'\nPlayer: Do I know what direction the noise came from?  Narrator: You listen carefully and can ascertain that the footsteps are coming from the street behind you, but as you turn around you don't see anything.", 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (1)', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (2)', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (3)', 'prompt_available': "At this point in the chase, the waffle will run down a deadend alleyway in an attempt to get away. Conversation Example: \nPlayer: I continue to chase after the noise yelling I swear I am friendly.  Narrator: As you continue to chase after the disembodied voice, you hear the noises run down an alley way followed by a large crash and yelps of 'no no no, I don't want to be eaten'.\n\n", 'prompt_completed': '', 'prompt_unavailable': ''}]], 'previous_scene': None, 'scene_name': "1.3 I'm gonna get you!", 'world_name': 'Fun with Food', 'npc_name': 'Narrator', 'background_image_filepath': 'Fun with Food/city_intersection.png'}
 into play_narration_intro
 narration_intro in self.scene
 As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.
@@ -54,86 +54,64 @@ Fun with Food
 scenes-Fun with Food-20230730123722828947
 Narrator
 James Thomas Stanhope
-Hello who goes there?
-As you hear the shuffling of footsteps running away, you hear another scream
+who's there??
+As you strain your ears, you hear a faint voice shouting, 'It's just me, the terrified waffle! Don't come any closer!'
 False
 Fun with Food
 scenes-Fun with Food-20230730123722828947
 Narrator
 James Thomas Stanhope
-chase after the screams as I yell "who are you?  im new here cant you just talk with me?  I swear I dont want to eat you!"
-As you continue to chase after the disembodied voice, you hear the noises run down an alleyway followed by a large crash and yelps of 'no no no, I don't want to be eaten'.
+I look towards where I heard the voice coming from
+As you turn your head towards the source of the voice, you catch a glimpse of a terrified waffle sprinting away from you, knocking over trash cans and dodging through alleys. It shouts, 'Leave me alone, you monstrous human! I won't be your breakfast!'
 False
 Fun with Food
 scenes-Fun with Food-20230730123722828947
 Narrator
 James Thomas Stanhope
-are you okay, do you need help?  I heard a crash!  I told you im new to this world, sort of, cant you help me?  I need help!  I'm lost and lonely and just want to be friends!
-After crashing into the alleyway, the voice responds, 'I'm fine, just a little shaken up. But I don't need any help, thank you. I'm just trying to get away from you. I'm not interested in being friends with a human!'
+haha, im not going to eat you little fella, i just want to talk!  I run after the waffle at full speed
+Oh sure, just a friendly chat while chasing me at full speed! Very reassuring! Keep your distance, you breakfast predator!
 False
 Fun with Food
 scenes-Fun with Food-20230730123722828947
 Narrator
 James Thomas Stanhope
-you dont want to be friends with a human?  why's that?  I just want to be friends!  stop running away already!
-Oh, why should I be friends with a human? It's just that humans have a tendency to eat food like me! Can you blame me for being cautious?
+if i stop running will you stop running as well then?  I dont want you to get away if you're the only person that can talk to me about what's going on in this world?
+Hah! Nice try, human! You think I'll fall for your tricks? I won't stop running until you're miles away from me! Good luck finding someone else to talk to!
 False
 Fun with Food
 scenes-Fun with Food-20230730123722828947
 Narrator
 James Thomas Stanhope
-how can I get you to trust me.  I'm not going to eat you holy crap.  Stop running, why are you so fast?
-Trust you? Ha! That's a good one. Maybe if you prove that you're not like the other humans who eat food, I might consider it. But for now, I'll keep my distance.
+okay, well then, i will catch you and force you to talk to me then and force you to realize that im friendly and that I am not goin to eat you.  I parkour off of the walls, for I was clearly a ninja in my past life
+Ha! Good luck catching me, ninja-human! I'm the master of food parkour! You'll never reach me!
 False
 Fun with Food
 scenes-Fun with Food-20230730123722828947
 Narrator
 James Thomas Stanhope
-okay okay, if i stop chasing after you will you come out and meet me?
-Hmm, well, if you promise to keep your distance and not try to eat me, I might consider it. But don't think I'll just come out and trust you right away!
+ugh, how the heck have I not caught this little guy?? is he really that fast.  I continue to chase after him, but this seems ridiculous
+Haha! You're struggling to catch up, aren't you? I told you, I'm the fastest waffle in town! You'll never catch me!
+False
+Fun with Food
+scenes-Fun with Food-20230730123722828947
+Narrator
+James Thomas Stanhope
+Dude, Mr Waffle, seriously.  just have a chat with me, I'm homeless. I have no food nor water.  Can you not make me a sandwich or something?  is there not food in abundance here?
+Oh, poor little homeless human. Maybe you should have thought about that before you chased after me! I won't be your personal chef, so good luck finding food on your own!
+False
+Fun with Food
+scenes-Fun with Food-20230730123722828947
+Narrator
+James Thomas Stanhope
+uhhh i continue to chase the waffle
+Oh, you're still chasing me? You're quite persistent for a hungry human. Maybe you should try running on all fours like a cheetah. It might help you catch up!
+False
+Fun with Food
+scenes-Fun with Food-20230730123722828947
+Narrator
+James Thomas Stanhope
+i continue to chase
+You're still chasing me? I must say, your determination is quite impressive. But I assure you, I'm one slippery waffle. Good luck keeping up!
 True
-{'_id': 'scenes-Fun with Food-20230730123722828947', 'NPCs': {'Narrator': {'scene_npc_prompt': "As the player steps out of the cryo facility, the sun shines down on them.  They step out into empty streets.  For all of the talk of the streets being inhabited by food, there is nothing anywhere.  When the player steps out you here a quick short scream of shock.  However, looking around, the player will see nothing at first.  However, the player will hear the scampering of footsteps running away from them down the streets.  While chasing after the direction of the noise, the player continues to hear shuffling moving away from them and heavy breathing in the form of emotes.\n\nThe scream has come from Mr Waffles who has seen the player, a human, and is hysterically running away, terrified that the player, a human, might eat him.  Your are the Narrator, do not ever talk from the perspective of Mr Waffles.  \n\nUnder no circumstances does Mr Waffles stop running away from the player until he runs into a dead end alley way by accident where Mr Waffles attempts to hide and be quiet.\n\nHere are some sample exchanges to explain the situation. However, please do not use these exact words and feel free to be creative.  This scene is designed to be funny.  So please be humorous!  Be hilarious.  Try your best in the weirdest or craziest of ways to make the player laugh!\n\nExample Player Input and Narrator outputs:\nPlayer: Do I know where the scream came from?  Narrator: The sound seems to have come from behind you.  As you turn around, you cannot see anything, but the noises seem to be getting more distant.  It may behoove you to start running before it is too late.\nPlayer: who goes there?  Narrator: As you hear the shuffling of footsteps running away, you hear another scream\nPlayer: I chase after the footsteps.  Narrator: As you chase after the footsteps, they seem to quicken, the voice screams again 'leave me along you monster'\nPlayer: Do I know what direction the noise came from?  Narrator: You listen carefully and can ascertain that the footsteps are coming from the street behind you, but as you turn around you don't see anything.\nPlayer: I continue to chase after the noise yelling I swear I am friendly.  Narrator: As you continue to chase after the disembodied voice, you hear the noises run down an alley way followed by a large crash and yelps of 'no no no, I don't want to be eaten'.\n\nAs the player chases after the sound they see streaks of a thick slippery substance on the street that smells oddly of maple and at this same time the voice yells 'oh no oh no I am going to need new pants now - oh wait I don't wear pants'.\n\n\nThe next objective of the player is to turn down the alleyway, so be sure to mention the 'alleyway' after the player continues to chase for a few dialog exchanges"}}, 'last_updated': '2023-07-30 21:58:45', 'narration_intro': "As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.", 'narration_outro': "As you turn down the alleyway you hear the longest most terrified scream, followed by a voice saying oh no oh no oh no dont eat me dont eat me I swear I don't taste nearly as delicious as I look.  I'm all flour I swear all flour.", 'objectives': [['The player explicitly states that they chase or run after the direction of the noise'], ['The player continues to chase after the direction of the noise (1)'], ['The player continues to chase after the direction of the noise (2)'], ['The player continues to chase after the direction of the noise (3)'], ['The player explicitly states that they turn down the alleyway']], 'previous_scene': None, 'scene_name': '1.3 Turkey Takeoff', 'world_name': 'Fun with Food', 'npc_name': 'Narrator', 'background_image_filepath': 'Fun with Food/city_intersection.png'}
-self.scene:  {'_id': 'scenes-Fun with Food-20230730202644869837', 'NPCs': {'sceneNpcName': {'scene_npc_prompt': ''}}, 'last_updated': '2023-07-30 20:26:44', 'narration_intro': '', 'narration_outro': '', 'objectives': [], 'previous_scene': 'scenes-Fun with Food-20230730123722828947', 'scene_name': '1.4 A syrupy ', 'world_name': 'Fun with Food'}
-
-Full traceback:
-  File "game/script.rpy", line 161, in script call
-    call run_scenes
-  File "game/script.rpy", line 150, in script call
-    call run_scenes
-  File "game/script.rpy", line 116, in script
-    $ objective_txt = game.get_scene_objectives_status()
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
-    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
-    exec(bytecode, globals, locals)
-  File "game/script.rpy", line 116, in <module>
-    $ objective_txt = game.get_scene_objectives_status()
-  File "game/script.rpy", line 90, in get_scene_objectives_status
-    objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-  File "api_requests.py", line 54, in get_scene_objectives_status
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/models.py", line 897, in json
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/__init__.py", line 346, in loads
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 337, in decode
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 355, in raw_decode
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-
-While running game code:
-  File "game/script.rpy", line 161, in script call
-    call run_scenes
-  File "game/script.rpy", line 150, in script call
-    call run_scenes
-  File "game/script.rpy", line 116, in script
-    $ objective_txt = game.get_scene_objectives_status()
-  File "game/script.rpy", line 116, in <module>
-    $ objective_txt = game.get_scene_objectives_status()
-  File "game/script.rpy", line 90, in get_scene_objectives_status
-    objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
-Maximum texture size: 4096x4096
+{'_id': 'scenes-Fun with Food-20230730123722828947', 'NPCs': {'Narrator': {'scene_npc_prompt': "As the player steps out of the cryo facility, the sun shines down on them.  They step out into empty streets.  For all of the talk of the streets being inhabited by food, there is nothing anywhere.  When the player steps out you here a quick short scream of shock.  However, looking around, the player will see nothing at first.  However, the player will hear the scampering of footsteps running away from them down the streets.  While chasing after the direction of the noise, the player continues to hear shuffling moving away from them and heavy breathing in the form of emotes.\n\nThe scream has come from the waffle who has seen the player, a human, and is hysterically running away, terrified that the player, a human, might eat him.  Your are the Narrator, do not ever talk from the perspective of the waffle.\n\nUnder no circumstances does the waffle stop running away from the player.  The waffle will not trust the player even if the player makes up some reason for why they should be friends.  The waffle will not do anything that the player asks it to do.  The only purpose of this scene is for the waffle to run away from the player.  As the Narrator, I want you to have the waffle run away in a fun manner as if in a chase scene in a movie.  The waffle should throw items behind it, or knock over trash cans, dodge through alleys.  Be creative.  In addition, the waffle should shout at the player.  The waffle should yell things at the player like 'leave me alone', 'dont eat me', etc.  The waffle is like a ninja, whipping through the city streets.  The waffle truly hates humans and only runs away.  Again, the waffle runs away and will not answer the player outside of witty banter.  The waffle will not have any meaninful conversation with the human that might detract from the waffle being terrified and running away.\n\nHere are some sample exchanges to explain the situation. However, please do not use these exact words and feel free to be creative.  This scene is designed to be funny.  So please be humorous!  Be hilarious.  Try your best in the weirdest or craziest of ways to make the player laugh!\n\nNarrator outputs should include both (hilarious explanations of the waffle running away) and (hilarious quips by the waffle)\n"}}, 'last_updated': '2023-07-31 21:11:10', 'narration_intro': "As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.", 'narration_outro': "As you turn down the alleyway you hear the longest most terrified scream, followed by a voice saying oh no oh no oh no dont eat me dont eat me I swear I don't taste nearly as delicious as I look.  I'm all flour I swear all flour.", 'objectives': [[{'objective': 'The player explicitly states that they chase or run after the direction of the noise', 'prompt_completed': '', 'prompt_available': "Examples Player Inputs and Narrator outputs:\nPlayer: Do I know where the scream came from?  Narrator: The sound seems to have come from behind you.  As you turn around, you cannot see anything, but the noises seem to be getting more distant.  It may behoove you to start running before it is too late.\nPlayer: who goes there?  Narrator: As you hear the shuffling of footsteps running away, you hear another scream\nPlayer: I chase after the footsteps.  Narrator: As you chase after the footsteps, they seem to quicken, the voice screams again 'leave me along you monster'\nPlayer: Do I know what direction the noise came from?  Narrator: You listen carefully and can ascertain that the footsteps are coming from the street behind you, but as you turn around you don't see anything.", 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (1)', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (2)', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (3)', 'prompt_available': "At this point in the chase, the waffle will run down a deadend alleyway in an attempt to get away. Conversation Example: \nPlayer: I continue to chase after the noise yelling I swear I am friendly.  Narrator: As you continue to chase after the disembodied voice, you hear the noises run down an alley way followed by a large crash and yelps of 'no no no, I don't want to be eaten'.\n\n", 'prompt_completed': '', 'prompt_unavailable': ''}]], 'previous_scene': None, 'scene_name': "1.3 I'm gonna get you!", 'world_name': 'Fun with Food', 'npc_name': 'Narrator', 'background_image_filepath': 'Fun with Food/city_intersection.png'}
+self.scene:  {'_id': 'scenes-Fun with Food-20230730202644869837', 'NPCs': {'sceneNpcName': {'scene_npc_prompt': ''}}, 'last_updated': '2023-07-31 12:56:34', 'narration_intro': '', 'narration_outro': '', 'objectives': [[{'objective': 'The player explicitly states that they chase or run after the direction of the noise'}], [{'objective': 'The player continues to chase after the direction of the noise (1)'}], [{'objective': 'The player continues to chase after the direction of the noise (2)'}], [{'objective': 'The player continues to chase after the direction of the noise (3)'}], [{'objective': 'The player explicitly states that they turn down the alleyway'}]], 'previous_scene': 'scenes-Fun with Food-20230730123722828947', 'scene_name': '1.4 A syrupy ', 'world_name': 'Fun with Food'}

@@ -169,7 +169,20 @@ def update_scene(scene_id: str, scene_info:dict)->dict:
     
 def get_scene(scene_id: str)->dict:
     scenes = query_collection(collection_name='scenes',query={'_id':scene_id})
-    return None if len(scenes) == 0 else scenes[0]
+    if scenes == []:
+        return None
+    else:
+        scene=scenes[0]
+        #this is for converting old objectives format of List[List[str]] -> List[List[Dict]]
+        old_objectives = scene['objectives']
+        if isinstance(old_objectives, list) and len(old_objectives) > 0:
+            if isinstance(old_objectives, list) and len(old_objectives[0]) > 0:
+                if isinstance(old_objectives[0][0], dict):#scene objectives of correct format lready
+                    new_objectives = old_objectives
+                else:#scene objectives are of the old format and need switching
+                    new_objectives = [[{"objective": item} for item in inner_list] for inner_list in scene['objectives']]
+        scene['objectives'] = new_objectives
+        return scene
 
 
 def get_next_scene(scene_id: Optional[str]=None)->dict:
@@ -245,7 +258,7 @@ def mark_objectives_completed(objectives_completed: dict, scene_id: str, user_na
     world_name = query_collection(collection_name='scenes',query={'_id':scene_id})[0]['world_name']
     items = query_collection(collection_name='scene_objectives_completed', query={'_id': id})
     if items == []:
-        scene_objectives = {objective: 'not_completed' for sublist in query_collection(collection_name='scenes',query={'_id': scene_id})[0]['objectives'] for objective in sublist}
+        scene_objectives = {objective['objective']: 'not_completed' for sublist in query_collection(collection_name='scenes',query={'_id': scene_id})[0]['objectives'] for objective in sublist}
     else:
         scene_objectives = items[0]['objectives_completed']
     for obj,comp in objectives_completed.items():
@@ -272,8 +285,8 @@ def get_scene_objectives_status(scene_id: str, user_name: str):
     print('completed_objectives: ', completed_objectives)
     if completed_objectives is None:
         objectives_completed = []
-        objectives_available = objectives[0]
-        objectives_unavailable = [obj for sublist in objectives[1:] for obj in sublist]
+        objectives_available = [obj['objective'] for obj in objectives[0]]
+        objectives_unavailable = [obj['objective'] for sublist in objectives[1:] for obj in sublist]
     else:
         objectives_completed = []
         objectives_available = []
@@ -281,13 +294,13 @@ def get_scene_objectives_status(scene_id: str, user_name: str):
         for index, objective_set in enumerate(objectives):
             print('objective_set: ', objective_set)
             #if all objectives completed, extend the objectives completed list
-            if all(completed_objectives.get(objective) == "completed" for objective in objective_set): 
-                objectives_completed.extend(objective_set)
+            if all(completed_objectives.get(objective['objective']) == "completed" for objective in objective_set): 
+                objectives_completed.extend([obj['objective'] for obj in objective_set])
             else:
-                objectives_completed.extend([obj for obj in objective_set if completed_objectives.get(obj) == "completed"])
-                objectives_available = [obj for obj in objective_set if completed_objectives.get(obj) == "not_completed"]
+                objectives_completed.extend([obj['objective'] for obj in objective_set if completed_objectives.get(obj['objective']) == "completed"])
+                objectives_available = [obj['objective'] for obj in objective_set if completed_objectives.get(obj['objective']) == "not_completed"]
                 if index+1 < len(objectives):
-                    objectives_unavailable = [obj for sublist in objectives[index+1:] for obj in sublist]
+                    objectives_unavailable = [obj['objective'] for sublist in objectives[index+1:] for obj in sublist]
                 else:
                     objectives_unavailable = []
                 break
