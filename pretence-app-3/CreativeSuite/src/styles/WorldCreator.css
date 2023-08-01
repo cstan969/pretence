@@ -45,4 +45,12 @@
 .WorldCreator .input-group input {
   flex: 1;
   margin-bottom: 0;
+  overflow-x: auto;
+  overflow-y: auto;
 }
+
+.objective-group {
+  display: flex;
+  flex-direction: column;
+}
+

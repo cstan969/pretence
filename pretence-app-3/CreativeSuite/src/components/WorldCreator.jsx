@@ -192,28 +192,13 @@ const WorldCreator = () => {
   };
 
   const saveScene = () => {
-    // console.log('saving scene')
-    // console.log('previousSceneName: ', previousSceneName)
-    // const previousScene = scenes.find(scene => scene.scene_name === currentScene.previous_scene);
     const previousScene = scenes.find(scene => scene.scene_name === previousSceneName)
-    // console.log('previousScene: ', previousScene)
     const previousSceneId = previousScene ? previousScene._id : '';
-    // console.log('previouSceneId: ', previousSceneId)
-    // console.log(currentScene)
-    // console.log(sceneNpcName)
-    // console.log(sceneNpcPrompt)
     const updatedScene = {
         ...currentScene,
         objectives: currentScene.objectives.map(objective => [...objective]),
         previous_scene: previousSceneId === '' ? null : previousSceneId,
         NPCs: sceneNPCs
-        // NPCs: { sceneNpcName: {scene_npc_prompt: sceneNpcPrompt}}
-        // NPCs: { 
-        // ...currentScene.NPCs,
-        // [sceneNpcName]: {
-        //   ...currentScene.NPCs[sceneNpcName],
-        //   scene_npc_prompt: sceneNpcPrompt
-        // }}
       }
     axios.post('http://127.0.0.1:8002/update_scene/', updatedScene)
       .then(res => console.log(res))
@@ -236,12 +221,6 @@ const WorldCreator = () => {
       scene_name: currentScene.scene_name, 
       previous_scene: foundScene ? foundScene._id : null,
       NPCs: { sceneNpcName: {scene_npc_prompt: sceneNpcPrompt}},
-      // NPCs: {
-      //   ...currentScene.NPCs,
-      //   [sceneNpcName]: {
-      //     ...currentScene.NPCs[sceneNpcName],
-      //     scene_npc_prompt: sceneNpcPrompt
-      //   }},
       objectives: currentScene.objectives,
       narration_intro: currentScene.narration_intro,
       narration_outro: currentScene.narration_outro,
@@ -320,9 +299,9 @@ const WorldCreator = () => {
 
   // the scene editor
   if (editorOption === 'scene') {
-    function handleObjectiveChange(listIndex, index, newValue) {
+    function handleObjectiveChange(listIndex, index, key, newValue) {
       const updatedObjectives = [...currentScene.objectives];
-      updatedObjectives[listIndex][index] = newValue;
+      updatedObjectives[listIndex][index] = {...updatedObjectives[listIndex][index], [key]: newValue};
       setCurrentScene({ ...currentScene, objectives: updatedObjectives });
   }
   
@@ -350,6 +329,7 @@ const WorldCreator = () => {
             {scenes.map((scene) => (
                 <button key={scene._id} onClick={() => {
                     console.log(scenes)
+                    console.log('selected scene: ', scene)
                     const matchedScene = scenes.find(scene2 => scene2._id === scene.previous_scene);
                     console.log('matchedScene: ', matchedScene)
                     const previous_scene_name_from_id = matchedScene ? matchedScene.scene_name : '';
@@ -364,17 +344,17 @@ const WorldCreator = () => {
                 </button>
             ))}
             <button onClick={() => {
-                setCurrentScene({
-                    scene_name: "",
-                    previous_scene: null,
-                    NPCs: {},
-                    objectives: [],
-                    narration_intro: "",
-                    narration_outro: ""
-                });
-                setSceneNpcName("")
-                setSceneNpcPrompt("")
-                setIsNewScene(true);
+              setCurrentScene({
+                  scene_name: "",
+                  previous_scene: null,
+                  NPCs: {},
+                  objectives: [],
+                  narration_intro: "",
+                  narration_outro: ""
+              });
+              setSceneNpcName("")
+              setSceneNpcPrompt("")
+              setIsNewScene(true);
             }}>
                 Create a new Scene
             </button>
@@ -421,25 +401,67 @@ const WorldCreator = () => {
                         <label>Scene NPC Prompt</label>
                         <textarea value={sceneNpcPrompt} onChange={(e) => setSceneNpcPrompt(e.target.value)}></textarea>
                     </div>
+              
                     {currentScene.objectives.map((objectiveList, listIndex) => (
-                      <div key={`list-${listIndex}`}>
-                          <h3>Objective Set {listIndex + 1}</h3>
-                          {objectiveList.map((objective, index) => (
-                              <div key={`objective-${listIndex}-${index}`} className="input-group">
-                                  <label>Objective {index + 1}</label>
-                                  <input
-                                      type="text"
-                                      value={objective}
-                                      onChange={(e) => handleObjectiveChange(listIndex, index, e.target.value)}
-                                  />
-                                  <FontAwesomeIcon
-                                      icon={faTrash}
-                                      onClick={() => removeObjective(listIndex, index)}
-                                  />
+                    <div key={`list-${listIndex}`}>
+                        <h3>Objective Set {listIndex + 1}</h3>
+                        {objectiveList.map((objective, index) => (
+                            <div key={`objective-${listIndex}-${index}`} className="input-group">
+                                <label>Objective {index + 1}</label>
+                                <div className="objective-group">
+                                  <div className="input-group">
+                                    <label>Quest Objective</label>
+                                      <textarea
+                                          placeholder="Quest Objective"
+                                          value={objective.objective || ''}
+                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'objective', e.target.value)}
+                                      />
+                                  </div>
+
+                                  <div className="input-group">
+                                      <label>User Facing Objective String</label>
+                                      <textarea
+                                          placeholder="User Facing Objective String"
+                                          value={objective.user_facing_objective_string || ''}
+                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'user_facing_objective_string', e.target.value)}
+                                      />
+                                  </div>
+
+                                  <div className="input-group">
+                                    <label>Prompt Completed</label>
+                                      <textarea
+                                          placeholder="Prompt Completed"
+                                          value={objective.prompt_completed || ''}
+                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'prompt_completed', e.target.value)}
+                                      />
+                                  </div>
+
+                                  <div className="input-group">
+                                    <label>Prompt Available</label>
+                                      <textarea
+                                          placeholder="Prompt Available"
+                                          value={objective.prompt_available || ''}
+                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'prompt_available', e.target.value)}
+                                      />
+                                  </div>
+
+                                  <div className="input-group">
+                                    <label>Prompt Unavailable</label>
+                                      <textarea
+                                          placeholder="Prompt Unavailable"
+                                          value={objective.prompt_unavailable || ''}
+                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'prompt_unavailable', e.target.value)}
+                                      />
+                                  </div>
                               </div>
-                          ))}
-                          <button onClick={() => addNewObjective(listIndex)}>Add New Objective</button>
-                      </div>
+                              <FontAwesomeIcon
+                                  icon={faTrash}
+                                  onClick={() => removeObjective(listIndex, index)}
+                              />
+                          </div>
+                        ))}
+                        <button onClick={() => addNewObjective(listIndex)}>Add New Objective</button>
+                    </div>
                     ))}
                     <button onClick={addNewObjectiveSet}>Add New Objective Set</button>
                     <div className="input-group">
@@ -479,53 +501,6 @@ const WorldCreator = () => {
                                 <option key={index} value={scene.scene_name}>{scene.scene_name}</option>
                                 ))}
                             </select>
-                        </div>
-
-                        <div className="input-group">
-                            <label>NPC Name</label>
-                            <select 
-                                value={currentScene.npc_name || 'Select NPC'} 
-                                onChange={(e) => {
-                                  setCurrentScene({ ...currentScene, npc_name: e.target.value });
-                                  setSceneNpcName(e.target.value);}}>
-                                {/* <option value="">Select NPC</option> */}
-                                {npcs.map((npc, index) => (
-                                <option key={index} value={npc.npc_name}>{npc.npc_name}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="input-group">
-                            <label>Scene NPC Prompt</label>
-                            <textarea value={sceneNpcPrompt} onChange={(e) => setSceneNpcPrompt(e.target.value)}></textarea>
-                        </div>
-                        {currentScene.objectives.map((objectiveList, listIndex) => (
-                          <div key={`list-${listIndex}`}>
-                              <h3>Objective Set {listIndex + 1}</h3>
-                              {objectiveList.map((objective, index) => (
-                                  <div key={`objective-${listIndex}-${index}`} className="input-group">
-                                      <label>Objective {index + 1}</label>
-                                      <input
-                                          type="text"
-                                          value={objective}
-                                          onChange={(e) => handleObjectiveChange(listIndex, index, e.target.value)}
-                                      />
-                                      <FontAwesomeIcon
-                                          icon={faTrash}
-                                          onClick={() => removeObjective(listIndex, index)}
-                                      />
-                                  </div>
-                              ))}
-                              <button onClick={() => addNewObjective(listIndex)}>Add New Objective</button>
-                          </div>
-                        ))}
-                        <button onClick={addNewObjectiveSet}>Add New Objective Set</button>
-                        <div className="input-group">
-                            <label>Narration Intro</label>
-                            <textarea value={currentScene.narration_intro || ''} onChange={(e) => setCurrentScene({ ...currentScene, narration_intro: e.target.value })}></textarea>
-                        </div>
-                        <div className="input-group">
-                            <label>Narration Outro</label>
-                            <textarea value={currentScene.narration_outro || ''} onChange={(e) => setCurrentScene({ ...currentScene, narration_outro: e.target.value })}></textarea>
                         </div>
                     </div>
                     <button onClick={createNewScene}>Create Scene</button>
