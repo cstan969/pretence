@@ -1,4 +1,4 @@
-Mon Jul 31 21:27:40 2023
+Mon Aug  7 11:18:23 2023
 Linux-5.19.0-50-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -33,15 +33,15 @@ Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.17s
+Interface start. took 0.26s
 
 Initializing gl2 renderer:
-primary display bounds: (1920, 0, 1920, 1080)
+primary display bounds: (3840, 0, 1920, 1080)
 swap interval: 1 frames
 Windowed mode.
 Vendor: "b'NVIDIA Corporation'"
 Renderer: b'NVIDIA GeForce RTX 4090/PCIe/SSE2'
-Version: b'4.6.0 NVIDIA 525.125.06'
+Version: b'4.6.0 NVIDIA 535.86.10'
 Display Info: None
 Screen sizes: virtual=(800, 600) physical=(800, 600) drawable=(800, 600)
 Maximum texture size: 4096x4096

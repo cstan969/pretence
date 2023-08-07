@@ -97,8 +97,8 @@ class mongo_fncs_unittests(TestCase):
         get_all_scenes_in_order(world_name=world_name)
 
     def test_get_scene_objectives_status(self):
-        scene_id = 'scenes-TraumaGame-20230711145400'
-        user_name='Carl5'
+        scene_id = 'scenes-Fun with Food-20230730202644869837'
+        user_name='James Thomas Stanhope'
         obj_status = get_scene_objectives_status(scene_id=scene_id,user_name=user_name)
         print('---')
         pprint.pprint(obj_status)
@@ -108,6 +108,13 @@ class mongo_fncs_unittests(TestCase):
         scene = get_scene(scene_id=scene_id)
         print('---')
         pprint.pprint(scene['objectives'])
+
+    def test_mark_objectives_completed(self):
+        obj = {'objectives_completed': {"Chef Celine shares the story about the time her friend baguette was taken by humans her story": 'completed'}}
+        scene_id = "scenes-Fun with Food-20230802112545611010"
+        user_name = "James Thomas Stanhope"
+        mark_objectives_completed(objectives_completed=obj['objectives_completed'],scene_id=scene_id,user_name=user_name)
+
         
 
 tc = mongo_fncs_unittests()
@@ -120,6 +127,7 @@ tc = mongo_fncs_unittests()
 # tc.test_play_test_scene_in_renpy()
 # tc.test_get_progress_of_user_in_game()
 # tc.test_get_all_scenes_in_order()
-tc.test_get_scene_objectives_status()
+# tc.test_get_scene_objectives_status()
 # tc.test_get_scene()
+tc.test_mark_objectives_completed()
 

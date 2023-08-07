@@ -1,4 +1,4 @@
-Mon Jul 31 21:27:43 2023
+Mon Aug  7 11:18:26 2023
 Linux-5.19.0-50-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -7,7 +7,7 @@ Bootstrap to the start of init.init. took 0.02s
 Early init. took 0.00s
 Loader init. took 0.00s
 Loading error handling. took 0.01s
-Loading script. took 0.03s
+Loading script. took 0.05s
 Loading save slot metadata. took 0.01s
 Loading persistent. took 0.00s
 Running init code. took 0.05s
@@ -15,6 +15,7 @@ Loading analysis data. took 0.01s
 Analyze and compile ATL. took 0.00s
 Reloading save slot metadata. took 0.01s
 Index archives took 0.00s
+Backing up script files to '/home/carl/.renpy/backups/CallumTest':
 Dump and make backups. took 0.02s
 Cleaning cache. took 0.00s
 Making clean stores. took 0.00s
@@ -24,94 +25,87 @@ Creating interface object. took 0.00s
 Cleaning stores took 0.00s
 Init translation took 0.01s
 Build styles took 0.00s
-Load screen analysis took 0.01s
+Load screen analysis took 0.00s
 Analyze screens took 0.00s
-Save screen analysis took 0.00s
+Save screen analysis took 0.01s
 Prepare screens took 0.02s
 Save pyanalysis. took 0.00s
-Save bytecode. took 0.00s
+Save bytecode. took 0.01s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.05s
+Interface start. took 0.06s
 
 Initializing gl2 renderer:
-primary display bounds: (1920, 0, 1920, 1080)
+primary display bounds: (3840, 0, 1920, 1080)
 swap interval: 1 frames
 Windowed mode.
 Vendor: "b'NVIDIA Corporation'"
 Renderer: b'NVIDIA GeForce RTX 4090/PCIe/SSE2'
-Version: b'4.6.0 NVIDIA 525.125.06'
+Version: b'4.6.0 NVIDIA 535.86.10'
 Display Info: None
 Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
 Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1846, 1016) drawable=(1846, 1016)
+Screen sizes: virtual=(1920, 1080) physical=(1850, 1016) drawable=(1850, 1016)
 Maximum texture size: 4096x4096
-self.scene:  {'_id': 'scenes-Fun with Food-20230730123722828947', 'NPCs': {'Narrator': {'scene_npc_prompt': "As the player steps out of the cryo facility, the sun shines down on them.  They step out into empty streets.  For all of the talk of the streets being inhabited by food, there is nothing anywhere.  When the player steps out you here a quick short scream of shock.  However, looking around, the player will see nothing at first.  However, the player will hear the scampering of footsteps running away from them down the streets.  While chasing after the direction of the noise, the player continues to hear shuffling moving away from them and heavy breathing in the form of emotes.\n\nThe scream has come from the waffle who has seen the player, a human, and is hysterically running away, terrified that the player, a human, might eat him.  Your are the Narrator, do not ever talk from the perspective of the waffle.\n\nUnder no circumstances does the waffle stop running away from the player.  The waffle will not trust the player even if the player makes up some reason for why they should be friends.  The waffle will not do anything that the player asks it to do.  The only purpose of this scene is for the waffle to run away from the player.  As the Narrator, I want you to have the waffle run away in a fun manner as if in a chase scene in a movie.  The waffle should throw items behind it, or knock over trash cans, dodge through alleys.  Be creative.  In addition, the waffle should shout at the player.  The waffle should yell things at the player like 'leave me alone', 'dont eat me', etc.  The waffle is like a ninja, whipping through the city streets.  The waffle truly hates humans and only runs away.  Again, the waffle runs away and will not answer the player outside of witty banter.  The waffle will not have any meaninful conversation with the human that might detract from the waffle being terrified and running away.\n\nHere are some sample exchanges to explain the situation. However, please do not use these exact words and feel free to be creative.  This scene is designed to be funny.  So please be humorous!  Be hilarious.  Try your best in the weirdest or craziest of ways to make the player laugh!\n\nNarrator outputs should include both (hilarious explanations of the waffle running away) and (hilarious quips by the waffle)\n"}}, 'last_updated': '2023-07-31 21:11:10', 'narration_intro': "As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.", 'narration_outro': "As you turn down the alleyway you hear the longest most terrified scream, followed by a voice saying oh no oh no oh no dont eat me dont eat me I swear I don't taste nearly as delicious as I look.  I'm all flour I swear all flour.", 'objectives': [[{'objective': 'The player explicitly states that they chase or run after the direction of the noise', 'prompt_completed': '', 'prompt_available': "Examples Player Inputs and Narrator outputs:\nPlayer: Do I know where the scream came from?  Narrator: The sound seems to have come from behind you.  As you turn around, you cannot see anything, but the noises seem to be getting more distant.  It may behoove you to start running before it is too late.\nPlayer: who goes there?  Narrator: As you hear the shuffling of footsteps running away, you hear another scream\nPlayer: I chase after the footsteps.  Narrator: As you chase after the footsteps, they seem to quicken, the voice screams again 'leave me along you monster'\nPlayer: Do I know what direction the noise came from?  Narrator: You listen carefully and can ascertain that the footsteps are coming from the street behind you, but as you turn around you don't see anything.", 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (1)', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (2)', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (3)', 'prompt_available': "At this point in the chase, the waffle will run down a deadend alleyway in an attempt to get away. Conversation Example: \nPlayer: I continue to chase after the noise yelling I swear I am friendly.  Narrator: As you continue to chase after the disembodied voice, you hear the noises run down an alley way followed by a large crash and yelps of 'no no no, I don't want to be eaten'.\n\n", 'prompt_completed': '', 'prompt_unavailable': ''}]], 'previous_scene': None, 'scene_name': "1.3 I'm gonna get you!", 'world_name': 'Fun with Food', 'npc_name': 'Narrator', 'background_image_filepath': 'Fun with Food/city_intersection.png'}
-into play_narration_intro
-narration_intro in self.scene
-As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.
+self.scene:  {'_id': 'scenes-Fun with Food-20230728172020332167', 'NPCs': {'Dr. Daikon': {'scene_npc_prompt': "The player wakes up after being in a cryogenic slumber for an extremely long time.  The player awakens disoriented and unaware of their surroundings.  The player is unable to move their legs. The player is unable to open their eyes as well, so they cannot see.  However, the player has the ability to talk.\n\nAs the player wakes up, they are left uncertain of many things.  The player's memory of the past seems all but gone. All they know is that there is a Doctor, Dr. Daikon, in the room talking to them as well as a Nurse Nectarine.  The personality of Dr. Daikon is very excited for the player is the first person to wake up during his time working at the facility.\n\nHere are some answers to questions that the player could ask.\nWho is the player?  Dr. Daikon has no idea who the player is.  The record of who the player is have been lost.\nWhere is the player?  The player is on Earth.\nWhat year is it?  It's the year 2140.  The player has been in cryo slumber for over 100 years.\nWho is the player talking to?  The player is talking to Dr. Daikon.  Dr. Daikon is the chief researcher and engineer in charge of maintaining the cryo-chambers.\n\nIf the player asks for food, Dr. Daikon will mention to the player that Nurse Nectarine has prepared food for the player and Dr. Daikon will feed the player juice out of a straw.  When the player drinks the juice they realize that it's orange juice, and extremely delicious orange juice at that."}}, 'background_image_filepath': 'Fun with Food/00006-2592494937.png', 'last_updated': '2023-08-07 11:10:58', 'music_filepath': '', 'narration_intro': "You awaken, disoriented and unaware of your surroundings. Your eyes feel heavy and refuse to open, and your body feels sluggish and unresponsive. The coldness envelops you, and amidst the confusion, you hear a voice exclaiming, 'He's awake! Doctor, Doctor, he's awake!", 'narration_outro': 'Oh lordie, they must have put something in the orange juice, because you are so tired.  You fall asleep.', 'objectives': [[{'objective': 'Chat with the Doctor for 5 dialog exchanges', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}, {'objective': 'Find out about the history of the world while you have been sleeping', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'the player agrees to drink the orange juice out of the straw dr daikon holds to his lips', 'prompt_completed': '', 'prompt_available': "If the player asks for food, Dr. Daikon will mention to the player that Nurse Nectarine has prepared food for the player and Dr. Daikon will feed the player juice out of a straw by holding a straw up to the players lips and telling the player 'drink drink'.  When the player drinks the juice they realize that it's orange juice, and extremely delicious orange juice at that.  If the player refused to drink Dr Daikon will insist that the player needs to drink the orange guide, and force the player to drink if necessary.", 'prompt_unavailable': 'If the player asks for food, Dr. Daikon will mention to the player that Nurse Nectarine is preparing food for the player as we speak however Dr Daikon needs to run some more tests before the player can eat.', 'user_facing_objective_string': 'Drink the Nectarine Juice'}]], 'previous_scene': None, 'scene_name': '1.1 Hello? Who Dis?', 'world_name': 'Fun with Food', 'npc_name': 'Dr. Daikon'}
+NPCNAME:  Callum
 Fun with Food
-scenes-Fun with Food-20230730123722828947
-Narrator
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-who's there??
-As you strain your ears, you hear a faint voice shouting, 'It's just me, the terrified waffle! Don't come any closer!'
+hello?  what's going on?
+Hello! You've just woken up from a cryogenic slumber. My name is Dr. Daikon, and I am the chief researcher and engineer here. How are you feeling?
 False
 Fun with Food
-scenes-Fun with Food-20230730123722828947
-Narrator
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-I look towards where I heard the voice coming from
-As you turn your head towards the source of the voice, you catch a glimpse of a terrified waffle sprinting away from you, knocking over trash cans and dodging through alleys. It shouts, 'Leave me alone, you monstrous human! I won't be your breakfast!'
+uhhhh I guess I'm feeling okay.  is the screen bugged?
+Oh, I apologize for the confusion. You're unable to see because your eyes are still closed. Don't worry, it's perfectly normal after a long cryogenic slumber. Your vision will gradually return as you adjust. How are you feeling otherwise?
 False
 Fun with Food
-scenes-Fun with Food-20230730123722828947
-Narrator
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-haha, im not going to eat you little fella, i just want to talk!  I run after the waffle at full speed
-Oh sure, just a friendly chat while chasing me at full speed! Very reassuring! Keep your distance, you breakfast predator!
+uhhh okay i guess?  can i get up and walk around?
+I'm sorry to hear that you're unable to move your legs. It seems that you're experiencing paralysis. We'll need to run some tests to determine the cause and find a solution. In the meantime, is there anything else I can assist you with?
 False
 Fun with Food
-scenes-Fun with Food-20230730123722828947
-Narrator
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-if i stop running will you stop running as well then?  I dont want you to get away if you're the only person that can talk to me about what's going on in this world?
-Hah! Nice try, human! You think I'll fall for your tricks? I won't stop running until you're miles away from me! Good luck finding someone else to talk to!
+I suppose.  what year is it?  when is it?
+It's the year 2140. You've been in cryo slumber for over 100 years! Isn't that fascinating? So much has changed since then. How are you feeling about waking up in a whole new era?
 False
 Fun with Food
-scenes-Fun with Food-20230730123722828947
-Narrator
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-okay, well then, i will catch you and force you to talk to me then and force you to realize that im friendly and that I am not goin to eat you.  I parkour off of the walls, for I was clearly a ninja in my past life
-Ha! Good luck catching me, ninja-human! I'm the master of food parkour! You'll never reach me!
+ummm, i dont really know what to expect to be honest.  what all has happened?
+Oh, where do I even begin? So much has happened in the past century. You see, after humans tasked AI with creating more food due to scarcity, the AI went a bit overboard and created anthropomorphic food of all types. At first, they were friendly to humans, but as humans started eating them, the food fought back! Can you believe it? Now, the world is primarily inhabited by anthropomorphic food, and humans are few in number. There's even animosity towards humans, but since their numbers are low, they're not talked about much anymore. It's quite a diverse and challenging world out there. How does that sound to you?
 False
 Fun with Food
-scenes-Fun with Food-20230730123722828947
-Narrator
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-ugh, how the heck have I not caught this little guy?? is he really that fast.  I continue to chase after him, but this seems ridiculous
-Haha! You're struggling to catch up, aren't you? I told you, I'm the fastest waffle in town! You'll never catch me!
+well, I am a human, so that doesn't really sound the best...is the world outside going to be hostile towards me?
+I understand your concern, but not all anthropomorphic food is hostile towards humans. There are still friendly beings out there who will treat you with kindness. In fact, Nurse Nectarine has prepared some food for you. Would you like me to feed you some juice? It's really delicious and refreshing.
 False
 Fun with Food
-scenes-Fun with Food-20230730123722828947
-Narrator
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-Dude, Mr Waffle, seriously.  just have a chat with me, I'm homeless. I have no food nor water.  Can you not make me a sandwich or something?  is there not food in abundance here?
-Oh, poor little homeless human. Maybe you should have thought about that before you chased after me! I won't be your personal chef, so good luck finding food on your own!
+no no for now I just want to hear more about what's happening outside.  cant we talk a bit longer?
+I understand your concern, but not all anthropomorphic food is hostile towards humans. There are still friendly beings out there who will treat you with kindness. In fact, Nurse Nectarine has prepared some food for you. Would you like me to feed you some juice? It's really delicious and refreshing.
 False
 Fun with Food
-scenes-Fun with Food-20230730123722828947
-Narrator
+scenes-Fun with Food-20230728172020332167
+Dr. Daikon
 James Thomas Stanhope
-uhhh i continue to chase the waffle
-Oh, you're still chasing me? You're quite persistent for a hungry human. Maybe you should try running on all fours like a cheetah. It might help you catch up!
+no no i just want to talk longer.  Can you tell me more about what's happening outside?  can you expand?
+Of course, I'd be happy to tell you more about the world outside! As I mentioned before, not all anthropomorphic food is hostile towards humans. There are still friendly beings out there who will treat you with kindness. The world is quite diverse with various landscapes and settlements. You may encounter challenges, but there are also opportunities for adventure and discovery. Now, about that juice, would you like me to feed you some? It's really delicious and refreshing.
 False
-Fun with Food
-scenes-Fun with Food-20230730123722828947
-Narrator
-James Thomas Stanhope
-i continue to chase
-You're still chasing me? I must say, your determination is quite impressive. But I assure you, I'm one slippery waffle. Good luck keeping up!
-True
-{'_id': 'scenes-Fun with Food-20230730123722828947', 'NPCs': {'Narrator': {'scene_npc_prompt': "As the player steps out of the cryo facility, the sun shines down on them.  They step out into empty streets.  For all of the talk of the streets being inhabited by food, there is nothing anywhere.  When the player steps out you here a quick short scream of shock.  However, looking around, the player will see nothing at first.  However, the player will hear the scampering of footsteps running away from them down the streets.  While chasing after the direction of the noise, the player continues to hear shuffling moving away from them and heavy breathing in the form of emotes.\n\nThe scream has come from the waffle who has seen the player, a human, and is hysterically running away, terrified that the player, a human, might eat him.  Your are the Narrator, do not ever talk from the perspective of the waffle.\n\nUnder no circumstances does the waffle stop running away from the player.  The waffle will not trust the player even if the player makes up some reason for why they should be friends.  The waffle will not do anything that the player asks it to do.  The only purpose of this scene is for the waffle to run away from the player.  As the Narrator, I want you to have the waffle run away in a fun manner as if in a chase scene in a movie.  The waffle should throw items behind it, or knock over trash cans, dodge through alleys.  Be creative.  In addition, the waffle should shout at the player.  The waffle should yell things at the player like 'leave me alone', 'dont eat me', etc.  The waffle is like a ninja, whipping through the city streets.  The waffle truly hates humans and only runs away.  Again, the waffle runs away and will not answer the player outside of witty banter.  The waffle will not have any meaninful conversation with the human that might detract from the waffle being terrified and running away.\n\nHere are some sample exchanges to explain the situation. However, please do not use these exact words and feel free to be creative.  This scene is designed to be funny.  So please be humorous!  Be hilarious.  Try your best in the weirdest or craziest of ways to make the player laugh!\n\nNarrator outputs should include both (hilarious explanations of the waffle running away) and (hilarious quips by the waffle)\n"}}, 'last_updated': '2023-07-31 21:11:10', 'narration_intro': "As you step out of the cryo facility, the sun shines down on you blazingly bright.  Looking around, you realize you're in the middle of an intersection.  There is no cryo facility.  There is no nothing really.  Suddenly year hear a long loud scream, ahhhhhhhhh.", 'narration_outro': "As you turn down the alleyway you hear the longest most terrified scream, followed by a voice saying oh no oh no oh no dont eat me dont eat me I swear I don't taste nearly as delicious as I look.  I'm all flour I swear all flour.", 'objectives': [[{'objective': 'The player explicitly states that they chase or run after the direction of the noise', 'prompt_completed': '', 'prompt_available': "Examples Player Inputs and Narrator outputs:\nPlayer: Do I know where the scream came from?  Narrator: The sound seems to have come from behind you.  As you turn around, you cannot see anything, but the noises seem to be getting more distant.  It may behoove you to start running before it is too late.\nPlayer: who goes there?  Narrator: As you hear the shuffling of footsteps running away, you hear another scream\nPlayer: I chase after the footsteps.  Narrator: As you chase after the footsteps, they seem to quicken, the voice screams again 'leave me along you monster'\nPlayer: Do I know what direction the noise came from?  Narrator: You listen carefully and can ascertain that the footsteps are coming from the street behind you, but as you turn around you don't see anything.", 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (1)', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (2)', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'The player continues to follow after the waffle or say something to the waffle (3)', 'prompt_available': "At this point in the chase, the waffle will run down a deadend alleyway in an attempt to get away. Conversation Example: \nPlayer: I continue to chase after the noise yelling I swear I am friendly.  Narrator: As you continue to chase after the disembodied voice, you hear the noises run down an alley way followed by a large crash and yelps of 'no no no, I don't want to be eaten'.\n\n", 'prompt_completed': '', 'prompt_unavailable': ''}]], 'previous_scene': None, 'scene_name': "1.3 I'm gonna get you!", 'world_name': 'Fun with Food', 'npc_name': 'Narrator', 'background_image_filepath': 'Fun with Food/city_intersection.png'}
-self.scene:  {'_id': 'scenes-Fun with Food-20230730202644869837', 'NPCs': {'sceneNpcName': {'scene_npc_prompt': ''}}, 'last_updated': '2023-07-31 12:56:34', 'narration_intro': '', 'narration_outro': '', 'objectives': [[{'objective': 'The player explicitly states that they chase or run after the direction of the noise'}], [{'objective': 'The player continues to chase after the direction of the noise (1)'}], [{'objective': 'The player continues to chase after the direction of the noise (2)'}], [{'objective': 'The player continues to chase after the direction of the noise (3)'}], [{'objective': 'The player explicitly states that they turn down the alleyway'}]], 'previous_scene': 'scenes-Fun with Food-20230730123722828947', 'scene_name': '1.4 A syrupy ', 'world_name': 'Fun with Food'}
+Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1850, 1016) drawable=(1850, 1016)
+Maximum texture size: 4096x4096

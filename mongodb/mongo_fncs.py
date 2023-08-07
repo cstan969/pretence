@@ -6,6 +6,7 @@ import pprint
 import os
 import subprocess
 import shutil
+from fuzzywuzzy import fuzz
 from config import RENPY_SH_PATH
 
 
@@ -79,6 +80,7 @@ def upsert_user_npc_interaction(
         world_name:str,
         user_name: str,
         npc_name: str,
+        scene_id: str,
         user_message: str,
         npc_response: str,
         npc_emotional_response: Optional[dict]=None,
@@ -91,6 +93,7 @@ def upsert_user_npc_interaction(
         'world_name':world_name,
         'user_name':user_name,
         'npc_name':npc_name,
+        'scene_id': scene_id,
         'user_message':user_message,
         'npc_response':npc_response,
         'npc_emotional_response':npc_emotional_response,
@@ -121,12 +124,16 @@ def get_latest_npc_emotional_state(
 def get_formatted_conversational_chain(
     world_name: str,
     user_name: str,
-    npc_name: str
+    npc_name: str,
+    num_interactions: Optional[int] = None
 )->str:
     interactions = query_collection(collection_name='user_npc_interactions',query={'world_name':world_name,'user_name':user_name,'npc_name':npc_name})
     if interactions == []:
         return None
     ordered_interactions = sorted(interactions, key=lambda x: datetime.strptime(x['created_at'], "%Y-%m-%d %H:%M:%S"))
+    if num_interactions is not None:
+        if num_interactions < len(ordered_interactions):
+            ordered_interactions = ordered_interactions[-num_interactions:]
     conversation_lines = [f"{user_name}: {msg['user_message']}\n{npc_name}: {msg['npc_response']}\n" for msg in ordered_interactions]
     return ''.join(conversation_lines).rstrip()
 
@@ -163,6 +170,10 @@ def update_scene(scene_id: str, scene_info:dict)->dict:
         item_to_upsert=current_scene[0]
         for k,v in scene_info.items():
             item_to_upsert[k] = v
+        if 'objectives' in list(item_to_upsert):
+            for index, obj_set in enumerate(item_to_upsert['objectives']):
+                for index2, obj in enumerate(obj_set):
+                    item_to_upsert['objectives'][index][index2]['objective'].replace('.  ','. ')
         upsert_item(collection_name='scenes',item=item_to_upsert)
         return item_to_upsert
         
@@ -261,9 +272,33 @@ def mark_objectives_completed(objectives_completed: dict, scene_id: str, user_na
         scene_objectives = {objective['objective']: 'not_completed' for sublist in query_collection(collection_name='scenes',query={'_id': scene_id})[0]['objectives'] for objective in sublist}
     else:
         scene_objectives = items[0]['objectives_completed']
-    for obj,comp in objectives_completed.items():
-        if comp == "completed" and obj in list(scene_objectives):
-            scene_objectives[obj]="completed"
+    print('the scene_objectives before being marked as completed: ', scene_objectives)
+    
+    from fuzzywuzzy import process
+    for obj, comp in objectives_completed.items():
+        print('obj: ', obj)
+        print('comp: ', comp)
+        if comp == "completed":
+
+            # Find best match in scene_objectives
+            best_match, score = process.extractOne(obj, scene_objectives.keys())
+            print('Best match: ', best_match)
+            print('score: ', score)
+
+            # If the best match score is greater than a certain threshold
+            # then consider it a match. You can adjust this threshold.
+            threshold = 80
+            if score > threshold:
+                print('test: ', scene_objectives[best_match])
+                scene_objectives[best_match] = "completed"
+    
+    
+    # for obj,comp in objectives_completed.items():
+    #     print('obj: ', obj)
+    #     print('comp: ', comp)
+    #     print('test: ', scene_objectives[obj])
+    #     if comp == "completed" and obj in list(scene_objectives):
+    #         scene_objectives[obj]="completed"
     item_to_upsert = {
         '_id': id,
         'world_name': world_name,
@@ -392,8 +427,11 @@ def play_test_scene_in_renpy(world_name: str, scene_id: str):
     # subprocess.Popen([RENPY_SH_PATH])
 
 def play_world_in_renpy(world_name: str, user_name: str):
+    #First reset the scene that the player is in; delete the objectives completed and user-npc-interactions
+    current_scene_id = get_progress_of_user_in_game(world_name=world_name, user_name=user_name)
+    delete_items(collection_name='user_npc_interactions',query={'user_name':user_name, 'scene_id': current_scene_id})
+    delete_items(collection_name='scene_objectives_completed', query={'user_name':user_name,'_id': current_scene_id})
+    
     set_renpy_init_state(world_name=world_name,user_name=user_name)
-    # subprocess.Popen(['pkill','renpy'])
-    # subprocess.Popen([RENPY_SH_PATH])
     os.system('pkill renpy')
     os.system(RENPY_SH_PATH + " &")

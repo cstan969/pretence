@@ -1,14 +1,12 @@
 ﻿define User = Character("User")
-define Callum = Character("Callum", voice='en-us')
+default NPCNAME = "Callum"
+define NPC = Character("[NPCNAME]", voice='en-us')
 define Narrator = Character("Narrator", what_slow_cps=30)
 
 #Dynamic Variables
 default scene_image_default = "TraumaGame/callum.jpeg"
 image scene_image = "[scene_image_default]"
 image top_right_text = ParameterizedText(xalign=0.98,yalign=0.0)
-
-default NPCNAME = "Callum"
-define NPC_CHARACTER = Character("[NPCNAME]")
 
 init python:
     import api_requests
@@ -35,6 +33,7 @@ init python:
             print('self.scene: ', self.scene)
             self.scene_id = self.scene['_id']
             self.npc_name = self.get_npc_in_scene()
+            print('NPCNAME: ', NPCNAME)
             return self.scene
 
         def get_npc_in_scene(self):
@@ -124,7 +123,7 @@ label run_scenes:
     if 'narration_intro' in game.scene:
         $ intro_narration = game.scene['narration_intro']
         Narrator "[intro_narration]"
-        $ game.play_scene_narration_intro()
+        # $ game.play_scene_narration_intro()
         
 
 
@@ -136,14 +135,16 @@ label run_scenes:
 
         if user_input is not None and user_input != "":
             $ response, scene_completed = game.message_npc_and_get_response(user_input)
-            Callum "[response]"
-            $ game.npc_text_to_speech(response)
+            $ NPCNAME = game.npc_name
+            NPC "[response]"
+            # $ game.npc_text_to_speech(response)
             $ objective_txt = game.get_scene_objectives_status()
             show top_right_text "[objective_txt]"
             if scene_completed:
+                $ renpy.pause(5)
                 $ outro_narration = game.scene['narration_outro']
                 Narrator "[outro_narration]"
-                $ game.play_scene_narration_outro()
+                # $ game.play_scene_narration_outro()
                 if game.final_scene:
                     return
                 else:

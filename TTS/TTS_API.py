@@ -29,6 +29,16 @@ async def text_to_speech(q: dict)->dict:
     os.system("""mimic3 --remote --voice 'en_UK/apope_low' \"{text}\"""".format(text=text))
     return {}
 
+# @app.post("/TTS")
+# async def text_to_speech(q: dict)->dict:
+#     print(q)
+#     text = q['text']
+#     voice = q['voice']
+#     # text.replace('\"','')
+
+#     os.system("""mimic3 --remote --voice 'en_UK/apope_low' \"{text}\"""".format(text=text))
+#     return {}
+
 
 from config import port_allocations
 if __name__ == '__main__':
