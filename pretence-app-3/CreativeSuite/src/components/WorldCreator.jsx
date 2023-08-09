@@ -193,11 +193,10 @@ const WorldCreator = () => {
 
   const saveScene = () => {
     const previousScene = scenes.find(scene => scene.scene_name === previousSceneName)
-    const previousSceneId = previousScene ? previousScene._id : '';
     const updatedScene = {
         ...currentScene,
         objectives: currentScene.objectives.map(objective => [...objective]),
-        previous_scene: previousSceneId === '' ? null : previousSceneId,
+        previous_scene: previousScene ? previousScene._id : null,
         NPCs: sceneNPCs
       }
     axios.post('http://127.0.0.1:8002/update_scene/', updatedScene)
@@ -232,8 +231,8 @@ const WorldCreator = () => {
       .then(res => {
         // console.log(res);
         setCurrentScene({
-          scene_name: "",
-          previous_scene: null,
+          scene_name: currentScene.scene_name,
+          previous_scene: foundScene ? foundScene._id : null,
           NPCs: {},
           objectives: [],
           narration_intro: "",

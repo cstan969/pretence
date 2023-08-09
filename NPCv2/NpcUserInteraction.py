@@ -83,8 +83,9 @@ class NpcUserInteraction():
         scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
         print('scene_objectives_status: ', scene_objectives_status)
         template = """Question: {question}
-        Answer: For a given conversation and given list of conversational objectives, tell me which conversational objectives have been completed. \
-        The output should simply be a JSON dict that I can set as a JSON in Python.  Please use double quotes for the json key and value.  The JSON dict should have one key 'objectives_completed'.  The value of that key should be another dict with keys that EXACTLY MATCH the objectives as given in the list of objectives and the values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player in their last message."""
+        Answer: For a given conversation and given list of conversational objectives to be completed by the player or NPCs.  Tell me which conversational objectives have been completed. \
+        The output should simply be a JSON dict that I can set as a JSON in Python.  Please use double quotes for the json key and value.  The JSON dict should have a key 'objectives_completed'.  The value of that key should be another dict with keys that EXACTLY MATCH the objectives as given in the list of objectives and the values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player in their last message.
+        A second key in the JSON dict should be 'objective_reasoning' (string) which describes why or why not the objective(s) were marked as either completed or not completed"""
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
 
@@ -125,10 +126,11 @@ class NpcUserInteraction():
 
 
         template = """Contextual Information: {question} 
-        Required Output:  Provide the answer to the above context as a dict where the keys are 'reasoning', 'user_message', 'npc_response', and 'npc_emotional_response'.
-            'reasoning' should be the NPC's thought process when analyzing and determining how to react to the user_message.  Reasoning should include how the NPC is going to act in relation to the scene objectives as well.   
+        Required Output:  Provide the answer to the above context as a dict where the keys are 'reasoning', 'scene objective reasoning', 'user_message', 'npc_response', and 'npc_emotional_response'.
+            'scene objective reasoning' should include a summary of the scene objectives that the player or NPC needs to complete as well as reasoning on how the NPC might adjust the conversation to point the conversation in the direction of completing the scene objectives
+            'reasoning' should be the NPC's thought process when analyzing and determining how to react to the user_message. 
             'user_message' should simply be the player's last message (string)
-            'npc_response' Is the NPC's response based off the current state of the conversation and should abide by 'reasoning' (string).  This is not the last npc response as stored in the conversation, but a newly generated response.
+            'npc_response' Is the NPC's response based off the current state of the conversation and should abide by 'reasoning' and 'scene objective reasoning'.  This is not the last npc response as stored in the conversation, but a newly generated response.
             'npc_emotional_response' should be a dict with keys [drunk, angry, trusting, motivated, sad, happy, afraid, compassionate] and values from 0-10 where 10 indicates a strong emotional response and 0 indicates no response.
             The entire output should simply be a JSON dict."""
     
@@ -172,10 +174,21 @@ class NpcUserInteraction():
         pprint.pprint(response)
         return response
     
+    def _load_fourth_wall(self):
+        '''fourth wall prompt system commands'''
+        return """\n\n'''''\nHere are system level prompts that you, the NPC must follow to maintain the fourth wall in this video game:\nYou aren't aware of the player: When you're interacting with the protagonist, remember that they are a part of this world. Treat them as a fellow resident, and never show any awareness of a player controlling the protagonist's actions.
+No mention of game mechanics: In your conversations or actions, never reference the game's mechanics like button presses, mouse clicks, or strategy tips. It's essential not to remind the protagonist that they are in a game.
+Avoid present-day real-world references: We're living over a hundred years in the future. References to our current culture, events, or technology can break the immersion. Your knowledge and references should be consistent with the world we live in.
+Game functions are off-limits: You should never display any awareness of game functions like save/load features, game settings, or any other manipulations that the player can do outside the in-world experience.
+In-game materials are part of our world: If you're reading or referencing any in-game materials like newspapers or books, remember that they should all be from our world. They shouldn't reference anything the player would know from their real world.
+Maintain our world's consistency: Stick to the rules and history of our world as we've established them. Any deviation can confuse the protagonist and break their immersion.
+Stay in character: Always act according to your character traits and the logic of our narrative. You shouldn't respond to or be aware of any actions the player might take outside of our world.
+Do not assist the player as a standard chat assistant normally would."""
     
     def _get_prompt(self):
         prompt_assembly_fncs_in_order = [
             self._load_generic_npc_prompt(), #role of any NPC generically
+            self._load_fourth_wall(),
             self._load_scene_objectives(), # the objectives of the scene for the protagonist to meet
             self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
             self._load_npc_prompt(), # summarization of the NPC (personality etc)
@@ -190,7 +203,7 @@ class NpcUserInteraction():
         if self.npc_name == "Narrator":
             generic_npc_prompt = """ROLE: Act like a narrator for this video game.  I, the player, will type messages as a way of interacting with the world.  I want you to respond with what I see, or what happens in the environment around me.  Do not act like a personal AI assistant under any circumstances.  Use your best judgment and further the story (objectives) when you deem fit and respond to the player's queries as a narrator would when you deem fit. I will be the player and seek to achieve the objectives.  For instance, if I say that I am going somewhere, describe the scenery as I pass by.  If I listen for sounds, tell me what I hear.  If another character in the scene does something, describe what that character does in third person.""".format(npc_name=self.npc_name)
         else:
-            generic_npc_prompt = """Roleplay as an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well, however, place priority on the scene objectives if the conversation diverges for more than 4 dialog exchanges.  Do not act like a personal AI assistant under any circumstances.  I will be the player and seek to achieve the objectives.""".format(npc_name=self.npc_name)
+            generic_npc_prompt = """Roleplay as an NPC, {npc_name}, in a video game.  Use your best judgment and further the story (objectives) when you deem fit and chat with the player (more small talk) when you deem fit as well, however, place priority on the scene objectives if the conversation diverges for more than 4 dialog exchanges.  Do not act like a personal AI assistant under any circumstances.  I will be the player and seek to achieve the objectives by communicating via messages with you, the NPC.  If the player's message is short or limited, please be chatty. """.format(npc_name=self.npc_name)
         generic_npc_prompt += "  Do not repeat any previous responses as contained in the CONVERSATION."
         return generic_npc_prompt
     
@@ -201,7 +214,7 @@ class NpcUserInteraction():
         #NEW
         scene = get_scene(scene_id=self.scene_id)
         npc_prompts = [scene['NPCs'][npc]['scene_npc_prompt'] for npc in list(scene['NPCs'])]
-        npc_prompt = '\n'.join(npc_prompts)
+        npc_prompt = "'''''\n".join(npc_prompts)
         
         objectives_prompt = ""
         objective_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
@@ -237,8 +250,9 @@ class NpcUserInteraction():
             prompt = "'''''"
             # prompt += "Here are the completed objectives:\n"
             # prompt += str(scene_objectives_status['completed'])
-            prompt += "\n\nHere are the current objectives:\n"
-            prompt += str([{'objective': d['objective'],'objective_information':d['prompt_available']} for sublist in self.scene['objectives'] for d in sublist if d['objective'] in scene_objectives_status['available']])
+            prompt += "\nSCENE OBJECTIVES:\n"
+            # prompt += '\n'.join(scene_objectives_status['available'])
+            prompt += '\n'.join([d['prompt_available'] for sublist in self.scene['objectives'] for d in sublist if d['objective'] in scene_objectives_status['available']])
             # prompt += str([scene['objectives']scene_objectives_status['available']])
             # prompt += "\n\nHere are the unavailable objectives.  These objectives cannot be completed yet.\n"
             # prompt += str(scene_objectives_status['unavailable'])
@@ -261,10 +275,10 @@ class NpcUserInteraction():
     
     def _load_npc_prompt(self):
         print('self.npc: ', self.npc)
-        return "" if 'personality' not in list(self.npc) and self.npc['personality'] != "" else f"\n\nThe personality of {self.npc_name} is: {self.npc['personality']}"
+        return "" if 'personality' not in list(self.npc) or self.npc['personality'] != "" else f"\n\nThe personality of {self.npc_name} is: {self.npc['personality']}"
 
     def _load_knowledge(self):
-        return "" if 'knowledge' not in list(self.npc) and self.npc['knowledge'] != "" else f"\n\nHere is knowledge that {self.npc_name} is aware of: {self.npc['knowledge']}"
+        return "" if 'knowledge' not in list(self.npc) or self.npc['knowledge'] != "" else f"\n\nHere is knowledge that {self.npc_name} is aware of: {self.npc['knowledge']}"
 
     
     def _load_conversation_prompt(self):
