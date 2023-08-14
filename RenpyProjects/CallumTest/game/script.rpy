@@ -53,6 +53,7 @@ init python:
                 scene_id=self.scene_id,
                 npc_name=self.npc_name
             )
+            print(response)
             npc_response = response['npc_response']
             scene_completed = response['scene_completed']
             print(npc_response)
@@ -88,6 +89,7 @@ init python:
 
         def get_scene_objectives_status(self):
             objective_status = api_requests.get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
+            print(objective_status)
             lines = ["--{s}" + o + "{/s}" for o in objective_status['completed']]
             # lines.extend(["--" + o for o in objective_status['available']])
             display_text = '\n'.join(lines)
@@ -124,7 +126,7 @@ label run_scenes:
     if 'narration_intro' in game.scene:
         $ intro_narration = game.scene['narration_intro']
         Narrator "[intro_narration]"
-        $ game.play_scene_narration_intro()
+        # $ game.play_scene_narration_intro()
         
 
 
@@ -137,13 +139,13 @@ label run_scenes:
         if user_input is not None and user_input != "":
             $ response, scene_completed = game.message_npc_and_get_response(user_input)
             Callum "[response]"
-            $ game.npc_text_to_speech(response)
+            # $ game.npc_text_to_speech(response)
             $ objective_txt = game.get_scene_objectives_status()
             show top_right_text "[objective_txt]"
             if scene_completed:
                 $ outro_narration = game.scene['narration_outro']
                 Narrator "[outro_narration]"
-                $ game.play_scene_narration_outro()
+                # $ game.play_scene_narration_outro()
                 if game.final_scene:
                     return
                 else:

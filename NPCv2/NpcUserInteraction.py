@@ -80,16 +80,21 @@ class NpcUserInteraction():
         '''given the current conversation with the current npc, figure out which objectives are completed for the current scene'''
         convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name).replace(self.user_name,'Player')
         scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-        print(scene_objectives_status)
+        print('scene_objectives_status: ', scene_objectives_status)
         template = """Question: {question}
         Answer: For a given conversation and given list of conversational objectives, tell me which conversational objectives have been completed. \
-        The output should simply be a JSON dict with one key 'objectives_completed'.  The value of that key should be another dict with keys that are the objectives as given in the list of objectives and the values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player."""
+        The output should simply be a JSON dict that I can set as a JSON in Python.  Please use double quotes for the json key and value.  The JSON dict should have one key 'objectives_completed'.  The value of that key should be another dict with keys that are the objectives as given in the list of objectives and the values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player in their last message."""
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
 
 
-        prompt = """These are the conversational objectives that have yet to be completed by the player.\nCONVERSATIONAL OBJECTIVES:\n{objectives}\n
-        This is the conversation between the player and the NPC so far.\nCONVERSATION:\n{conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
+        prompt = """Based off of the conversation below, which of the conversational objectives have been completed?
+        CONVERSATIONAL OBJECTIVES:
+        {objectives}
+
+        This is the conversation between the player and the NPC so far.
+        CONVERSATION:
+        {conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
         print(prompt)
         response = llm_chain.run(prompt)
         print(response)
@@ -98,7 +103,6 @@ class NpcUserInteraction():
         pprint.pprint(response)
         print('--END 2 decouple objective response--')
         return response
-
 
 
 
