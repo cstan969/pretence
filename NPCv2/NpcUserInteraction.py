@@ -22,10 +22,15 @@ from mongodb.mongo_fncs import (
     progress_user_to_next_scene,
     get_scene_objectives_status
 )
-from config import NpcUserInteraction_model
 from langchain import PromptTemplate, LLMChain
-from langchain.chat_models import ChatOpenAI
 
+from langchain.llms import LlamaCpp
+from langchain import PromptTemplate, LLMChain
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+
+from config import NpcUserInteraction_model
 
 DEBUGGING = False
 
@@ -37,9 +42,10 @@ class NpcUserInteraction():
         self.scene = get_scene(scene_id=scene_id)
         self.npc_name=npc_name
         self.user_name = user_name
-        self.llm = ChatOpenAI(model='gpt-3.5-turbo')
-        # self.llm = ChatOpenAI(model='gpt-4')
-        # self.llm = ChatOpenAI(model=NpcUserInteraction_model)
+        self.llm = NpcUserInteraction_model
+
+   
+
         print('init npc user interaction')
         print('world_name: ', world_name)
         print('npc_name: ', npc_name)
