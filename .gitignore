@@ -1,4 +1,6 @@
-/venv/
-*/__pycache__/*
-/RenpyProjects/CallumTest/game/saves/
+venv/
+__pycache__/
+NPCv2/__pycache__/
+RenpyProjects/CallumTest/game/saves/
+mongodb/__pycache__/
 renpy-8.1.1-sdk/

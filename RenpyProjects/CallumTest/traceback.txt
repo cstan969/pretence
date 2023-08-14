@@ -33,7 +33,7 @@ Full traceback:
   File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 355, in raw_decode
 JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 
-Linux-5.19.0-50-generic-x86_64-with-glibc2.35 x86_64
+Linux-6.2.0-26-generic-x86_64-with-glibc2.35 x86_64
 Ren'Py 8.1.1.23060707
 CallumTest 1.0
-Wed Aug  9 16:18:11 2023
+Thu Aug 10 13:34:01 2023
