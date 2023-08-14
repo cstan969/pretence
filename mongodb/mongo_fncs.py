@@ -143,18 +143,28 @@ def get_formatted_conversational_chain(
 #####SCENES#####
 ################
 def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str]=None):
-    #find scene_id that is linked to previous_scene currently
-    if previous_scene is not None and 'scenes-' not in previous_scene:
-        previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'scene_name':previous_scene})[0]['_id']
-    current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene})
+    #make sure scene is unique first, else return None
+    scene = query_collection(collection_name='scenes',query={'world_name':world_name,'scene_name':scene_info['scene_name']})
+    if len(scene) > 0:
+        return None
+    # this is the current previous scene
+    if previous_scene is not None and 'scenes-' in previous_scene:
+        previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,previous_scene:previous_scene})[0]
+    elif 'previous_scene_name' in list(scene_info):
+        previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'scene_name':scene_info['previous_scene_name']})[0]
     
+    # this is the scene currently hooked up to that previous scene
+    current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene['_id']})
+    print('current_scene_hooked_up: ', current_scene_hooked_up_to_previous_scene)
+
     #upsert the new scene
     upserted_scene = {k:v for k,v in scene_info.items()}
     scene_id = '-'.join(['scenes',world_name,get_current_date_formatted_no_spaces()])
     upserted_scene['_id'] = scene_id
     upserted_scene['world_name'] = world_name
-    upserted_scene['previous_scene'] = previous_scene
+    upserted_scene['previous_scene'] = previous_scene['_id']
     upsert_item(collection_name='scenes',item=upserted_scene)
+
     #hook up the old next scene to the newly upserted scene
     if len(current_scene_hooked_up_to_previous_scene) > 0:
         current_scene_hooked_up_to_previous_scene = current_scene_hooked_up_to_previous_scene[0]

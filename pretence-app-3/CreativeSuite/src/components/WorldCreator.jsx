@@ -8,6 +8,8 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import SceneBackgroundImageFileSelector from '../components/SceneBackgroundImageFileSelector';
 import SceneMusicFileSelector from './SceneMusicFileSelector.jsx';
 
+
+
 const WorldCreator = () => {
   //user variables
   const [users, setUsers] = useState([]);
@@ -66,6 +68,7 @@ const WorldCreator = () => {
   const clearCurrentScene = () => {
     setCurrentScene({
       scene_name: "",
+      previous_scene_name: "",
       previous_scene: "",
       NPCs: {},
       objectives: [],
@@ -78,14 +81,18 @@ const WorldCreator = () => {
     setSceneNpcPrompt("");
   };
 
-
   useEffect(() => {
-    getAllWorlds()
-    getAllUsers()
-  }, []);
+    updateWorlds();
+    updateUsers();
+}, []); // An empty dependency array
+
+  // For operations that run every time currentScene changes:
+  useEffect(() => {
+      console.log('currentScene has changed: ', currentScene);
+  }, [currentScene]); 
 
 
-  const getAllWorlds = () => {
+  const updateWorlds = () => {
     axios.get('http://127.0.0.1:8002/get_all_worlds')
       .then(res => {
         setWorlds(res.data.worlds);
@@ -93,7 +100,7 @@ const WorldCreator = () => {
       .catch(err => console.log(err));
   };
 
-  const getAllUsers = () => {
+  const updateUsers = () => {
     axios.get('http://127.0.0.1:8002/get_all_users')
     .then(res => {
         setUsers(res.data);
@@ -127,6 +134,7 @@ const WorldCreator = () => {
     })
     .catch(err => console.log(err))
     setNewWorldName('');
+    updateWorlds()
   };
 
   const createUser = () => {
@@ -134,7 +142,8 @@ const WorldCreator = () => {
     setPlayGameUser(newUserName);
     setNewUserName('');
     setShowPopupNewUser(false);
-    axios.post('http://127.0.0.1:8002/upsert_user', {'user_name': newUserName,})
+    axios.post('http://127.0.0.1:8002/upsert_user', {'user_name': newUserName})
+    updateUsers()
   };
 
   const updatePlayTestWorld = (world_name) => {
@@ -196,11 +205,17 @@ const WorldCreator = () => {
     const updatedScene = {
         ...currentScene,
         objectives: currentScene.objectives.map(objective => [...objective]),
-        previous_scene: previousScene ? previousScene._id : null,
+        previous_scene: currentScene.previous_scene,
+        previous_scene_name: currentScene.previous_scene_name,
         NPCs: sceneNPCs
       }
+    // Update the Scene
     axios.post('http://127.0.0.1:8002/update_scene/', updatedScene)
       .then(res => console.log(res))
+      .catch(err => console.log(err));
+    // Update 'scenes' variable by re-pulling the scenes
+    axios.post('http://127.0.0.1:8002/get_all_scenes_in_order/', { world_name: currentWorld.world_name })
+      .then(res => setScenes(res.data.scenes))
       .catch(err => console.log(err));
   }
 
@@ -213,12 +228,11 @@ const WorldCreator = () => {
   }
 
   const createNewScene = () => {
-    // console.log('into CreateNewScene')
-    const foundScene = scenes.find(scene => scene.scene_name === currentScene.previous_scene);
     const newScene = { 
       world_name: currentWorld.world_name, 
       scene_name: currentScene.scene_name, 
-      previous_scene: foundScene ? foundScene._id : null,
+      previous_scene: currentScene.previous_Scene ? currentScene.previous_scene : null,
+      previous_scene_name: currentScene.previous_scene_name ? currentScene.previous_scene_name : "",
       NPCs: { sceneNpcName: {scene_npc_prompt: sceneNpcPrompt}},
       objectives: currentScene.objectives,
       narration_intro: currentScene.narration_intro,
@@ -226,23 +240,24 @@ const WorldCreator = () => {
       background_image_filepath: currentScene.background_image_filepath,
       music_filepath: currentScene.music_filepath
     };
-    // console.log(newScene)
+    console.log('newScene: ', newScene)
+    // Upsert the new scene
     axios.post('http://127.0.0.1:8002/insert_scene/', newScene)
       .then(res => {
-        // console.log(res);
-        setCurrentScene({
-          scene_name: currentScene.scene_name,
-          previous_scene: foundScene ? foundScene._id : null,
-          NPCs: {},
-          objectives: [],
-          narration_intro: "",
-          narration_outro: "",
-          background_image_filepath: "",
-          music_filepath: ""
-        });
-        handleSceneEditor();
+        clearCurrentScene();
+        setCurrentScene(curScene => ({...curScene, scene_name: res.data.scene_name, previous_scene: res.data.previous_scene, previous_scene_name: res.data.previous_scene_name}));
       })
       .catch(err => console.log(err));
+    // Get the new updated 'scenes' variable from DB
+    axios.post('http://127.0.0.1:8002/get_all_scenes_in_order/', { world_name: currentWorld.world_name })
+      .then(res => {
+        setScenes(res.data.scenes);
+      })
+      .catch(err => console.log(err));
+    
+    // get scene editor to update (ulgy way w/e)
+    setEditorOption('world');
+    setEditorOption('scene');
   };
 
   const createNewNpc = () => {
@@ -331,8 +346,7 @@ const WorldCreator = () => {
                     console.log('selected scene: ', scene)
                     const matchedScene = scenes.find(scene2 => scene2._id === scene.previous_scene);
                     console.log('matchedScene: ', matchedScene)
-                    const previous_scene_name_from_id = matchedScene ? matchedScene.scene_name : '';
-                    setCurrentScene({...scene, previous_scene: previous_scene_name_from_id});
+                    setCurrentScene({...scene, previous_scene: matchedScene ? matchedScene._id : null, previous_scene_name: matchedScene ? matchedScene.scene_name : ""});
                     const npcName = scene.NPCs ? Object.keys(scene.NPCs)[0] : '';
                     const npcPrompt = scene.NPCs && scene.NPCs[npcName] ? scene.NPCs[npcName].scene_npc_prompt : '';
                     setSceneNpcName(npcName);
@@ -372,9 +386,9 @@ const WorldCreator = () => {
                     <div className="input-group">
                         <label>Previous Scene</label>
                         <select 
-                                value={currentScene.previous_scene || ''} 
+                                value={currentScene.previous_scene_name || ''} 
                                 onChange={(e) => {
-                                  setCurrentScene({ ...currentScene, previous_scene: e.target.value });
+                                  setCurrentScene({ ...currentScene, previous_scene_name: e.target.value });
                                   setPreviousSceneName(e.target.value);}
                                 }>
                                 <option value="">Select previous scene</option>
@@ -493,8 +507,8 @@ const WorldCreator = () => {
                         <div className="input-group">
                             <label>Previous Scene</label>
                             <select 
-                                value={currentScene.previous_scene || ''} 
-                                onChange={(e) => setCurrentScene({ ...currentScene, previous_scene: e.target.value })}>
+                                value={currentScene.previous_scene_name || ''} 
+                                onChange={(e) => setCurrentScene({ ...currentScene, previous_scene_name: e.target.value })}>
                                 <option value="">Select previous scene</option>
                                 {scenes.map((scene, index) => (
                                 <option key={index} value={scene.scene_name}>{scene.scene_name}</option>

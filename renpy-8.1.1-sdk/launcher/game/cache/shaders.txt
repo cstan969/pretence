@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 renpy.alpha renpy.texture
 renpy.alpha renpy.geometry renpy.texture
 renpy.geometry renpy.texture
@@ -5,3 +6,12 @@ renpy.geometry renpy.solid
 renpy.solid
 renpy.ftl
 renpy.texture
+=======
+renpy.alpha renpy.geometry renpy.texture
+renpy.texture
+renpy.solid
+renpy.geometry renpy.solid
+renpy.ftl
+renpy.alpha renpy.texture
+renpy.geometry renpy.texture
+>>>>>>> test
