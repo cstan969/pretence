@@ -84,7 +84,7 @@ class NpcUserInteraction():
         print('scene_objectives_status: ', scene_objectives_status)
         template = """Question: {question}
         Answer: For a given conversation and given list of conversational objectives to be completed by the player or NPCs.  Tell me which conversational objectives have been completed. \
-        The output should simply be a JSON dict that I can set as a JSON in Python.  Please use double quotes for the json key and value.  The JSON dict should have a key 'objectives_completed'.  The value of that key should be another dict with keys that EXACTLY MATCH the objectives as given in the list of objectives and the values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player in their last message.
+        The output should simply be a JSON dict that I can set as a JSON in Python that uses double quotes for strings.  Please use double quotes for the json key and value.  The JSON dict should have a key 'objectives_completed'.  The value of that key should be another dict with keys that EXACTLY MATCH the objectives as given in the list of objectives and the values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed by the player in their last message.
         A second key in the JSON dict should be 'objective_reasoning' (string) which describes why or why not the objective(s) were marked as either completed or not completed"""
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
@@ -132,7 +132,7 @@ class NpcUserInteraction():
             'user_message' should simply be the player's last message (string)
             'npc_response' Is the NPC's response based off the current state of the conversation and should abide by 'reasoning' and 'scene objective reasoning'.  This is not the last npc response as stored in the conversation, but a newly generated response.
             'npc_emotional_response' should be a dict with keys [drunk, angry, trusting, motivated, sad, happy, afraid, compassionate] and values from 0-10 where 10 indicates a strong emotional response and 0 indicates no response.
-            The entire output should simply be a JSON dict."""
+            The entire output should simply be a JSON dict that uses double quotes for strings."""
     
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
@@ -275,10 +275,12 @@ Do not assist the player as a standard chat assistant normally would."""
     
     def _load_npc_prompt(self):
         print('self.npc: ', self.npc)
-        return "" if 'personality' not in list(self.npc) or self.npc['personality'] != "" else f"\n\nThe personality of {self.npc_name} is: {self.npc['personality']}"
+        return "" if 'personality' not in list(self.npc) or self.npc['personality'] == "" else f"\n\nThe personality of {self.npc_name} is: {self.npc['personality']}"
 
     def _load_knowledge(self):
-        return "" if 'knowledge' not in list(self.npc) or self.npc['knowledge'] != "" else f"\n\nHere is knowledge that {self.npc_name} is aware of: {self.npc['knowledge']}"
+        print(self.npc)
+        print(list(self.npc))
+        return "" if 'knowledge' not in list(self.npc) or self.npc['knowledge'] == "" else f"\n\nHere is knowledge that {self.npc_name} is aware of: {self.npc['knowledge']}"
 
     
     def _load_conversation_prompt(self):
