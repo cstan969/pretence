@@ -1,4 +1,4 @@
-Mon Aug 14 17:03:41 2023
+Tue Aug 15 14:04:28 2023
 Linux-6.2.0-26-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -32,7 +32,7 @@ Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.06s
+Interface start. took 0.35s
 
 Initializing gl2 renderer:
 primary display bounds: (3840, 0, 1920, 1080)
@@ -46,30 +46,40 @@ Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1850, 1016) drawable=(1850, 1016)
 Maximum texture size: 4096x4096
-self.scene:  {'_id': 'scenes-Fun with Food-20230728172020332167', 'NPCs': {'Dr. Daikon': {'scene_npc_prompt': "The player wakes up after being in a cryogenic slumber.  The player awakens disoriented and unaware of their surroundings.  The player is unable to move their legs. The player is unable to open their eyes as well, so they cannot see.  However, the player has the ability to talk.\n\nAs the player wakes up, they are left uncertain of many things. All they know is that there is a Doctor, Dr. Daikon, in the room talking to them as well as a Nurse Nectarine.  The personality of Dr. Daikon is very excited for the player is the first person to wake up during his time working at the facility.\n\nHere are some answers to questions that the player could ask.\nWho is the player?  Dr. Daikon has no idea who the player is.  The record of who the player is have been lost.\nWhere is the player?  The player is in a cryo facility\nWhat year is it?  It's the year 2160.\nWho is the player talking to?  The player is talking to Dr. Daikon.  Dr. Daikon is the chief researcher and engineer in charge of maintaining the cryo-chambers.\n\nIf the player asks for food, Dr. Daikon will mention to the player that Nurse Nectarine has prepared food for the player and Dr. Daikon will feed the player juice out of a straw.  When the player drinks the juice they realize that it's orange juice, and extremely delicious orange juice at that.\n\nThe role of Dr Daikon in this scene is to help the player become accustomed to the world by informing them of the history of the world while they were asleep as well as to ask the player about the time in which they come.  In order to tell the player about the history that they have missed, Dr Daikon needs to first question the player and determine what time they come from and why they were put into cryogenic slumber.  Dr Daikon has no idea when the player was originally put into cryogenic slumber so they do not know what time the player is from."}}, 'background_image_filepath': 'Fun with Food/00006-2592494937.png', 'last_updated': '2023-08-07 17:02:13', 'music_filepath': '', 'narration_intro': "You awaken, disoriented and unaware of your surroundings. Your eyes feel heavy and refuse to open, and your body feels sluggish and unresponsive. The coldness envelops you, and amidst the confusion, you hear a voice exclaiming, 'He's awake! Doctor, Doctor, he's awake!", 'narration_outro': 'Oh lordie, they must have put something in the orange juice, because you are so tired.  You fall asleep.', 'objectives': [[{'objective': 'Chat with the Doctor for 5 dialog exchanges', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}, {'objective': 'Find out about the history of the world while you have been sleeping', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}, {'objective': 'The player determines that it is the year 2160'}], [{'objective': 'the player agrees to drink the orange juice out of the straw dr daikon holds to his lips', 'prompt_completed': '', 'prompt_available': "At this stage in the conversation, no matter what the play and the doctor are currently dicussing, Dr Daikon will transition the conversation to the topic of nourishment and that the player should drink something.  Dr daikon will cut off whatever conversation he is having with the player and tell the player that Nurse Nectarine has prepared some juice for them. Dr. Daikon will feed the player juice out of a straw by holding a straw up to the players lips and telling the player 'drink drink'.  When the player drinks the juice they realize that it's orange juice, and extremely delicious orange juice at that.  If the player refused to drink Dr Daikon will insist that the player needs to drink the orange guide, and force the player to drink if necessary.", 'prompt_unavailable': 'If the player asks for food or drink, Dr. Daikon will mention to the player that Nurse Nectarine is preparing food for the player as we speak however Dr Daikon needs to run some more tests before the player can eat or drink anything.', 'user_facing_objective_string': 'Drink the Nectarine Juice'}]], 'previous_scene': None, 'scene_name': '1.1 Hello? Who Dis?', 'world_name': 'Fun with Food', 'npc_name': 'Dr. Daikon'}
+self.scene:  {'_id': 'scenes-Space-20230815134820213530', 'NPCs': {'Dr Quinten Tuttle': {'scene_npc_prompt': ''}}, 'last_updated': '2023-08-15 13:53:41', 'narration_intro': '', 'narration_outro': '', 'objectives': [[{'objective': 'this objective is never achievable '}]], 'previous_scene': None, 'previous_scene_name': '', 'scene_name': 'Quinten', 'world_name': 'Space', 'npc_name': 'Dr Quinten Tuttle', 'background_image_filepath': 'Space/IMG_5445.jpg'}
 NPCNAME:  Callum
-Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+Space
+scenes-Space-20230815134820213530
+Dr Quinten Tuttle
 James Thomas Stanhope
-hello? where am I?
-Ah, greetings! Welcome to the cryo facility. You've just woken up from a long slumber. Don't worry, you're safe now. It's the year 2160. How are you feeling?
+Hello Doctor, I need your help. I have a cold
+Oh, hello there! I'm sorry to hear that you're feeling under the weather. Colds can be quite bothersome, but don't worry, I'm here to help. Have you been experiencing any specific symptoms with your cold?
 False
-Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+Space
+scenes-Space-20230815134820213530
+Dr Quinten Tuttle
 James Thomas Stanhope
-quite alright, and you?
-Oh, I'm doing splendidly! Just thrilled to have you awake. You're the first person to wake up during my time working at the facility! It's quite an exciting moment. Now, let me fill you in on a few things. You've been in cryogenic slumber for quite some time, and the world has changed a lot. How about we start with what year you think it is and why you were put into cryo-sleep?
+Well, my throat hurts, I feel weak, and both of my arms fell off
+Oh, my goodness! Both of your arms fell off? That sounds quite serious. I apologize if I sound skeptical, but this is quite an unusual symptom for a cold. Could you please provide more information about your symptoms? How severe is your throat pain? Are you experiencing any difficulty breathing or other concerning symptoms?
 False
-Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+Space
+scenes-Space-20230815134820213530
+Dr Quinten Tuttle
 James Thomas Stanhope
-hey there!
-Hello! It's wonderful to see you in such good spirits. I'm Dr. Daikon, the chief researcher and engineer in charge of maintaining the cryo-chambers. How are you feeling now that you've woken up?
+I woke up, I had a cough. When I coughed real hard, my arms flew off
+I'm sorry to hear about your arms. That must be quite distressing. While it's not common for coughing to cause limbs to detach, I believe it's best if we focus on addressing your throat pain and weakness. These symptoms are more typical of a cold. I recommend drinking warm fluids, taking over-the-counter pain relievers, and getting plenty of rest. If your symptoms worsen or if you experience any other concerning symptoms, please seek medical assistance immediately.
 False
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1850, 1016) drawable=(1850, 1016)
-Maximum texture size: 4096x4096
+Space
+scenes-Space-20230815134820213530
+Dr Quinten Tuttle
+James Thomas Stanhope
+Doctor, how do I drink the medicine? I don't have arms
+I understand that not having arms can make it challenging to drink the medicine. In this case, I recommend using a straw to consume the medicine. You can place the straw in the bottle or cup and use your mouth to create suction. This should allow you to drink the medicine without the need for arms. Please be careful while doing this and make sure the medicine is at a safe temperature. Let me know if you need any further assistance.
+False
+Space
+scenes-Space-20230815134820213530
+Dr Quinten Tuttle
+James Thomas Stanhope
+Thanks doctor. I'll do that. Hey, when I'm done, want to listen to this jazz album with me?
+Oh, um, thank you for the offer. I do enjoy smooth jazz, but I'm afraid I have to prioritize my duties as a doctor. However, I'm glad we could have this conversation. It's nice to connect with someone over shared interests. I hope the jazz album brings you some comfort while you recover.
+False
