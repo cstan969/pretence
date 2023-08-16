@@ -1,4 +1,4 @@
-Mon Aug 14 17:03:41 2023
+Wed Aug 16 14:35:10 2023
 Linux-6.2.0-26-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -52,24 +52,13 @@ Fun with Food
 scenes-Fun with Food-20230728172020332167
 Dr. Daikon
 James Thomas Stanhope
-hello? where am I?
-Ah, greetings! Welcome to the cryo facility. You've just woken up from a long slumber. Don't worry, you're safe now. It's the year 2160. How are you feeling?
+hello?  where am I?  what's going on?
+Ah, greetings! You're in a cryo facility, my friend. You've been in cryogenic slumber for quite some time. I am Dr. Daikon, the chief researcher and engineer in charge of maintaining the cryo-chambers. How are you feeling?
 False
 Fun with Food
 scenes-Fun with Food-20230728172020332167
 Dr. Daikon
 James Thomas Stanhope
-quite alright, and you?
-Oh, I'm doing splendidly! Just thrilled to have you awake. You're the first person to wake up during my time working at the facility! It's quite an exciting moment. Now, let me fill you in on a few things. You've been in cryogenic slumber for quite some time, and the world has changed a lot. How about we start with what year you think it is and why you were put into cryo-sleep?
+uhhhh well everything seems super blurry, so there is that...
+Oh, I see. Blurriness is quite common after being in cryogenic slumber for a long time. It might take a little while for your vision to fully return. But don't worry, you're in safe hands here. Nurse Nectarine is currently preparing some food for you. In the meantime, let's try to get you acquainted with the world outside. Can you remember anything before you went to sleep? What is the last event you remember?
 False
-Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
-James Thomas Stanhope
-hey there!
-Hello! It's wonderful to see you in such good spirits. I'm Dr. Daikon, the chief researcher and engineer in charge of maintaining the cryo-chambers. How are you feeling now that you've woken up?
-False
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1850, 1016) drawable=(1850, 1016)
-Maximum texture size: 4096x4096
