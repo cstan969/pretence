@@ -115,6 +115,13 @@ class mongo_fncs_unittests(TestCase):
         user_name = "James Thomas Stanhope"
         mark_objectives_completed(objectives_completed=obj['objectives_completed'],scene_id=scene_id,user_name=user_name)
 
+    def test_get_number_of_user_npc_interactions(self):
+        out = get_number_of_user_npc_interactions(world_name='test',
+                                            user_name='James Thomas Stanhope',
+                                            npc_name='Callum',
+                                            scene_id='scenes-test-20230815140955910513'
+                                            )
+        print(out)
         
 
 tc = mongo_fncs_unittests()
@@ -129,5 +136,6 @@ tc = mongo_fncs_unittests()
 # tc.test_get_all_scenes_in_order()
 # tc.test_get_scene_objectives_status()
 # tc.test_get_scene()
-tc.test_mark_objectives_completed()
+# tc.test_mark_objectives_completed()
+tc.test_get_number_of_user_npc_interactions()
 

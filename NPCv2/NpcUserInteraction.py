@@ -20,7 +20,8 @@ from mongodb.mongo_fncs import (
     get_scene_objectives_completed,
     mark_objectives_completed,
     progress_user_to_next_scene,
-    get_scene_objectives_status
+    get_scene_objectives_status,
+    get_number_of_user_npc_interactions
 )
 from config import NpcUserInteraction_model
 from langchain import PromptTemplate, LLMChain
@@ -35,6 +36,10 @@ class NpcUserInteraction():
         self.world_name=world_name
         self.scene_id=scene_id
         self.scene = get_scene(scene_id=scene_id)
+        if 'max_number_of_dialogue_exchanges' in list(self.scene):
+            self.max_number_of_dialogue_exchanges = self.scene['max_number_of_dialogue_exchanges']
+        else:
+            self.max_number_of_dialogue_exchanges = None
         self.npc_name=npc_name
         self.user_name = user_name
         self.llm = ChatOpenAI(model='gpt-3.5-turbo')
@@ -171,6 +176,15 @@ class NpcUserInteraction():
         else:
             response['scene_completed'] = False
 
+        #get number of npc_interactions
+        if self.max_number_of_dialogue_exchanges is not None:
+            response['max_number_of_dialogue_exchanges'] = self.scene['max_number_of_dialogue_exchanges']
+            num_interactions = get_number_of_user_npc_interactions(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name,scene_id=self.scene_id)
+            response['number_of_dialogue_exchanges_so_far'] = num_interactions
+            if num_interactions >= self.scene['max_number_of_dialogue_exchanges']:
+                response['max_number_of_dialogue_exchanges_met'] = True
+            else:
+                response['max_number_of_dialogue_exchanges_met'] = False
         pprint.pprint(response)
         return response
     
