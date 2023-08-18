@@ -123,6 +123,10 @@ class mongo_fncs_unittests(TestCase):
         knowledge_files = get_knowledge_files_npc_has_access_to(world_name='test',npc_name='test')
         print(knowledge_files)
 
+    def test_get_formatted_conversational_chain(self):
+        chain = get_formatted_conversational_chain(world_name='Fun with Food',user_name='Carl',npc_name='Dr. Daikon')
+        print(chain)
+
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
 # tc.test_collection_users()
@@ -136,6 +140,6 @@ tc = mongo_fncs_unittests()
 # tc.test_get_scene_objectives_status()
 # tc.test_get_scene()
 # tc.test_mark_objectives_completed()
-tc.test_upsert_knowledge()
-tc.test_get_knowledge_files_npc_has_access_to()
-
+# tc.test_upsert_knowledge()
+# tc.test_get_knowledge_files_npc_has_access_to()
+tc.test_get_formatted_conversational_chain()

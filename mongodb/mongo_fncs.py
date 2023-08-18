@@ -125,9 +125,13 @@ def get_formatted_conversational_chain(
     world_name: str,
     user_name: str,
     npc_name: str,
+    scene_id: Optional[str]=None,
     num_interactions: Optional[int] = None
 )->str:
-    interactions = query_collection(collection_name='user_npc_interactions',query={'world_name':world_name,'user_name':user_name,'npc_name':npc_name})
+    query = {'world_name':world_name,'user_name':user_name,'npc_name':npc_name}
+    if scene_id is not None:
+        query['scene_id']=scene_id
+    interactions = query_collection(collection_name='user_npc_interactions',query=query)
     if interactions == []:
         return None
     ordered_interactions = sorted(interactions, key=lambda x: datetime.strptime(x['created_at'], "%Y-%m-%d %H:%M:%S"))
