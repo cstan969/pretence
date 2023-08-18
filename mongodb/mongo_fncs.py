@@ -160,6 +160,7 @@ def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str
     if len(scene) > 0:
         return None
     # this is the current previous scene
+    current_scene_hooked_up_to_previous_scene = []
     if previous_scene is not None:
         if 'scenes-' in previous_scene:
             previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,previous_scene:previous_scene})[0]
