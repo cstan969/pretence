@@ -115,7 +115,13 @@ class mongo_fncs_unittests(TestCase):
         user_name = "James Thomas Stanhope"
         mark_objectives_completed(objectives_completed=obj['objectives_completed'],scene_id=scene_id,user_name=user_name)
 
-        
+    def test_upsert_knowledge(self):
+        upsert_knowledge(world_name="test",tag="tag",knowledge_description="test_description",level="1",knowledge="test knowledge")
+        upsert_npc(world_name='test',npc_name='test',npc_metadata={'knowledge':[['tag',1]]})
+    
+    def test_get_knowledge_files_npc_has_access_to(self):
+        knowledge_files = get_knowledge_files_npc_has_access_to(world_name='test',npc_name='test')
+        print(knowledge_files)
 
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
@@ -129,5 +135,7 @@ tc = mongo_fncs_unittests()
 # tc.test_get_all_scenes_in_order()
 # tc.test_get_scene_objectives_status()
 # tc.test_get_scene()
-tc.test_mark_objectives_completed()
+# tc.test_mark_objectives_completed()
+tc.test_upsert_knowledge()
+tc.test_get_knowledge_files_npc_has_access_to()
 

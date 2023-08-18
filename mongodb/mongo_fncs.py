@@ -7,7 +7,7 @@ import os
 import subprocess
 import shutil
 from fuzzywuzzy import fuzz
-from config import RENPY_SH_PATH
+from config import RENPY_SH_PATH, KNOWLEDGE_PATH
 
 
 #####USERS#####
@@ -301,14 +301,6 @@ def mark_objectives_completed(objectives_completed: dict, scene_id: str, user_na
             if score > threshold:
                 print('test: ', scene_objectives[best_match])
                 scene_objectives[best_match] = "completed"
-    
-    
-    # for obj,comp in objectives_completed.items():
-    #     print('obj: ', obj)
-    #     print('comp: ', comp)
-    #     print('test: ', scene_objectives[obj])
-    #     if comp == "completed" and obj in list(scene_objectives):
-    #         scene_objectives[obj]="completed"
     item_to_upsert = {
         '_id': id,
         'world_name': world_name,
@@ -399,6 +391,41 @@ def set_scene_the_user_is_in(world_name: str, user_name: str, scene_id: str):
         'scene_id': scene_id
     }
     upsert_item(collection_name='progress_of_user_in_game',item=item_to_upsert)
+
+
+#####################
+######KNOWLEDGE######
+#####################
+
+def upsert_knowledge(world_name, tag, knowledge_description, level, knowledge):
+    collection_name='knowledge'
+    #Write the knowledge to file
+    filename=os.path.join(KNOWLEDGE_PATH,world_name,tag + "_" + level + ".txt")
+    os.makedirs(os.path.dirname(filename),exist_ok=True)
+    with open(filename,'w') as outfile:
+        outfile.write(knowledge)
+    item_to_upsert = {
+        '_id': '-'.join([collection_name,world_name,tag,level]),
+        'world_name': world_name,
+        'tag': tag,
+        'level': int(level),
+        'knowledge_description': knowledge_description,
+        'knowledge_filepath': filename
+    }
+    upsert_item(collection_name=collection_name,item=item_to_upsert)
+
+def get_knowledge_files_npc_has_access_to(world_name, npc_name):
+    npcs = query_collection(collection_name='npcs',query={'world_name':world_name,'npc_name':npc_name})
+    if len(npcs) > 0:
+        npc = npcs[0]
+        if 'knowledge' in list(npc):
+            npc_knowledge = npc['knowledge']
+            if len(npc_knowledge) > 0:
+                query_parts = [{"tag": tag, "level": {"$gte": level}} for tag, level in npc_knowledge]
+                query = {"$or": query_parts}
+                results = query_collection(collection_name='knowledge',query=query)
+                return [result['knowledge_filepath'] for result in results]
+    return []
 
 
 ################################
