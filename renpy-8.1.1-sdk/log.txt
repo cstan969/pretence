@@ -1,4 +1,4 @@
-Wed Aug 16 14:35:09 2023
+Mon Aug 21 10:53:50 2023
 Linux-6.2.0-26-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -33,7 +33,7 @@ Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.22s
+Interface start. took 0.08s
 
 Initializing gl2 renderer:
 primary display bounds: (3840, 0, 1920, 1080)

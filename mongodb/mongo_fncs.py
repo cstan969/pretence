@@ -7,7 +7,7 @@ import os
 import subprocess
 import shutil
 from fuzzywuzzy import fuzz
-from config import RENPY_SH_PATH, KNOWLEDGE_PATH
+from config import RENPY_SH_PATH, KNOWLEDGE_STORE_PATH
 
 
 #####USERS#####
@@ -404,12 +404,12 @@ def set_scene_the_user_is_in(world_name: str, user_name: str, scene_id: str):
 def upsert_knowledge(world_name, tag, knowledge_description, level, knowledge):
     collection_name='knowledge'
     #Write the knowledge to file
-    filename=os.path.join(KNOWLEDGE_PATH,world_name,tag + "_" + level + ".txt")
+    filename=os.path.join(KNOWLEDGE_STORE_PATH,world_name,tag + "_" + str(level) + ".txt")
     os.makedirs(os.path.dirname(filename),exist_ok=True)
     with open(filename,'w') as outfile:
         outfile.write(knowledge)
     item_to_upsert = {
-        '_id': '-'.join([collection_name,world_name,tag,level]),
+        '_id': '-'.join([collection_name,world_name,tag,str(level)]),
         'world_name': world_name,
         'tag': tag,
         'level': int(level),
@@ -424,11 +424,19 @@ def get_knowledge_files_npc_has_access_to(world_name, npc_name):
         npc = npcs[0]
         if 'knowledge' in list(npc):
             npc_knowledge = npc['knowledge']
-            if len(npc_knowledge) > 0:
-                query_parts = [{"tag": tag, "level": {"$gte": level}} for tag, level in npc_knowledge]
-                query = {"$or": query_parts}
-                results = query_collection(collection_name='knowledge',query=query)
-                return [result['knowledge_filepath'] for result in results]
+            queries = []
+            for tag, level in npc_knowledge.items():
+                queries.append({
+                    "tag": tag,
+                    "level": {"$gte": level}
+                })
+            
+            query = {"$or": queries}
+            # if len(npc_knowledge) > 0:
+                # query_parts = [{"tag": tag, "level": {"$gte": level}} for tag, level in npc_knowledge]
+                # query = {"$or": query_parts}
+            results = query_collection(collection_name='knowledge',query=query)
+            return [result['knowledge_filepath'] for result in results]
     return []
 
 
