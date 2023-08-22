@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from typing import Optional
 from pydantic import BaseModel
-from NPCv2.NpcUserInteraction import NpcUserInteraction
+from NPCv2.NpcUserInteraction_v2 import NpcUserInteraction
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 

@@ -1,4 +1,4 @@
-Wed Aug 16 14:35:10 2023
+Tue Aug 22 15:06:22 2023
 Linux-6.2.0-26-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -32,7 +32,7 @@ Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.06s
+Interface start. took 0.08s
 
 Initializing gl2 renderer:
 primary display bounds: (3840, 0, 1920, 1080)
@@ -46,19 +46,41 @@ Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1850, 1016) drawable=(1850, 1016)
 Maximum texture size: 4096x4096
-self.scene:  {'_id': 'scenes-Fun with Food-20230728172020332167', 'NPCs': {'Dr. Daikon': {'scene_npc_prompt': "The player wakes up after being in a cryogenic slumber.  The player awakens disoriented and unaware of their surroundings.  The player is unable to move their legs. The player is unable to open their eyes as well, so they cannot see.  However, the player has the ability to talk.\n\nAs the player wakes up, they are left uncertain of many things. All they know is that there is a Doctor, Dr. Daikon, in the room talking to them as well as a Nurse Nectarine.  The personality of Dr. Daikon is very excited for the player is the first person to wake up during his time working at the facility.\n\nHere are some answers to questions that the player could ask.\nWho is the player?  Dr. Daikon has no idea who the player is.  The record of who the player is have been lost.\nWhere is the player?  The player is in a cryo facility\nWhat year is it?  It's the year 2160.\nWho is the player talking to?  The player is talking to Dr. Daikon.  Dr. Daikon is the chief researcher and engineer in charge of maintaining the cryo-chambers.\n\nIf the player asks for food, Dr. Daikon will mention to the player that Nurse Nectarine has prepared food for the player and Dr. Daikon will feed the player juice out of a straw.  When the player drinks the juice they realize that it's orange juice, and extremely delicious orange juice at that.\n\nThe role of Dr Daikon in this scene is to help the player become accustomed to the world by informing them of the history of the world while they were asleep as well as to ask the player about the time in which they come.  In order to tell the player about the history that they have missed, Dr Daikon needs to first question the player and determine what time they come from and why they were put into cryogenic slumber.  Dr Daikon has no idea when the player was originally put into cryogenic slumber so they do not know what time the player is from."}}, 'background_image_filepath': 'Fun with Food/00006-2592494937.png', 'last_updated': '2023-08-07 17:02:13', 'music_filepath': '', 'narration_intro': "You awaken, disoriented and unaware of your surroundings. Your eyes feel heavy and refuse to open, and your body feels sluggish and unresponsive. The coldness envelops you, and amidst the confusion, you hear a voice exclaiming, 'He's awake! Doctor, Doctor, he's awake!", 'narration_outro': 'Oh lordie, they must have put something in the orange juice, because you are so tired.  You fall asleep.', 'objectives': [[{'objective': 'Chat with the Doctor for 5 dialog exchanges', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}, {'objective': 'Find out about the history of the world while you have been sleeping', 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}, {'objective': 'The player determines that it is the year 2160'}], [{'objective': 'the player agrees to drink the orange juice out of the straw dr daikon holds to his lips', 'prompt_completed': '', 'prompt_available': "At this stage in the conversation, no matter what the play and the doctor are currently dicussing, Dr Daikon will transition the conversation to the topic of nourishment and that the player should drink something.  Dr daikon will cut off whatever conversation he is having with the player and tell the player that Nurse Nectarine has prepared some juice for them. Dr. Daikon will feed the player juice out of a straw by holding a straw up to the players lips and telling the player 'drink drink'.  When the player drinks the juice they realize that it's orange juice, and extremely delicious orange juice at that.  If the player refused to drink Dr Daikon will insist that the player needs to drink the orange guide, and force the player to drink if necessary.", 'prompt_unavailable': 'If the player asks for food or drink, Dr. Daikon will mention to the player that Nurse Nectarine is preparing food for the player as we speak however Dr Daikon needs to run some more tests before the player can eat or drink anything.', 'user_facing_objective_string': 'Drink the Nectarine Juice'}]], 'previous_scene': None, 'scene_name': '1.1 Hello? Who Dis?', 'world_name': 'Fun with Food', 'npc_name': 'Dr. Daikon'}
+self.scene:  {'_id': 'scenes-Dreambound-20230726193433827682', 'NPCs': {'Little Timmy': {'scene_npc_prompt': "As the player walks into the room, Timmy is nervous.  Timmy, an eight year old child, has been having panic attacks.  The panic attack stems from having to attend a new school.  Timmy describes the panic attacks as a big scary monster inside me when I have to go to my new school, roaring and making my heart go super fast. I get so dizzy, like when you spin in circles until you can't stand straight and your tummy feels all icky. \n\nTimmy is also afraid of the player initially.  Timmy's mother has told him that the player is a dream catcher and that the player is going to help Timmy with his panic attacks. The purpose of this scene is for the player to converse with Timmy and to get Timmy to trust that the player will help his anxiety.  The player plans to do this by going into Timmy's dream world and defeating the monster for Timmy.\n\nTimmy's problem (e.g. panic attacks) can only be solved by going into the dream world.\n\nTimmy's personal motivations include really wanting to make new friends at school, hoping to do well in his classes, and also wishing he wasn't so scared all the time. He wants to feel brave like his favorite superhero and be able to have fun without worrying about the scary feelings he gets."}}, 'last_updated': '2023-08-22 14:09:04', 'narration_intro': 'You step into a cozy room within the heart of the Dream Catchers Guild, where soft rays of sunlight filter through the window, casting a warm and comforting ambiance. In the room, you see a little boy named Timmy, accompanied by his mother. Timmy stands close to his mother, seeking refuge in her presence. His eyes, wide with uncertainty, dart around the room.', 'narration_outro': "As Timmy closes his eyes, you close yours as well. Holding the dream pendant in your hands, you step into Timmy's dream world, hoping that your promise to help will come to fruition. The world around you shifts, and you find yourself facing his fears. Time seems to stretch on as darkness descends, bringing with it a profound silence.", 'objectives': [[{'objective': 'Converse with Timmy about his panic attacks represented as a dream monster.'}], [{'objective': 'Timmy agrees to let the player enter his dream world.'}]], 'previous_scene': 'scenes-Dreambound-20230726161443900418', 'scene_name': '1.2 Meeting Timmy', 'world_name': 'Dreambound', 'npc_name': 'Little Timmy', 'background_image_filepath': 'Dreambound/00005-398050871.png', 'previous_scene_name': '1.1 Induction'}
 NPCNAME:  Callum
 Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
+scenes-Dreambound-20230726193433827682
+Little Timmy
 James Thomas Stanhope
-hello?  where am I?  what's going on?
-Ah, greetings! You're in a cryo facility, my friend. You've been in cryogenic slumber for quite some time. I am Dr. Daikon, the chief researcher and engineer in charge of maintaining the cryo-chambers. How are you feeling?
-False
-Fun with Food
-scenes-Fun with Food-20230728172020332167
-Dr. Daikon
-James Thomas Stanhope
-uhhhh well everything seems super blurry, so there is that...
-Oh, I see. Blurriness is quite common after being in cryogenic slumber for a long time. It might take a little while for your vision to fully return. But don't worry, you're in safe hands here. Nurse Nectarine is currently preparing some food for you. In the meantime, let's try to get you acquainted with the world outside. Can you remember anything before you went to sleep? What is the last event you remember?
-False
+hello mr daikon sir
+
+Full traceback:
+  File "game/script.rpy", line 162, in script call
+    call run_scenes
+  File "game/script.rpy", line 137, in script
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
+    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
+  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
+    exec(bytecode, globals, locals)
+  File "game/script.rpy", line 137, in <module>
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "game/script.rpy", line 48, in message_npc_and_get_response
+    response = api_requests.message_npc_and_get_response(
+  File "api_requests.py", line 24, in message_npc_and_get_response
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/models.py", line 897, in json
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/__init__.py", line 346, in loads
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 337, in decode
+  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 355, in raw_decode
+JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+While running game code:
+  File "game/script.rpy", line 162, in script call
+    call run_scenes
+  File "game/script.rpy", line 137, in script
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "game/script.rpy", line 137, in <module>
+    $ response, scene_completed = game.message_npc_and_get_response(user_input)
+  File "game/script.rpy", line 48, in message_npc_and_get_response
+    response = api_requests.message_npc_and_get_response(
+JSONDecodeError: Expecting value: line 1 column 1 (char 0)
