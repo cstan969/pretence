@@ -54,9 +54,13 @@ init python:
             )
             npc_response = response['npc_response']
             scene_completed = response['scene_completed']
+            max_number_of_dialogue_exchanges_met = False
+            if 'max_number_of_dialogue_exchanges_met' in list(response):
+                if response['max_number_of_dialogue_exchanges_met']:
+                    max_number_of_dialogue_exchanges_met = True
             print(npc_response)
             print(scene_completed)
-            return npc_response, scene_completed
+            return npc_response, scene_completed, max_number_of_dialogue_exchanges_met
 
         def npc_text_to_speech(self, npc_message):
             api_requests.npc_text_to_speech(npc_message)
@@ -134,7 +138,7 @@ label run_scenes:
         User "[user_input]{nw}"
 
         if user_input is not None and user_input != "":
-            $ response, scene_completed = game.message_npc_and_get_response(user_input)
+            $ response, scene_completed, max_number_of_dialogue_exchanges_met = game.message_npc_and_get_response(user_input)
             $ NPCNAME = game.npc_name
             NPC "[response]"
             # $ game.npc_text_to_speech(response)
@@ -149,6 +153,8 @@ label run_scenes:
                     return
                 else:
                     call run_scenes
+            if max_number_of_dialogue_exchanges_met:
+                Narrator "The max number of dialogue exchanges has been met"
 
 
 label start:
