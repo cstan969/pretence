@@ -40,7 +40,6 @@ def get_all_worlds():
     return query_collection(collection_name='worlds',query={})
 
 def get_world(world_name:str):
-    print('world_name passed to get_world: ', world_name)
     worlds = query_collection(collection_name='worlds',query={'world_name':world_name})
     return None if worlds is None else worlds[0]
 
@@ -56,8 +55,6 @@ def upsert_npc(world_name:str, npc_name:str, npc_metadata:Optional[dict]=None):
     item['world_name']=world_name
     item['npc_name']=npc_name
     item['_id']='-'.join([collection_name,world_name,npc_name])
-    print('upsert_npc: ')
-    print(item)
     upsert_item(collection_name=collection_name,item=item)
 
 def get_npcs_in_world(world_name):
@@ -155,7 +152,6 @@ def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str
     
     # this is the scene currently hooked up to that previous scene
     current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene['_id']})
-    print('current_scene_hooked_up: ', current_scene_hooked_up_to_previous_scene)
 
     #upsert the new scene
     upserted_scene = {k:v for k,v in scene_info.items()}
@@ -213,8 +209,6 @@ def get_next_scene(scene_id: Optional[str]=None)->dict:
 def get_all_scenes_in_order(world_name: str):
     ''''Return all of the scenes for some world in order'''
     scenes = query_collection(collection_name='scenes',query={'world_name':world_name})
-    print([scene['_id'] for scene in scenes])
-    print([scene['previous_scene'] for scene in scenes])
     if len(scenes) == 0:
         return []
     else:
@@ -229,7 +223,6 @@ def get_all_scenes_in_order(world_name: str):
 def get_starting_scene_of_world(world_name: str):
     '''returns the starting scene for some world'''
     scenes = get_all_scenes_in_order(world_name=world_name)
-    print('scenes in order: ', scenes)
     return scenes[0] if len(scenes)>0 else None
 
 def delete_scene(id:str):
@@ -243,8 +236,6 @@ def set_scene_background_image_filepath(scene_id: str, file):
     db_filepath = f"{world_name}/{file.filename}"
     os.makedirs(os.path.dirname(renpy_filepath),exist_ok=True)
     os.makedirs(os.path.dirname(db_filepath),exist_ok=True)
-    print(renpy_filepath)
-    print(db_filepath)
     with open(renpy_filepath,'wb') as f:
         shutil.copyfileobj(file.file, f)
     with open(db_filepath,'wb') as f:
@@ -258,8 +249,6 @@ def set_scene_music_filepath(scene_id: str, file):
     renpy_path = os.path.join(os.getenv('PRETENCE_PATH'),'RenpyProjects','CallumTest','game')
     renpy_filepath = os.path.join(renpy_path,'audio',world_name,file.filename)
     db_filepath = f"{world_name}/{file.filename}"
-    print(renpy_filepath)
-    print(db_filepath)
     os.makedirs(os.path.dirname(renpy_filepath),exist_ok=True)
     os.makedirs(os.path.dirname(db_filepath),exist_ok=True)
     with open(renpy_filepath,'wb') as f:
@@ -282,33 +271,19 @@ def mark_objectives_completed(objectives_completed: dict, scene_id: str, user_na
         scene_objectives = {objective['objective']: 'not_completed' for sublist in query_collection(collection_name='scenes',query={'_id': scene_id})[0]['objectives'] for objective in sublist}
     else:
         scene_objectives = items[0]['objectives_completed']
-    print('the scene_objectives before being marked as completed: ', scene_objectives)
     
     from fuzzywuzzy import process
     for obj, comp in objectives_completed.items():
-        print('obj: ', obj)
-        print('comp: ', comp)
         if comp == "completed":
 
             # Find best match in scene_objectives
             best_match, score = process.extractOne(obj, scene_objectives.keys())
-            print('Best match: ', best_match)
-            print('score: ', score)
 
             # If the best match score is greater than a certain threshold
             # then consider it a match. You can adjust this threshold.
             threshold = 80
             if score > threshold:
-                print('test: ', scene_objectives[best_match])
                 scene_objectives[best_match] = "completed"
-    
-    
-    # for obj,comp in objectives_completed.items():
-    #     print('obj: ', obj)
-    #     print('comp: ', comp)
-    #     print('test: ', scene_objectives[obj])
-    #     if comp == "completed" and obj in list(scene_objectives):
-    #         scene_objectives[obj]="completed"
     item_to_upsert = {
         '_id': id,
         'world_name': world_name,
@@ -325,9 +300,7 @@ def get_scene_objectives_completed(scene_id: str, user_name: str):
 
 def get_scene_objectives_status(scene_id: str, user_name: str):
     objectives = get_scene(scene_id=scene_id)['objectives']
-    print('objectives: ', objectives)
     completed_objectives = get_scene_objectives_completed(scene_id=scene_id,user_name=user_name)
-    print('completed_objectives: ', completed_objectives)
     if completed_objectives is None:
         objectives_completed = []
         objectives_available = [obj['objective'] for obj in objectives[0]]
@@ -337,7 +310,6 @@ def get_scene_objectives_status(scene_id: str, user_name: str):
         objectives_available = []
         objectives_unavailable = []
         for index, objective_set in enumerate(objectives):
-            print('objective_set: ', objective_set)
             #if all objectives completed, extend the objectives completed list
             if all(completed_objectives.get(objective['objective']) == "completed" for objective in objective_set): 
                 objectives_completed.extend([obj['objective'] for obj in objective_set])
@@ -350,7 +322,6 @@ def get_scene_objectives_status(scene_id: str, user_name: str):
                     objectives_unavailable = []
                 break
     output = {'completed': objectives_completed,'available': objectives_available,'unavailable':objectives_unavailable}
-    print(output)
     return output
 
 def delete_user_scene_objectives(scene_id: str, user_name:str):
@@ -362,16 +333,12 @@ def delete_user_scene_objectives(scene_id: str, user_name:str):
 
 def get_progress_of_user_in_game(world_name: str, user_name: str)->str:
     '''Returns the scene_id that a user is up to for some world'''
-    print('world_name: ', world_name)
-    print('user_name: ', user_name)
     items = query_collection(collection_name='progress_of_user_in_game',query={'world_name': world_name,'user_name':user_name})
-    print(items)
     if len(items) > 0:
         return items[0]['scene_id']
     else:
         #return the first scene of the world
         starting_scene = get_starting_scene_of_world(world_name=world_name)
-        print(starting_scene)
         if starting_scene is not None:
             return starting_scene['_id']
         else:
@@ -423,7 +390,6 @@ def set_renpy_init_state(world_name: str, user_name: str):
 
 def get_renpy_init_state():
     items = query_collection(collection_name='renpy_init_state',query={'_id': 'renpy_init_state'})
-    print(items)
     return None if items is None else items[0]
 
 def play_test_scene_in_renpy(world_name: str, scene_id: str):

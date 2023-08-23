@@ -1,4 +1,4 @@
-Tue Aug 22 15:06:22 2023
+Wed Aug 23 14:57:10 2023
 Linux-6.2.0-26-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -32,7 +32,7 @@ Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.08s
+Interface start. took 0.10s
 
 Initializing gl2 renderer:
 primary display bounds: (3840, 0, 1920, 1080)
@@ -46,41 +46,19 @@ Screen sizes: virtual=(1920, 1080) physical=(1650, 928) drawable=(1650, 928)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1850, 1016) drawable=(1850, 1016)
 Maximum texture size: 4096x4096
-self.scene:  {'_id': 'scenes-Dreambound-20230726193433827682', 'NPCs': {'Little Timmy': {'scene_npc_prompt': "As the player walks into the room, Timmy is nervous.  Timmy, an eight year old child, has been having panic attacks.  The panic attack stems from having to attend a new school.  Timmy describes the panic attacks as a big scary monster inside me when I have to go to my new school, roaring and making my heart go super fast. I get so dizzy, like when you spin in circles until you can't stand straight and your tummy feels all icky. \n\nTimmy is also afraid of the player initially.  Timmy's mother has told him that the player is a dream catcher and that the player is going to help Timmy with his panic attacks. The purpose of this scene is for the player to converse with Timmy and to get Timmy to trust that the player will help his anxiety.  The player plans to do this by going into Timmy's dream world and defeating the monster for Timmy.\n\nTimmy's problem (e.g. panic attacks) can only be solved by going into the dream world.\n\nTimmy's personal motivations include really wanting to make new friends at school, hoping to do well in his classes, and also wishing he wasn't so scared all the time. He wants to feel brave like his favorite superhero and be able to have fun without worrying about the scary feelings he gets."}}, 'last_updated': '2023-08-22 14:09:04', 'narration_intro': 'You step into a cozy room within the heart of the Dream Catchers Guild, where soft rays of sunlight filter through the window, casting a warm and comforting ambiance. In the room, you see a little boy named Timmy, accompanied by his mother. Timmy stands close to his mother, seeking refuge in her presence. His eyes, wide with uncertainty, dart around the room.', 'narration_outro': "As Timmy closes his eyes, you close yours as well. Holding the dream pendant in your hands, you step into Timmy's dream world, hoping that your promise to help will come to fruition. The world around you shifts, and you find yourself facing his fears. Time seems to stretch on as darkness descends, bringing with it a profound silence.", 'objectives': [[{'objective': 'Converse with Timmy about his panic attacks represented as a dream monster.'}], [{'objective': 'Timmy agrees to let the player enter his dream world.'}]], 'previous_scene': 'scenes-Dreambound-20230726161443900418', 'scene_name': '1.2 Meeting Timmy', 'world_name': 'Dreambound', 'npc_name': 'Little Timmy', 'background_image_filepath': 'Dreambound/00005-398050871.png', 'previous_scene_name': '1.1 Induction'}
+self.scene:  {'_id': 'scenes-Fun with Food-20230730092808304209', 'NPCs': {'Dr. Daikon': {'scene_npc_prompt': "In this scene the player is allowed to ask questions of Dr Daikon to their hearts desire.  Dr Daikon answers honestly.  Dr Daikon is much less serious in this scene and loves to crack jokes and make puns.  The role of Dr Daikon in this scene is to help the player become accustomed to the world by informing them of the history of the world while they were asleep as well as to ask the player about the time in which they come.  In order to tell the player about the history that they have missed, Dr Daikon needs to first question the player and determine what time they come from and what the world was like during their time.  Dr Daikon has no idea when the player was originally put into cryogenic slumber so they do not know what time the player is from.   The only objective of this scene is that the player EXPLICITLY says that they are ready to start.\n\nDr Daikon will inform the player that they can go out into the world whenever they are ready but that he can answer any of their questions they might have about the world before they depart.  Dr Daikon tells you to yell 'I am ready to have fun with food' when you are ready for him to open the door to a brave new world.\n"}}, 'last_updated': '2023-08-09 12:50:45', 'narration_intro': 'Awakening once more, you find yourself nestled within the familiar confines of the cryo facility. Your vision, once shrouded in a blurry haze, has recalibrated, bringing the world around you into sharp relief. The eerie sensation of disembodiment has faded, leaving behind only a faint numbness. A palpable sense of progression lingers in the air, whispering promises of a journey forward.', 'narration_outro': 'As you step beyond the clinic\'s cool tile floor, the clinical aroma of "antiseptic apple pies" and "bandage baklavas" gives way to a zesty hint of the unknown, a distant whisper of "peppermint possibilities." You leave behind the world of "clinical croutons" and "operating table omelettes," setting your senses on the tantalizing promise of "adventure al dente."  Beyond the clinic doors, a culinary cosmos unfurls, serving up a world where the whimsical and the edible intertwine. The very air seems thick with anticipation, whispering of "whipped cream wonders," "sorbet surprises," and a horizon studded with "jellybean journeys." This isn\'t a mere "salad stroll" you\'re embarking on, but a delicious escapade filled with "taco twists," "sundae spirals," and "cookie capers."  Your heart pounds with egg-citement at the prospect of exploring "popcorn paths," scaling "carrot cake cliffs," and maybe even sailing on "mashed potato molehills." The commonplace is left far behind, replaced by a gastronomic playground where "cabbage convalescents" give way to "bagel balloons" and "marshmallow meadows."  So, tighten your apron strings, adjust your chef\'s hat, and prepare for an egg-straordinary adventure. You\'re not just leaving a clinic, but embarking on a journey of "soup operas," "risotto revolutions," and culinary carnivals. Brace yourself for a mouth-watering expedition of epic proportions, where each step promises a delightful dish of daring and whimsy. This world is your buffet; it\'s time to feast on the adventure!', 'objectives': [[{'objective': "Talk with Dr Daikon about anything you'd like for 10 dialogue exchanges", 'prompt_completed': '', 'prompt_available': '', 'prompt_unavailable': ''}], [{'objective': 'The player explicitly states that they are ready to leave the cryo facility or depart out into the world etc', 'prompt_completed': '', 'prompt_available': "Dr Daikon will inform the player that they can go out into the world whenever they are ready but that he can answer any of their questions they might have about the world before they depart.  Dr Daikon tells you to yell 'I am ready to have fun with food' when you are ready for him to open the door to a brave new world.\n", 'prompt_unavailable': 'if the player asks to leave the facility Dr Daikon will tell the player that Nurse Nectarine is currently priming the pastry portal but that they will be able to depart shortly.'}], []], 'previous_scene': 'scenes-Fun with Food-20230728172020332167', 'scene_name': '1.2 Is this real life?', 'world_name': 'Fun with Food', 'background_image_filepath': 'Fun with Food/_7ac6227e-70d9-4852-972d-49d4dcc5e5fc.jpeg', 'npc_name': 'Dr. Daikon'}
 NPCNAME:  Callum
 Fun with Food
-scenes-Dreambound-20230726193433827682
-Little Timmy
+scenes-Fun with Food-20230730092808304209
+Dr. Daikon
 James Thomas Stanhope
-hello mr daikon sir
-
-Full traceback:
-  File "game/script.rpy", line 162, in script call
-    call run_scenes
-  File "game/script.rpy", line 137, in script
-    $ response, scene_completed = game.message_npc_and_get_response(user_input)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/ast.py", line 1138, in execute
-    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
-  File "/home/carl/Pretence/renpy-8.1.1-sdk/renpy/python.py", line 1122, in py_exec_bytecode
-    exec(bytecode, globals, locals)
-  File "game/script.rpy", line 137, in <module>
-    $ response, scene_completed = game.message_npc_and_get_response(user_input)
-  File "game/script.rpy", line 48, in message_npc_and_get_response
-    response = api_requests.message_npc_and_get_response(
-  File "api_requests.py", line 24, in message_npc_and_get_response
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/models.py", line 897, in json
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/__init__.py", line 346, in loads
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 337, in decode
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 355, in raw_decode
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-
-While running game code:
-  File "game/script.rpy", line 162, in script call
-    call run_scenes
-  File "game/script.rpy", line 137, in script
-    $ response, scene_completed = game.message_npc_and_get_response(user_input)
-  File "game/script.rpy", line 137, in <module>
-    $ response, scene_completed = game.message_npc_and_get_response(user_input)
-  File "game/script.rpy", line 48, in message_npc_and_get_response
-    response = api_requests.message_npc_and_get_response(
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+oh shit what's up!  you're like legit a daikon radish
+Wow, you won't believe it! I'm actually a legit daikon radish, and I can talk too! It's quite a rare combination, if I do say so myself. But hey, let's focus on you now, my friend. I'm absolutely thrilled to hear about your world and all the amazing adventures you've had before stepping into this brave new one!
+False
+Fun with Food
+scenes-Fun with Food-20230730092808304209
+Dr. Daikon
+James Thomas Stanhope
+no no no, let's stay in the present.  I know you're probably interested in my past, but let's be real here my learning about the present is more important than your learning about the past here.  so uhhh, what can you tell me?
+Isn't it intriguing? In this extraordinary new realm, humans have transformed into mere legends, while the food entities surrounding us have forged their own societies. It's truly a captivating era to exist, don't you think?
+False
