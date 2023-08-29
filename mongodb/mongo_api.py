@@ -125,7 +125,31 @@ async def get_all_scenes_in_order(q: dict):
 async def get_scene_objectives_status(q:dict):
     return fncs.get_scene_objectives_status(scene_id=q['scene_id'],user_name=q['user_name'])
 
+@app.post("/get_all_knowledge_for_world")
+def get_all_knowledge_for_world(q:dict):
+    world_name=q['world_name']
+    return fncs.get_all_knowledge_for_world(world_name=world_name)
 
+@app.post("/get_knowledge")
+def get_knowledge(q:dict):
+    world_name=q['world_name']
+    tag = q['tag'] if 'tag' in list(q) else None
+    return fncs.get_knowledge(world_name=world_name,tag=tag)
+    
+
+@app.post("/get_all_unique_knowledge_tags_for_world")
+def get_all_unique_knowledge_tags_for_world(q:dict):
+    world_name=q['world_name']
+    return fncs.get_all_unique_knowledge_tags_for_world(world_name=world_name)
+
+@app.post("/upsert_knowledge")
+def upsert_knowledge(q:dict):
+    world_name = q['world_name']
+    tag = q['tag']
+    knowledge_description = q['knowledge_description']
+    level = q['level']
+    knowledge=q['knowledge']
+    return fncs.upsert_knowledge(world_name=world_name,tag=tag,knowledge_description=knowledge_description, knowledge=knowledge,level=level)
 
 ################################
 #####MULTI COLLECTION CALLS#####

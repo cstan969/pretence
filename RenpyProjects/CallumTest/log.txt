@@ -1,4 +1,4 @@
-Mon Aug 21 10:46:18 2023
+Mon Aug 28 17:12:06 2023
 Linux-6.2.0-26-generic-x86_64-with-glibc2.35
 Ren'Py 8.1.1.23060707
  
@@ -32,7 +32,7 @@ Save pyanalysis. took 0.00s
 Save bytecode. took 0.00s
 Running _start took 0.00s
 Performance test:
-Interface start. took 0.07s
+Interface start. took 0.06s
 
 Initializing gl2 renderer:
 primary display bounds: (3840, 0, 1920, 1080)
@@ -52,6 +52,17 @@ TraumaGame
 scenes-TraumaGame-20230711145400
 Callum
 James Thomas Stanhope
-how's it going man, whatcha thinking about?
-Oh, hello. I'm just lost in thought, pondering about the past and the future. It's been a tough journey, you know? But I'm trying to find hope and believe in a better world. How about you? What brings you here?
+hey there, can you tell me if there is an inn or tavern nearby?
+I... I know of a place... 'The Rusty Mug'... It's nearby, just a few blocks away... Some... Some people say it's a decent place to rest and grab a drink... But... but you should be careful... trouble... trouble seems to find its way there...
 False
+TraumaGame
+scenes-TraumaGame-20230711145400
+Callum
+James Thomas Stanhope
+i think i heard it was something tum tum or something like that?
+Ah, Tum Tum's tavern... It brings back memories of better times. It's not the safest place these days, though. I'm afraid it's fallen on hard times.
+False
+Screen sizes: virtual=(1920, 1080) physical=(1920, 1016) drawable=(1920, 1016)
+Maximum texture size: 4096x4096
+Screen sizes: virtual=(1920, 1080) physical=(1850, 1016) drawable=(1850, 1016)
+Maximum texture size: 4096x4096

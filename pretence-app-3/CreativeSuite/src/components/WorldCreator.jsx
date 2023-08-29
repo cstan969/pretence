@@ -49,21 +49,33 @@ const WorldCreator = () => {
   const [npcKnowledge, setNpcKnowledge] = useState('');
   const [sceneNpcName, setSceneNpcName] = useState('');
   const [sceneNpcPrompt, setSceneNpcPrompt] = useState('');
+  const [npcSpeechPatterns, setNpcSpeechPatterns] = useState('');
   const sceneNPCs = {
     [sceneNpcName]: {
       scene_npc_prompt: sceneNpcPrompt
     }
   };
+  
   const [newNpcName, setNewNpcName] = useState('');
   const [newNpcPersonality, setNewNpcPersonality] = useState('');
+  const [selectedTag, setSelectedTag] = useState("");
+  const [selectedLevel, setSelectedLevel] = useState(0);
+  const [npcKnowledgeList, setNpcKnowledgeList] = useState({});
   const [isNewScene, setIsNewScene] = useState(true);
+
   //play game as user variables
   const [playGameWorld, setPlayGameWorld] = useState('')
   const [playGameUser, setPlayGameUser] = useState('')
-  //play test world/scene variables
   const [playTestSceneWorld, setPlayTestSceneWorld] = useState('')
   const [playTestSceneScene, setPlayTestSceneScene] = useState('')
   const [playTestScenes, setPlayTestScenes] = useState([])
+
+
+  //knowledge stuffs
+  const [knowledgeTags, setKnowledgeTags] = useState([]);
+  //const [knowledges, setKnowledges] = useState([]);
+  const [currentKnowledge, setCurrentKnowledge] = useState({});
+  const [isNewKnowledge, setIsNewKnowledge] = useState(true);
 
   const clearCurrentScene = () => {
     setCurrentScene({
@@ -90,6 +102,11 @@ const WorldCreator = () => {
   useEffect(() => {
       console.log('currentScene has changed: ', currentScene);
   }, [currentScene]); 
+
+//   // For operations that run every time currentScene changes:
+//   useEffect(() => {
+//     console.log('currentKnowledge has changed: ', currentKnowledge);
+// }, [currentKnowledge]); 
 
 
   const updateWorlds = () => {
@@ -185,6 +202,26 @@ const WorldCreator = () => {
   const handleNpcEditor = () => {
     updateNpcs();
     setEditorOption('npc');
+    updateKnowledge();
+  };
+
+  const handleKnowledgeEditor = () => {
+    updateKnowledge();
+    setEditorOption('knowledge')
+  };
+
+  const updateKnowledge = () => {
+    if (currentWorld) {
+      axios.post('http://127.0.0.1:8002/get_all_unique_knowledge_tags_for_world/', { world_name: currentWorld.world_name })  
+        .then(res => {
+          console.log(res);
+          setKnowledgeTags(res.data);
+        })
+        .then(res => {
+          console.log('knowledge tags: ', knowledgeTags);
+        })
+        .catch(err => console.log(err));
+    }
   };
 
 
@@ -220,7 +257,12 @@ const WorldCreator = () => {
   }
 
   const saveNpc = () => {
-    const updatedNpc = {...currentNpc, personality: npcPersonality, knowledge: npcKnowledge}
+    const updatedNpc = {...currentNpc,
+      personality: npcPersonality,
+      knowledge: npcKnowledge,
+      speech_patterns: npcSpeechPatterns,
+      knowledge_tag_levels: npcKnowledgeList
+    }
     // console.log(updatedNpc)
     axios.post('http://127.0.0.1:8002/upsert_npc/',updatedNpc)
     .then(res=>console.log(res))
@@ -282,6 +324,7 @@ const WorldCreator = () => {
         <button onClick={() => setEditorOption('world')}>World Editor</button>
         <button onClick={handleSceneEditor}>Scene Editor</button>
         <button onClick={handleNpcEditor}>NPC Editor</button>
+        <button onClick={handleKnowledgeEditor}>Knowledge Editor</button>
       </div>
     );
   }
@@ -523,16 +566,210 @@ const WorldCreator = () => {
     );
 }
 
+  if (editorOption === 'knowledge') {
+    
+    function setCurrentKnowledgeFromTag(input_tag){
+      console.log('---hello---');
+      let k = {
+        tag: input_tag,
+        knowledge_description: "",
+        level0: "",
+        level1: "",
+        level2: "",
+        level3: "",
+        level4: "",
+        level5: ""
+      }
+      axios.post('http://127.0.0.1:8002/get_knowledge/', {tag: input_tag, world_name: currentWorld.world_name})
+      .then(res => {
+        res.data.forEach(item => {
+          const levelKey = `level${item.level}`;
+          console.log('levelKey: ', levelKey)
+          k[levelKey] = item.knowledge;
+          k['knowledge_description']=item.knowledge_description;
+          setCurrentKnowledge(k);
+        });
+      })
+      .catch(err => console.log(err));
+    }
+
+    function createNewKnowledge(){
+      //add the additional tag to the set of tags
+      setKnowledgeTags([...knowledgeTags, currentKnowledge.tag]);
+      setIsNewKnowledge(false);
+    }
+
+    function upsertKnowledgeToDB(){
+      console.log(currentKnowledge);
+      const knowledge = {
+        world_name: currentWorld.world_name,
+        tag: currentKnowledge.tag,
+        knowledge_description: currentKnowledge.knowledge_description,
+      }
+      axios.post('http://127.0.0.1:8002/upsert_knowledge/', {...knowledge,level:0,knowledge:currentKnowledge.level0})
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err));
+
+      axios.post('http://127.0.0.1:8002/upsert_knowledge/', {...knowledge,level:1,knowledge:currentKnowledge.level1})
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err));
+      
+      axios.post('http://127.0.0.1:8002/upsert_knowledge/', {...knowledge,level:2,knowledge:currentKnowledge.level2})
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err));
+
+      axios.post('http://127.0.0.1:8002/upsert_knowledge/', {...knowledge,level:3,knowledge:currentKnowledge.level3})
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err));
+
+      axios.post('http://127.0.0.1:8002/upsert_knowledge/', {...knowledge,level:4,knowledge:currentKnowledge.level4})
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err));
+
+      axios.post('http://127.0.0.1:8002/upsert_knowledge/', {...knowledge,level:5,knowledge:currentKnowledge.level5})
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err));
+
+      axios.post('http://127.0.0.1:8002/upsert_knowledge/', {...knowledge,level:0,knowledge:currentKnowledge.level0})
+      .then(res => console.log(res.data))
+     .catch(err => console.log(err));
+    }
+
+    return (
+      <div className="WorldCreator">
+        <button onClick={() => setEditorOption(null)}>Back</button>
+        <h1>Select Knowledge to Update:</h1>
+        <select onChange={event => {
+          setCurrentKnowledgeFromTag(event.target.value);
+          setIsNewKnowledge(false);
+        }}>
+        <option value="">Choose Knowledge</option>
+        {knowledgeTags.map((tag, index) => (
+            <option key={index} value={tag}>
+            {tag}
+            </option>
+        ))}
+        </select>
+
+        <button onClick={() => {
+              setCurrentKnowledge({
+                  tag: "",
+                  knowledge_description: "",
+                  level0: "",
+                  level1: "",
+                  level2: "",
+                  level3: "",
+                  level4: "",
+                  level5: ""
+              });
+              setIsNewKnowledge(true);
+            }}>
+                Clear Knowledge Template
+        </button>
+        
+        {isNewKnowledge ? (
+          <div>
+            <div className="input-group">
+            <label>Tag</label>
+            <input type="text" value={currentKnowledge ? currentKnowledge.tag : ''} onChange={(e) => setCurrentKnowledge({...currentKnowledge, tag: e.target.value}) }/>
+            </div>
+            <button onClick={() => {createNewKnowledge()}}>Create New Tag</button>
+          </div>
+        ) : (
+          // <div key={JSON.stringify(currentKnowledge)}>
+          <div>
+            <div className="input-group">
+            <label>Tag</label>
+            <input type="text" value={currentKnowledge.tag} readOnly onChange={(e) => setCurrentKnowledge({...currentKnowledge, tag: e.target.value}) }/>
+            </div>
+            <div className="input-group">
+            <label>Description</label>
+            <input type="text" value={currentKnowledge.knowledge_description} onChange={(e) => setCurrentKnowledge({...currentKnowledge, knowledge_description: e.target.value}) }/>
+            </div>
+            <div className="input-group">
+            <label>Level0: Everyone knows. Period.</label>
+            <input type="text" value={currentKnowledge.level0} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level0: e.target.value}) }/>
+            </div>
+            <div className="input-group">
+            <label>Level 1: Common Knowledge.</label>
+            <input type="text" value={currentKnowledge.level1} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level1: e.target.value}) }/>
+            </div>
+            <div className="input-group">
+            <label>Level 2: Acquainted</label>
+            <input type="text" value={currentKnowledge.level2} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level2: e.target.value}) }/>
+            </div>
+            <div className="input-group">
+            <label>Level 3: Knows pretty well</label>
+            <input type="text" value={currentKnowledge.level3} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level3: e.target.value}) }/>
+            </div>
+            <div className="input-group">
+            <label>Level 4</label>
+            <input type="text" value={currentKnowledge.level4} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level4: e.target.value}) }/>
+            </div>
+            <div className="input-group">
+            <label>Level 5</label>
+            <input type="text" value={currentKnowledge.level5} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level5: e.target.value}) }/>
+            </div>
+            <button onClick={() => {upsertKnowledgeToDB()}}>Update Knowledge</button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   if (editorOption === 'npc') {
+    function TagDropdown({ tags, onChange, value }) {
+      return (
+        <select value={value} onChange={e => onChange(e.target.value)}>
+          <option value="">Select a tag</option>
+          {tags.map(tag => (
+            <option key={tag} value={tag}>
+              {tag}
+            </option>
+          ))}
+        </select>
+      );
+    }
+
+    function LevelDropdown({ levels, onChange, value }) {
+      return (
+        <select value={value} onChange={e => onChange(e.target.value)}>
+          <option value="">Select a level</option>
+          {levels.map(level => (
+            <option key={level} value={level}>
+              {level}
+            </option>
+          ))}
+        </select>
+      );
+    }
+
+
+    const addKnowledgeToNpc = () => {
+      setNpcKnowledgeList(prevList => ({...prevList, [selectedTag]: selectedLevel}));
+    }
+
+    // State and logic for the TagSelector
+    const handleTagChange = (index, newTag) => {
+      const newSelectedTags = [...selectedTags];
+      newSelectedTags[index] = newTag;
+      setSelectedTags(newSelectedTags);
+    };
+
     return (
         <div className="WorldCreator">
             <button onClick={() => setEditorOption(null)}>Back</button>
-            <h1>Select a NPC:</h1>
+            <h1>Select an NPC:</h1>
             {npcs.map((npc) => (
-                <button key={npc._id} onClick={() => {
+                <button key={npc._id} onClick={
+                  () => {
                   setCurrentNpc(npc);
                   setNpcPersonality(npc.personality !== undefined ? npc.personality : '');
-                  setNpcKnowledge(npc.knowledge != undefined ? npc.knowledge : '')}}>
+                  setNpcKnowledge(npc.knowledge != undefined ? npc.knowledge : '');
+                  setNpcSpeechPatterns(npc.speech_patterns !== undefined ? npc.speech_patterns : '')
+                  setNpcKnowledgeList(npc.knowledge_tag_levels != undefined ? npc.knowledge_tag_levels : {});
+                }
+                }>
                 {npc.npc_name}
                 </button>
             ))}
@@ -540,6 +777,7 @@ const WorldCreator = () => {
               setCurrentNpc(null);
               setNpcPersonality('');
               setNpcKnowledge('');
+              setNpcSpeechPatterns('');
               }}>Create a new NPC</button>
             {currentNpc ? (
             <div>
@@ -549,10 +787,38 @@ const WorldCreator = () => {
                 <textarea value={npcPersonality} onChange={(e) => {setNpcPersonality(e.target.value)}}></textarea>
                 </div>
                 <div className="input-group">
+                <label>Speech Patterns</label>
+                <textarea value={npcSpeechPatterns} onChange={(e) => {setNpcSpeechPatterns(e.target.value)}}></textarea>
+                </div>
+                <div className="input-group">
                 <label>Knowledge</label>
                 <textarea value={npcKnowledge} onChange={(e) => {setNpcKnowledge(e.target.value)}}></textarea>
                 </div>
+                
+
+                <div>
+                  <TagDropdown 
+                    tags={knowledgeTags}
+                    value={selectedTag}
+                    onChange={setSelectedTag}
+                  />
+                  <LevelDropdown
+                    levels={[0, 1, 2, 3, 4, 5]}
+                    value={selectedLevel}
+                    onChange={setSelectedLevel}
+                  />
+                  <button onClick={addKnowledgeToNpc}>Add Knowledge to NPC</button>
+                  <div>
+                    {Object.entries(npcKnowledgeList).map(([tag, level]) => (
+                    <div key={tag}>
+                      Tag: {tag}, Level: {level}
+                    </div>
+                    ))}
+                  </div>
+                </div>
+
                 <button onClick={saveNpc}>Save Updates to NPC</button>
+
             </div>
             ) : (
             <div>
@@ -560,10 +826,6 @@ const WorldCreator = () => {
                 <div className="input-group">
                     <label>NPC Name</label>
                     <input type="text" value={newNpcName} onChange={(e) => setNewNpcName(e.target.value)} />
-                </div>
-                <div className="input-group">
-                    <label>Personality</label>
-                    <textarea value={newNpcPersonality} onChange={(e) => setNewNpcPersonality(e.target.value)}></textarea>
                 </div>
                 <button onClick={createNewNpc}>Create NPC</button>
             </div>

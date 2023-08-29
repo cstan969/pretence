@@ -414,30 +414,51 @@ def upsert_knowledge(world_name, tag, knowledge_description, level, knowledge):
         'tag': tag,
         'level': int(level),
         'knowledge_description': knowledge_description,
-        'knowledge_filepath': filename
+        'knowledge_filepath': filename,
+        'knowledge': knowledge
     }
     upsert_item(collection_name=collection_name,item=item_to_upsert)
 
+def get_knowledge(world_name: str, tag: Optional[str]=None):
+    query = {'world_name': world_name}
+    if tag is not None:
+        query['tag'] = tag
+    return query_collection(collection_name='knowledge',query=query)
+
+def get_all_knowledge_for_world(world_name: str):
+    return query_collection(collection_name='knowledge',query={'world_name': world_name})
+
+def get_all_unique_knowledge_tags_for_world(world_name: str):
+    knowledges = query_collection(collection_name='knowledge',query={'world_name': world_name})
+    tags = [k['tag'] for k in knowledges]
+    return list(set(tags))
+
 def get_knowledge_files_npc_has_access_to(world_name, npc_name):
     npcs = query_collection(collection_name='npcs',query={'world_name':world_name,'npc_name':npc_name})
+    filenames = []
     if len(npcs) > 0:
         npc = npcs[0]
-        if 'knowledge' in list(npc):
-            npc_knowledge = npc['knowledge']
-            queries = []
-            for tag, level in npc_knowledge.items():
-                queries.append({
-                    "tag": tag,
-                    "level": {"$gte": level}
-                })
+        if 'knowledge_tag_levels' in list(npc):
+            npc_knowledge_tag_levels = npc['knowledge_tag_levels']
+            for tag, level in npc_knowledge_tag_levels.items():
+                for l in range(level + 1): 
+                    filenames.append(os.path.join(KNOWLEDGE_STORE_PATH, world_name, tag + "_" + str(l) + ".txt"))
+    return filenames
+
+
+
+    #         queries = []
+    #         for tag, level in npc_knowledge.items():
+    #             queries.append({
+    #                 "tag": tag,
+    #                 "level": {"$gte": level}
+    #             })
             
-            query = {"$or": queries}
-            # if len(npc_knowledge) > 0:
-                # query_parts = [{"tag": tag, "level": {"$gte": level}} for tag, level in npc_knowledge]
-                # query = {"$or": query_parts}
-            results = query_collection(collection_name='knowledge',query=query)
-            return [result['knowledge_filepath'] for result in results]
-    return []
+    #         query = {"$or": queries}
+    #         results = query_collection(collection_name='knowledge',query=query)
+    #         return [result['knowledge_filepath'] for result in results]
+    # return []
+    
 
 
 ################################

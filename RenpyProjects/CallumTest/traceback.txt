@@ -7,9 +7,9 @@ While running game code:
     $ response, scene_completed = game.message_npc_and_get_response(user_input)
   File "game/script.rpy", line 137, in <module>
     $ response, scene_completed = game.message_npc_and_get_response(user_input)
-  File "game/script.rpy", line 48, in message_npc_and_get_response
-    response = api_requests.message_npc_and_get_response(
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+  File "game/script.rpy", line 52, in message_npc_and_get_response
+    scene_id=self.scene_id,
+AttributeError: 'Game' object has no attribute 'scene_id'
 
 -- Full Traceback ------------------------------------------------------------
 
@@ -24,16 +24,11 @@ Full traceback:
     exec(bytecode, globals, locals)
   File "game/script.rpy", line 137, in <module>
     $ response, scene_completed = game.message_npc_and_get_response(user_input)
-  File "game/script.rpy", line 48, in message_npc_and_get_response
-    response = api_requests.message_npc_and_get_response(
-  File "api_requests.py", line 24, in message_npc_and_get_response
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/site-packages/requests/models.py", line 897, in json
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/__init__.py", line 346, in loads
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 337, in decode
-  File "/home/tom/ab/renpy-build/tmp/install.linux-x86_64/lib/python3.9/json/decoder.py", line 355, in raw_decode
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+  File "game/script.rpy", line 52, in message_npc_and_get_response
+    scene_id=self.scene_id,
+AttributeError: 'Game' object has no attribute 'scene_id'
 
-Linux-5.19.0-50-generic-x86_64-with-glibc2.35 x86_64
+Linux-6.2.0-26-generic-x86_64-with-glibc2.35 x86_64
 Ren'Py 8.1.1.23060707
 CallumTest 1.0
-Wed Aug  9 16:18:11 2023
+Mon Aug 28 17:11:59 2023
