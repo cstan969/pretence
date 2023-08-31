@@ -164,7 +164,6 @@ def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str
     if len(scene) > 0:
         return None
     # this is the current previous scene
-<<<<<<< HEAD
     if previous_scene is not None and 'scenes-' in previous_scene:
         previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,previous_scene:previous_scene})[0]
     elif 'previous_scene_name' in list(scene_info):
@@ -172,17 +171,7 @@ def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str
     
     # this is the scene currently hooked up to that previous scene
     current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene['_id']})
-=======
-
-    if previous_scene is not None:
-        if 'scenes-' in previous_scene:
-            previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,previous_scene:previous_scene})[0]
-        elif 'previous_scene_name' in list(scene_info):
-            previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'scene_name':scene_info['previous_scene_name']})[0]
-        # this is the scene currently hooked up to that previous scene
-        current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene['_id']})
-        print('current_scene_hooked_up: ', current_scene_hooked_up_to_previous_scene)
->>>>>>> test
+    print('current_scene_hooked_up: ', current_scene_hooked_up_to_previous_scene)
 
     #upsert the new scene
     upserted_scene = {k:v for k,v in scene_info.items()}
@@ -512,8 +501,6 @@ def play_test_scene_in_renpy(world_name: str, scene_id: str):
     set_scene_the_user_is_in(world_name=world_name,user_name=user_name,scene_id=scene_id)
     os.system('pkill renpy')
     os.system(RENPY_SH_PATH + " &")
-    # subprocess.Popen(['pkill','renpy'])
-    # subprocess.Popen([RENPY_SH_PATH])
 
 def play_world_in_renpy(world_name: str, user_name: str):
     #First reset the scene that the player is in; delete the objectives completed and user-npc-interactions

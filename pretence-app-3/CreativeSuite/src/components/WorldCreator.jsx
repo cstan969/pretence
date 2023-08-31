@@ -51,7 +51,6 @@ const WorldCreator = () => {
   const [npcSpeechPatterns, setNpcSpeechPatterns] = useState('');
   const [sceneNpcName, setSceneNpcName] = useState('');
   const [sceneNpcPrompt, setSceneNpcPrompt] = useState('');
-  const [npcSpeechPatterns, setNpcSpeechPatterns] = useState('');
   const sceneNPCs = {
     [sceneNpcName]: {
       scene_npc_prompt: sceneNpcPrompt
