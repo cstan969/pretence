@@ -7,7 +7,7 @@ import os
 import subprocess
 import shutil
 from fuzzywuzzy import fuzz
-from config import RENPY_SH_PATH
+from config import RENPY_SH_PATH, KNOWLEDGE_STORE_PATH
 
 
 #####USERS#####
@@ -71,7 +71,10 @@ def delete_npc(world_name:str,npc_name:str):
 
 #####USER_NPC_INTERACTIONS#####
 def get_user_npc_interactions(world_name:str, user_name: str, npc_name:str)->list:
-    return query_collection(collection_name='user_npc_interactions',query={'world_name':world_name,'user_name':user_name,'npc_name':npc_name})
+    interactions = query_collection(collection_name='user_npc_interactions',query={'world_name':world_name,'user_name':user_name,'npc_name':npc_name})
+    ordered_interactions = sorted(interactions, key=lambda x: datetime.strptime(x['created_at'], "%Y-%m-%d %H:%M:%S"))
+    return ordered_interactions
+
 
 def get_number_of_user_npc_interactions(world_name: str, user_name: str, npc_name: str, scene_id: Optional[str]=None):
     print('inputs to get_number_of_user_npc_interactions:')
@@ -133,9 +136,13 @@ def get_formatted_conversational_chain(
     world_name: str,
     user_name: str,
     npc_name: str,
+    scene_id: Optional[str]=None,
     num_interactions: Optional[int] = None
 )->str:
-    interactions = query_collection(collection_name='user_npc_interactions',query={'world_name':world_name,'user_name':user_name,'npc_name':npc_name})
+    query = {'world_name':world_name,'user_name':user_name,'npc_name':npc_name}
+    if scene_id is not None:
+        query['scene_id']=scene_id
+    interactions = query_collection(collection_name='user_npc_interactions',query=query)
     if interactions == []:
         return None
     ordered_interactions = sorted(interactions, key=lambda x: datetime.strptime(x['created_at'], "%Y-%m-%d %H:%M:%S"))
@@ -157,6 +164,15 @@ def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str
     if len(scene) > 0:
         return None
     # this is the current previous scene
+<<<<<<< HEAD
+    if previous_scene is not None and 'scenes-' in previous_scene:
+        previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,previous_scene:previous_scene})[0]
+    elif 'previous_scene_name' in list(scene_info):
+        previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'scene_name':scene_info['previous_scene_name']})[0]
+    
+    # this is the scene currently hooked up to that previous scene
+    current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene['_id']})
+=======
 
     if previous_scene is not None:
         if 'scenes-' in previous_scene:
@@ -166,6 +182,7 @@ def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str
         # this is the scene currently hooked up to that previous scene
         current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene['_id']})
         print('current_scene_hooked_up: ', current_scene_hooked_up_to_previous_scene)
+>>>>>>> test
 
     #upsert the new scene
     upserted_scene = {k:v for k,v in scene_info.items()}
@@ -390,6 +407,78 @@ def set_scene_the_user_is_in(world_name: str, user_name: str, scene_id: str):
         'scene_id': scene_id
     }
     upsert_item(collection_name='progress_of_user_in_game',item=item_to_upsert)
+
+
+#####################
+######KNOWLEDGE######
+#####################
+
+def upsert_knowledge(world_name, tag, knowledge_description, level, knowledge):
+    collection_name='knowledge'
+    #Write the knowledge to file
+    filename=os.path.join(KNOWLEDGE_STORE_PATH,world_name,tag + "_" + str(level) + ".txt")
+    os.makedirs(os.path.dirname(filename),exist_ok=True)
+    with open(filename,'w') as outfile:
+        outfile.write(knowledge)
+    item_to_upsert = {
+        '_id': '-'.join([collection_name,world_name,tag,str(level)]),
+        'world_name': world_name,
+        'tag': tag,
+        'level': int(level),
+        'knowledge_description': knowledge_description,
+        'knowledge_filepath': filename,
+        'knowledge': knowledge
+    }
+    upsert_item(collection_name=collection_name,item=item_to_upsert)
+
+def get_knowledge(world_name: str, tag: Optional[str]=None):
+    query = {'world_name': world_name}
+    if tag is not None:
+        query['tag'] = tag
+    return query_collection(collection_name='knowledge',query=query)
+
+def get_all_knowledge_for_world(world_name: str):
+    return query_collection(collection_name='knowledge',query={'world_name': world_name})
+
+def get_all_unique_knowledge_tags_for_world(world_name: str):
+    knowledges = query_collection(collection_name='knowledge',query={'world_name': world_name})
+    tags = [k['tag'] for k in knowledges]
+    return list(set(tags))
+
+def get_knowledge_files_npc_has_access_to(world_name, npc_name):
+    npcs = query_collection(collection_name='npcs',query={'world_name':world_name,'npc_name':npc_name})
+    filenames = []
+    if len(npcs) > 0:
+        npc = npcs[0]
+        if 'knowledge_tag_levels' in list(npc):
+            npc_knowledge_tag_levels = npc['knowledge_tag_levels']
+            for tag, level in npc_knowledge_tag_levels.items():
+                for l in range(level + 1): 
+                    filenames.append(os.path.join(KNOWLEDGE_STORE_PATH, world_name, tag + "_" + str(l) + ".txt"))
+    k_zeros = query_collection(collection_name='knowledge',query={'world_name':world_name,'level':0})
+    k_zero_filenames = [f['knowledge_filepath'] for f in k_zeros]
+    filenames.extend(k_zero_filenames)
+    filenames=list(set(filenames))
+    return filenames
+
+# ######################
+# #####OBSERVATIONS#####
+# ######################
+
+# def upsert_observation(observation: str, world_name: str, user_name: str, npc_name: str, time: str):
+#     return upsert_item(collection_name='observations',item={
+#         '_id': '-'.join(['collections',world_name,user_name,npc_name,get_current_date_formatted_no_spaces()]),
+#         'world_name': world_name,
+#         'user_name': user_name,
+#         'npc_name': npc_name,
+#         'observation': observation,
+#         'time': time
+#     })    
+
+# def get_observations(world_name: str, user_name: str, npc_name: str):
+#     return query_collection(collection_name='observations',query={'world_name':world_name,'user_name': user_name,'npc_name':npc_name})
+
+
 
 
 ################################

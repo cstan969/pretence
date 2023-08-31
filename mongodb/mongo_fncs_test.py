@@ -115,6 +115,46 @@ class mongo_fncs_unittests(TestCase):
         user_name = "James Thomas Stanhope"
         mark_objectives_completed(objectives_completed=obj['objectives_completed'],scene_id=scene_id,user_name=user_name)
 
+    def test_upsert_knowledge(self):
+        upsert_knowledge(world_name="test",tag="tag",knowledge_description="test_description",level="1",knowledge="test knowledge")
+        upsert_npc(world_name='test',npc_name='test',npc_metadata={'knowledge':[['tag',1]]})
+    
+    def test_get_knowledge_files_npc_has_access_to(self):
+        knowledge_files = get_knowledge_files_npc_has_access_to(world_name='test',npc_name='test')
+        print(knowledge_files)
+
+    def test_get_formatted_conversational_chain(self):
+        chain = get_formatted_conversational_chain(world_name='Fun with Food',user_name='Carl',npc_name='Dr. Daikon')
+        print(chain)
+
+    def test_knowledge_end_to_end(self):
+        tag = 'Callum'
+        level = 5
+        world_name = 'test'
+        user_name='James Thomas Stanhope'
+        npc_name='Callum'
+        callum_5 = """In the days before the cataclysm, Callum was known throughout the lands as a hero of unmatched bravery and joyous spirit. Born in the bustling city of Eldoria, he was the youngest of five siblings. While his brothers and sisters took to crafts and trade, Callum's heart was always in the wilderness, drawn to adventure and the promise of uncharted territories.
+As an adventurer, Callum's tales of bravery were woven into the very fabric of local legends. He crossed the Treacherous Peaks, where he saved a village from a monstrous ice wyrm; explored the mystical Whispering Caves and returned with treasures that many thought were mere myths. His laugh was infectious, his stories captivating, and wherever he went, people found hope.
+However, after the cataclysm, the world Callum once knew was no more. Eldoria was among the first cities to fall, and with it, the entirety of his family. The weight of his losses bore heavily upon him, causing a shift in his demeanor. The jovial hero became a quiet, introspective wanderer.
+He spent years moving from one desolate place to another. Initially, he found solace in the Silent Forest, a once-vibrant place now rendered hauntingly quiet. Here, he encountered the spirits of nature, mourning the loss of their home. They shared ancient knowledge with Callum, deepening his wisdom.
+From the forest, he traveled to the Ruins of Verathis, a place that used to be a grand citadel. It was here that a significant trauma further changed him. Callum was captured by a group of raiders who saw value in ransoming the famed hero. Though he eventually escaped, the experience left deep scars, both physical and emotional, reminding him of the cruelty the world had come to harbor.
+In his journey for healing and understanding, Callum stumbled upon the settlement of Sunken Hearth. Though he intended to move on, the plight of the people touched what remained of his heroic heart. The settlement became his home, a place to protect and serve."""
+        upsert_knowledge(world_name='test',tag=tag,knowledge=callum_5,knowledge_description='test_backstory',level=level)
+        callum = get_npc(world_name='test',npc_name='Callum')
+        if 'knowledge' in callum and callum['knowledge'] != '':
+            callum_knowledge = callum['knowledge']
+            callum_knowledge.append([tag, level])
+        else:
+            callum_knowledge = [[tag,level]]
+        callum['knowledge'] = callum_knowledge
+        upsert_npc(world_name=world_name,npc_name='Callum',npc_metadata=callum)
+        user_message = "Hey there buddy how are you?  What're you thinking about?"
+        npc_response = 'Nothing important, just reminiscing about the past'
+        upsert_user_npc_interaction(world_name=world_name,user_name=user_name,npc_name=npc_name,user_message=user_message,npc_response=npc_response,scene_id='scenes-test-20230815140955910513')
+        # user_message = "Oh, can you tell me more about that?"
+        # npc_response = 'Nothing important, just reminiscing about the past'
+        # upsert_user_npc_interaction(world_name=world_name,user_name=user_name,npc_name=npc_name,user_message=user_message,npc_response=npc_response,scene_id='scenes-test-20230815140955910513')
+
     def test_get_number_of_user_npc_interactions(self):
         out = get_number_of_user_npc_interactions(world_name='test',
                                             user_name='James Thomas Stanhope',
@@ -137,5 +177,8 @@ tc = mongo_fncs_unittests()
 # tc.test_get_scene_objectives_status()
 # tc.test_get_scene()
 # tc.test_mark_objectives_completed()
+# tc.test_upsert_knowledge()
+# tc.test_get_knowledge_files_npc_has_access_to()
+# tc.test_get_formatted_conversational_chain()
+tc.test_knowledge_end_to_end()
 tc.test_get_number_of_user_npc_interactions()
-

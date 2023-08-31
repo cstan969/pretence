@@ -1,6 +1,9 @@
 from langchain.llms.llamacpp import LlamaCpp
 import os
 RENPY_SH_PATH = os.path.join(os.getenv('PRETENCE_PATH'),'renpy-8.1.1-sdk','renpy.sh')
+KNOWLEDGE_STORE_PATH = os.path.join(os.getenv('PRETENCE_PATH'),'KnowledgeBase','knowledge_store')
+LONG_TERM_MEMORY_PATH = os.path.join(os.getenv('PRETENCE_PATH'),'LongTermMemory')
+KNOWLEDGE_INDICIES_PATH = os.path.join(os.getenv('PRETENCE_PATH'),'KnowledgeBase')
 
 from langchain.llms import LlamaCpp
 from langchain import PromptTemplate, LLMChain

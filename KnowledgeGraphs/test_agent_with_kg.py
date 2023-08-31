@@ -13,17 +13,17 @@ from langchain.agents import Tool
 from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.chat_models import ChatOpenAI
 from langchain.agents import initialize_agent
-
+import os
 from llama_index import VectorStoreIndex, SimpleDirectoryReader
 from pydantic import BaseModel
 
-
+world_name = 'TraumaGame'
 from llama_index import VectorStoreIndex, SimpleDirectoryReader
-documents = SimpleDirectoryReader('Fun with Food').load_data()
+documents = SimpleDirectoryReader("/home/carl/Pretence/KnowledgeGraphs/TraumaGame/data").load_data()
 index = VectorStoreIndex.from_documents(documents)
-index.storage_context.persist(persist_dir='Fun with Food/storage')
+index.storage_context.persist(persist_dir=os.path.join(world_name,'storage'))
 from llama_index import StorageContext, load_index_from_storage
-storage_context = StorageContext.from_defaults(persist_dir="Fun with Food/storage")
+storage_context = StorageContext.from_defaults(persist_dir=os.path.join(world_name,'storage'))
 
 
 from langchain.agents import AgentType
@@ -42,7 +42,7 @@ memory = ConversationBufferMemory(memory_key="chat_history", return_messages=Tru
 agent_executor = initialize_agent(
     tools, llm, agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION, memory=memory, verbose=True
 )
-agent_executor.run('Hey there, where are you from buddy?')
+agent_executor.run('sunken hearth tavern')
 
 
 
