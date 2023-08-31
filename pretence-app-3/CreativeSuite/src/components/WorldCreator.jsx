@@ -40,13 +40,15 @@ const WorldCreator = () => {
     narration_intro: "",
     narration_outro: "",
     background_image_filepath: "",
-    music_filepath: ""
+    music_filepath: "",
+    max_number_of_dialogue_exchanges: null
   });
   const [previousSceneName, setPreviousSceneName] = useState('')
   const [npcs, setNpcs] = useState([]);
   const [currentNpc, setCurrentNpc] = useState(null);
   const [npcPersonality, setNpcPersonality] = useState('');
   const [npcKnowledge, setNpcKnowledge] = useState('');
+  const [npcSpeechPatterns, setNpcSpeechPatterns] = useState('');
   const [sceneNpcName, setSceneNpcName] = useState('');
   const [sceneNpcPrompt, setSceneNpcPrompt] = useState('');
   const [npcSpeechPatterns, setNpcSpeechPatterns] = useState('');
@@ -87,7 +89,8 @@ const WorldCreator = () => {
       narration_intro: "",
       narration_outro: "",
       background_image_filepath: "",
-      music_filepath: ""
+      music_filepath: "",
+      max_number_of_dialogue_exchanges: null
     });
     setSceneNpcName("");
     setSceneNpcPrompt("");
@@ -263,6 +266,7 @@ const WorldCreator = () => {
       speech_patterns: npcSpeechPatterns,
       knowledge_tag_levels: npcKnowledgeList
     }
+
     // console.log(updatedNpc)
     axios.post('http://127.0.0.1:8002/upsert_npc/',updatedNpc)
     .then(res=>console.log(res))
@@ -280,7 +284,8 @@ const WorldCreator = () => {
       narration_intro: currentScene.narration_intro,
       narration_outro: currentScene.narration_outro,
       background_image_filepath: currentScene.background_image_filepath,
-      music_filepath: currentScene.music_filepath
+      music_filepath: currentScene.music_filepath,
+      max_number_of_dialogue_exchanges: currentScene.max_number_of_dialogue_exchanges
     };
     console.log('newScene: ', newScene)
     // Upsert the new scene
@@ -319,7 +324,7 @@ const WorldCreator = () => {
   if (currentWorld._id && editorOption === null) {
     return (
       <div>
-        <button onClick={() => setCurrentWorld({world_name: "",world_description: "",narration_intro: "",narration_outro: "",background_image_filepath: "",music_filepath: ""})}>Back</button>
+        <button onClick={() => setCurrentWorld({world_name: "",world_description: "",narration_intro: "",narration_outro: "",background_image_filepath: "",music_filepath: "",max_number_of_dialogue_exchanges:null})}>Back</button>
         <h1>{currentWorld.world_name}</h1>
         <button onClick={() => setEditorOption('world')}>World Editor</button>
         <button onClick={handleSceneEditor}>Scene Editor</button>
@@ -406,13 +411,14 @@ const WorldCreator = () => {
                   NPCs: {},
                   objectives: [],
                   narration_intro: "",
-                  narration_outro: ""
+                  narration_outro: "",
+                  max_number_of_dialogue_exchanges: null
               });
               setSceneNpcName("")
               setSceneNpcPrompt("")
               setIsNewScene(true);
             }}>
-                Create a new Scene
+                New Scene Template
             </button>
             {!isNewScene ? (
                 <div>
@@ -535,6 +541,10 @@ const WorldCreator = () => {
                     <div className="input-group">
                         <label>Music Filepath</label>
                         <SceneMusicFileSelector scene_id={currentScene._id} defaultFileName={currentScene.music_filepath}/>
+                    </div>
+                    <div className="input-group">
+                        <label>Max Number of Dialogue Exchanges (number)</label>
+                        <textarea value={currentScene.max_number_of_dialogue_exchanges || null} onChange={(e) => setCurrentScene({ ...currentScene, max_number_of_dialogue_exchanges: e.target.value })}></textarea>
                     </div>
                     <button onClick={saveScene}>Save Updates to Scene</button>
                     </div>
@@ -770,6 +780,7 @@ const WorldCreator = () => {
                   setNpcKnowledgeList(npc.knowledge_tag_levels != undefined ? npc.knowledge_tag_levels : {});
                 }
                 }>
+
                 {npc.npc_name}
                 </button>
             ))}
@@ -816,7 +827,6 @@ const WorldCreator = () => {
                     ))}
                   </div>
                 </div>
-
                 <button onClick={saveNpc}>Save Updates to NPC</button>
 
             </div>

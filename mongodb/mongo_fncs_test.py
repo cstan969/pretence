@@ -155,6 +155,14 @@ In his journey for healing and understanding, Callum stumbled upon the settlemen
         # npc_response = 'Nothing important, just reminiscing about the past'
         # upsert_user_npc_interaction(world_name=world_name,user_name=user_name,npc_name=npc_name,user_message=user_message,npc_response=npc_response,scene_id='scenes-test-20230815140955910513')
 
+    def test_get_number_of_user_npc_interactions(self):
+        out = get_number_of_user_npc_interactions(world_name='test',
+                                            user_name='James Thomas Stanhope',
+                                            npc_name='Callum',
+                                            scene_id='scenes-test-20230815140955910513'
+                                            )
+        print(out)
+        
 
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
@@ -173,3 +181,4 @@ tc = mongo_fncs_unittests()
 # tc.test_get_knowledge_files_npc_has_access_to()
 # tc.test_get_formatted_conversational_chain()
 tc.test_knowledge_end_to_end()
+tc.test_get_number_of_user_npc_interactions()

@@ -76,6 +76,17 @@ def get_user_npc_interactions(world_name:str, user_name: str, npc_name:str)->lis
     return ordered_interactions
 
 
+def get_number_of_user_npc_interactions(world_name: str, user_name: str, npc_name: str, scene_id: Optional[str]=None):
+    print('inputs to get_number_of_user_npc_interactions:')
+    print(world_name)
+    print(user_name)
+    print(npc_name)
+    print(scene_id)
+    query = {'world_name':world_name,'user_name':user_name,'npc_name':npc_name}
+    if scene_id is not None:
+        query['scene_id'] = scene_id
+    return len(query_collection(collection_name='user_npc_interactions',query=query))
+
 def upsert_user_npc_interaction(
         world_name:str,
         user_name: str,
@@ -149,9 +160,11 @@ def get_formatted_conversational_chain(
 def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str]=None):
     #make sure scene is unique first, else return None
     scene = query_collection(collection_name='scenes',query={'world_name':world_name,'scene_name':scene_info['scene_name']})
+    print('previous_scene: ', previous_scene)
     if len(scene) > 0:
         return None
     # this is the current previous scene
+<<<<<<< HEAD
     if previous_scene is not None and 'scenes-' in previous_scene:
         previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,previous_scene:previous_scene})[0]
     elif 'previous_scene_name' in list(scene_info):
@@ -159,13 +172,29 @@ def insert_scene(world_name: str, scene_info: dict, previous_scene: Optional[str
     
     # this is the scene currently hooked up to that previous scene
     current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene['_id']})
+=======
+
+    if previous_scene is not None:
+        if 'scenes-' in previous_scene:
+            previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,previous_scene:previous_scene})[0]
+        elif 'previous_scene_name' in list(scene_info):
+            previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'scene_name':scene_info['previous_scene_name']})[0]
+        # this is the scene currently hooked up to that previous scene
+        current_scene_hooked_up_to_previous_scene = query_collection(collection_name='scenes',query={'world_name':world_name,'previous_scene':previous_scene['_id']})
+        print('current_scene_hooked_up: ', current_scene_hooked_up_to_previous_scene)
+>>>>>>> test
 
     #upsert the new scene
     upserted_scene = {k:v for k,v in scene_info.items()}
     scene_id = '-'.join(['scenes',world_name,get_current_date_formatted_no_spaces()])
     upserted_scene['_id'] = scene_id
     upserted_scene['world_name'] = world_name
-    upserted_scene['previous_scene'] = previous_scene['_id']
+    upserted_scene['previous_scene'] = None if previous_scene is None else previous_scene['_id']
+    if 'max_number_of_dialogue_exchanges' in list(upserted_scene) and upserted_scene['max_number_of_dialogue_exchanges'] is not None:
+        try:
+            upserted_scene['max_number_of_dialogue_exchanges'] = int(upserted_scene['max_number_of_dialogue_exchanges'])
+        except:
+            upserted_scene['max_number_of_dialogue_exchanges'] = None
     upsert_item(collection_name='scenes',item=upserted_scene)
 
     #hook up the old next scene to the newly upserted scene
@@ -187,6 +216,11 @@ def update_scene(scene_id: str, scene_info:dict)->dict:
             for index, obj_set in enumerate(item_to_upsert['objectives']):
                 for index2, obj in enumerate(obj_set):
                     item_to_upsert['objectives'][index][index2]['objective'].replace('.  ','. ')
+        if 'max_number_of_dialogue_exchanges' in list(item_to_upsert) and item_to_upsert['max_number_of_dialogue_exchanges'] is not None:
+            try:
+                item_to_upsert['max_number_of_dialogue_exchanges'] = int(item_to_upsert['max_number_of_dialogue_exchanges'])
+            except:
+                item_to_upsert['max_number_of_dialogue_exchanges'] = None
         upsert_item(collection_name='scenes',item=item_to_upsert)
         return item_to_upsert
         
