@@ -11,7 +11,7 @@ EMOTIONS = ["drunk",
 import json, os, pprint, math, asyncio
 import regex as re
 # from VicunaLLM.VicunaLLM import VicunaLLM
-from KnowledgeBase.knowledge_retriever import extract_knowledge_for_user_npc_interaction
+from LongTermMemory.long_term_memory import LongTermMemory
 
 from mongodb.mongo_fncs import (
     get_npc,
@@ -42,6 +42,7 @@ class NpcUserInteraction():
         self.npc_name=npc_name
         self.user_name = user_name
         self.llm = ChatOpenAI(model='gpt-3.5-turbo')
+        self.ltm = LongTermMemory(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name)
         # self.llm = ChatOpenAI(model='gpt-4')
         # self.llm = ChatOpenAI(model=NpcUserInteraction_model)
         self.npc = get_npc(world_name,npc_name)
@@ -151,13 +152,9 @@ class NpcUserInteraction():
             CONVERSATION:
             {conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
             response = llm_chain.run(prompt)
-            print('---response inside of objectives prompt---')
-            print(response)
             response = json.loads(response)
             input_response['objectives_completed'] = response['objectives_completed']
             input_response['objectives_completed_reason'] = response['objectives_completed_reason']
-            print('---input response inside of objectives prompt---')
-            pprint.pprint(input_response)
             return input_response
         except Exception as e:
             print('Exception inside of run_prompt_to_get_objective_completion:\n', str(e))
@@ -236,11 +233,8 @@ class NpcUserInteraction():
         response = llm_chain.run(prompt)
         # response = re.search(r'\{(.*)\}', response).group(1) if re.search(r'\{(.*)\}', response) else response
         try:
-            print('original json before test broken: ', response)
             response = json.loads(response)
-            print('type of response in main step: ', type(response))
         except:
-            print('broken json: ', response)
             response = self.fix_json(response)
             response = json.loads(response)
         return response
@@ -265,8 +259,6 @@ class NpcUserInteraction():
         response['objectives_completed'] = response_objectives['objectives_completed']
         response['objectives_completed_reason'] = response_objectives['objectives_completed_reason']
 
-        print('---response---')
-        pprint.pprint(response)
         #Save interaction to DB
         upsert_user_npc_interaction(
             world_name=self.world_name,
@@ -289,8 +281,19 @@ class NpcUserInteraction():
         else:
             response['scene_completed'] = False
 
+        self.ltm.add_memories([self.user_name + " said to " + self.npc_name + " '" + self.user_message + "'.",
+                               self.npc_name + " said to " + self.user_name + " '" + response['npc_response'] + "'."])
+
         pprint.pprint(response)
         return response
+    
+    def _load_long_term_memory(self):
+        memories = self.ltm.fetch_memories(observation=self.user_message)
+        if memories is not None and len(memories) > 0:
+            return f"""Here are some memories for {self.npc_name}:
+            {memories}"""
+        else:
+            return ""
     
     def _load_fourth_wall(self):
         '''fourth wall prompt system commands'''
@@ -308,6 +311,7 @@ class NpcUserInteraction():
             self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
             self._load_npc_prompt(), # summarization of the NPC (personality etc)
             self._load_knowledge(), #knowledge the NPC is aware of (via tags)
+            self._load_long_term_memory(),
             self._load_npc_in_world_prompt(), # role of the NPC in the world
             self._load_conversation_prompt(), # conversation of user with NPC
         ]
@@ -360,7 +364,6 @@ class NpcUserInteraction():
                     objectives_prompt += objective['prompt_available']
                 elif status == 'unavailable' and 'prompt_unavailable' in list(objective) and objective['prompt_unavailable'] != "":
                     objectives_prompt += objective['prompt_unavailable']
-        print('objectives_prompt: ', objectives_prompt)
 
         prompt = f"""'''''\nScene Information:\n
         {npc_prompt}\n
@@ -369,7 +372,6 @@ class NpcUserInteraction():
 
     def _load_scene_objectives(self):
         scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-        print('scne_objectives_status in load_scene_objectives: ', scene_objectives_status)
         prompt = "'''''"
         # prompt += "Here are the completed objectives:\n"
         # prompt += str(scene_objectives_status['completed'])
@@ -402,7 +404,6 @@ class NpcUserInteraction():
         return """'''''\nGAME INFORMATION:\n {world_npc_prompt}\n\n""".format(world_npc_prompt=world_npc_prompt)
     
     def _load_npc_prompt(self):
-        print('self.npc: ', self.npc)
         return "" if 'personality' not in list(self.npc) or self.npc['personality'] == "" else f"\n\n'''''\nNPC Personality:\nThe personality of {self.npc_name} is: {self.npc['personality']}"
 
 
@@ -455,23 +456,13 @@ class NpcUserInteraction():
             agent_kwargs={'SystemMessage':system_message}
         )
         response = agent.run(input=user_message)
-        print('-----response from the agent-----:\n', response)
         return response
 
     def _load_knowledge(self):
-        print('knowledge')
         knowledge_from_tags = self._load_knowledge_via_llamaindex_agent(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name,user_message=self.user_message)
         knowledge_from_npc = "" if 'knowledge' not in list(self.npc) or self.npc['knowledge'] == "" else self.npc['knowledge']
-        print('knowledge_from_npc: ', knowledge_from_npc)
-        print('knowledge from tags: ', knowledge_from_tags)
         knowledge = f"\n\nHere is knowledge that {self.npc_name} is aware of:\n{knowledge_from_npc}\n{knowledge_from_tags}"
         return knowledge
-        # print(self.npc)
-        # print(list(self.npc))
-        # return "" if 'knowledge' not in list(self.npc) or self.npc['knowledge'] == "" else f"\n\nHere is knowledge that {self.npc_name} is aware of: {self.npc['knowledge']}"
-    
-
-    
     def _load_conversation_prompt(self):
         prompt = "'''''\nHere is the CONVERSATION so far:\n"
         prompt += self.get_conversation()

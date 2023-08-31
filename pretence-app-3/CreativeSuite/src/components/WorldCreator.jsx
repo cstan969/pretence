@@ -684,31 +684,31 @@ const WorldCreator = () => {
             </div>
             <div className="input-group">
             <label>Description</label>
-            <input type="text" value={currentKnowledge.knowledge_description} onChange={(e) => setCurrentKnowledge({...currentKnowledge, knowledge_description: e.target.value}) }/>
+            <textarea value={currentKnowledge.knowledge_description} onChange={(e) => setCurrentKnowledge({...currentKnowledge, knowledge_description: e.target.value}) }/>
             </div>
             <div className="input-group">
             <label>Level0: Everyone knows. Period.</label>
-            <input type="text" value={currentKnowledge.level0} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level0: e.target.value}) }/>
+            <textarea  value={currentKnowledge.level0} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level0: e.target.value}) }/>
             </div>
             <div className="input-group">
             <label>Level 1: Common Knowledge.</label>
-            <input type="text" value={currentKnowledge.level1} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level1: e.target.value}) }/>
+            <textarea  value={currentKnowledge.level1} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level1: e.target.value}) }/>
             </div>
             <div className="input-group">
             <label>Level 2: Acquainted</label>
-            <input type="text" value={currentKnowledge.level2} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level2: e.target.value}) }/>
+            <textarea  value={currentKnowledge.level2} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level2: e.target.value}) }/>
             </div>
             <div className="input-group">
             <label>Level 3: Knows pretty well</label>
-            <input type="text" value={currentKnowledge.level3} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level3: e.target.value}) }/>
+            <textarea  value={currentKnowledge.level3} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level3: e.target.value}) }/>
             </div>
             <div className="input-group">
             <label>Level 4</label>
-            <input type="text" value={currentKnowledge.level4} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level4: e.target.value}) }/>
+            <textarea  value={currentKnowledge.level4} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level4: e.target.value}) }/>
             </div>
             <div className="input-group">
             <label>Level 5</label>
-            <input type="text" value={currentKnowledge.level5} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level5: e.target.value}) }/>
+            <textarea  value={currentKnowledge.level5} onChange={(e) => setCurrentKnowledge({...currentKnowledge, level5: e.target.value}) }/>
             </div>
             <button onClick={() => {upsertKnowledgeToDB()}}>Update Knowledge</button>
           </div>

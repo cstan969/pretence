@@ -421,22 +421,30 @@ def get_knowledge_files_npc_has_access_to(world_name, npc_name):
             for tag, level in npc_knowledge_tag_levels.items():
                 for l in range(level + 1): 
                     filenames.append(os.path.join(KNOWLEDGE_STORE_PATH, world_name, tag + "_" + str(l) + ".txt"))
+    k_zeros = query_collection(collection_name='knowledge',query={'world_name':world_name,'level':0})
+    k_zero_filenames = [f['knowledge_filepath'] for f in k_zeros]
+    filenames.extend(k_zero_filenames)
+    filenames=list(set(filenames))
     return filenames
 
+# ######################
+# #####OBSERVATIONS#####
+# ######################
+
+# def upsert_observation(observation: str, world_name: str, user_name: str, npc_name: str, time: str):
+#     return upsert_item(collection_name='observations',item={
+#         '_id': '-'.join(['collections',world_name,user_name,npc_name,get_current_date_formatted_no_spaces()]),
+#         'world_name': world_name,
+#         'user_name': user_name,
+#         'npc_name': npc_name,
+#         'observation': observation,
+#         'time': time
+#     })    
+
+# def get_observations(world_name: str, user_name: str, npc_name: str):
+#     return query_collection(collection_name='observations',query={'world_name':world_name,'user_name': user_name,'npc_name':npc_name})
 
 
-    #         queries = []
-    #         for tag, level in npc_knowledge.items():
-    #             queries.append({
-    #                 "tag": tag,
-    #                 "level": {"$gte": level}
-    #             })
-            
-    #         query = {"$or": queries}
-    #         results = query_collection(collection_name='knowledge',query=query)
-    #         return [result['knowledge_filepath'] for result in results]
-    # return []
-    
 
 
 ################################
