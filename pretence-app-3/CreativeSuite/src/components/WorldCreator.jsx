@@ -78,6 +78,23 @@ const WorldCreator = () => {
   const [currentKnowledge, setCurrentKnowledge] = useState({});
   const [isNewKnowledge, setIsNewKnowledge] = useState(true);
 
+  //Missions stuff
+  const [currentMission, setCurrentMission] = useState({
+    mission_name: "",
+    mission_brief: "",
+    possible_outcomes: []
+  });
+  const [missions, setMissions] = useState([]);
+  const [isNewMission, setIsNewMission] = useState(true);
+  const [editingNpcsIndexes, setEditingNpcsIndexes] = useState(() => {
+    return currentMission.possible_outcomes.map((outcome, index) => {
+      return outcome.npcs.length > 0 ? index : null;
+    }).filter(i => i !== null);
+  });
+  const [selectedNpcsForMission, setSelectedNpcsForMission] = useState([]);
+  const [missionApiResponse, setMissionApiResponse] = useState("");
+
+
   const clearCurrentScene = () => {
     setCurrentScene({
       scene_name: "",
@@ -104,12 +121,6 @@ const WorldCreator = () => {
   useEffect(() => {
       console.log('currentScene has changed: ', currentScene);
   }, [currentScene]); 
-
-//   // For operations that run every time currentScene changes:
-//   useEffect(() => {
-//     console.log('currentKnowledge has changed: ', currentKnowledge);
-// }, [currentKnowledge]); 
-
 
   const updateWorlds = () => {
     axios.get('http://127.0.0.1:8002/get_all_worlds')
@@ -200,6 +211,10 @@ const WorldCreator = () => {
           .catch(err => console.log(err));
       }
   };
+      //   // For operations that run every time currentScene changes:
+      //   useEffect(() => {
+      //     console.log('currentKnowledge has changed: ', currentKnowledge);
+      // }, [currentKnowledge]); 
 
   const handleNpcEditor = () => {
     updateNpcs();
@@ -210,6 +225,26 @@ const WorldCreator = () => {
   const handleKnowledgeEditor = () => {
     updateKnowledge();
     setEditorOption('knowledge')
+  };
+
+  const handleMissionEditor = () => {
+    updateMissions();
+    updateNpcs();
+    setEditorOption('mission')
+  };
+
+  const updateMissions = () =>{
+    if (currentWorld) {
+      axios.post('http://127.0.0.1:8002/get_all_missions_for_world/', { world_name: currentWorld.world_name })  
+        .then(res => {
+          console.log(res);
+          setMissions(res.data);
+        })
+        .then(res => {
+          console.log('missions: ', missions);
+        })
+        .catch(err => console.log(err));
+    }
   };
 
   const updateKnowledge = () => {
@@ -329,6 +364,7 @@ const WorldCreator = () => {
         <button onClick={handleSceneEditor}>Scene Editor</button>
         <button onClick={handleNpcEditor}>NPC Editor</button>
         <button onClick={handleKnowledgeEditor}>Knowledge Editor</button>
+        <button onClick={handleMissionEditor}>Mission Editor</button>
       </div>
     );
   }
@@ -726,6 +762,198 @@ const WorldCreator = () => {
     )
   }
 
+  if (editorOption === 'mission'){
+
+    const saveMission = () => {
+      axios.post('http://127.0.0.1:8002/upsert_mission/', {...currentMission,world_name:currentWorld.world_name})
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err));
+    };
+
+    const createNewMission = () => {
+      setIsNewMission(false);
+    };
+
+    const handleAddOutcome = () => {
+      setCurrentMission(prevMission => ({
+        ...prevMission,
+        possible_outcomes: [...prevMission.possible_outcomes, {
+          npcs: "",
+          outcome_summary: "",
+          outcome_name: "",
+          effects: ""
+        }]
+      }));
+    }
+
+
+    const sendNpcsOnMission = async () => {
+      try {
+        // Call your API endpoint using axios. Adjust the URL and payload as needed.
+        const response = await axios.post('http://127.0.0.1:8001/send_npcs_on_mission/', 
+        { world_name: currentWorld.world_name,
+        npc_names: selectedNpcsForMission,
+        mission_id: currentMission._id,
+        user_name: 'James Thomas Stanhope'
+        });
+        setMissionApiResponse(JSON.stringify(response.data, null, 2));
+      } catch (error) {
+        console.error('Error sending NPCs on mission:', error);
+        setMissionApiResponse("Failed to send NPCs on mission.");
+      }
+    };
+
+    const handleOutcomeChange = (index, key, value) => {
+      const newOutcomes = [...currentMission.possible_outcomes];
+      newOutcomes[index][key] = value;
+      setCurrentMission({
+        ...currentMission,
+        possible_outcomes: newOutcomes
+      });
+    }
+
+    // const toggleEditNpcs = (index) => {
+    //   if (editingNpcsIndexes.includes(index)) {
+    //     setEditingNpcsIndexes(prevIndexes => prevIndexes.filter(i => i !== index));
+    //   } else {
+    //     setEditingNpcsIndexes(prevIndexes => [...prevIndexes, index]);
+    //   }
+    // }
+
+    const toggleEditNpcs = (index) => {
+      if (editingNpcsIndexes.includes(index)) {
+        // If already in editing mode, toggle off and clear NPCs for this outcome
+        setEditingNpcsIndexes(prevIndexes => prevIndexes.filter(i => i !== index));
+        setCurrentMission(prevMission => {
+          const updatedMission = {...prevMission};
+          updatedMission.possible_outcomes[index].npcs = [];
+          return updatedMission;
+        });
+      } else {
+        // If not in editing mode, just toggle on
+        setEditingNpcsIndexes(prevIndexes => [...prevIndexes, index]);
+      }
+    };
+
+    const handleNpcSelectionChange = (index, selectedNpcs) => {
+      const newOutcomes = [...currentMission.possible_outcomes];
+      newOutcomes[index].npcs = selectedNpcs;
+      setCurrentMission({
+        ...currentMission,
+        possible_outcomes: newOutcomes
+      });
+    }
+  
+
+    function updateMission(mission_id) {
+      axios.post("http://127.0.0.1:8002/get_mission/", {mission_id: mission_id})
+      .then(res => {
+        setCurrentMission(res.data);
+      })
+      .catch(err => console.log(err))
+      setIsNewMission(false);
+    };
+
+    return(
+      <div className="WorldCreator">
+        <button onClick={() => setEditorOption(null)}>Back</button>
+
+        <select onChange={event => {
+          updateMission(event.target.value);
+        }}>
+        <option value="">Choose Mission</option>
+        {missions.map((mission, index) => (
+            <option key={mission._id} value={mission._id}>
+            {mission.mission_name}
+            </option>
+        ))}
+        </select>
+
+        <button onClick={() => {
+              setCurrentMission({
+                mission_name: "",
+                mission_briefing: "",
+                possible_outcomes: [],
+              });
+              setIsNewMission(true);
+            }}>
+                Clear Mission Template
+        </button>
+
+        {!isNewMission ? (
+          <div>
+            <div className="input-group">
+            <label>mission_name</label>
+            <textarea readOnly value={currentMission.mission_name} onChange={(e) => setCurrentMission({...currentMission, mission_name: e.target.value}) }/>
+            </div>
+            <div className="input-group">
+            <label>mission_briefing</label>
+            <textarea value={currentMission.mission_briefing} onChange={(e) => setCurrentMission({...currentMission, mission_briefing: e.target.value}) }/>
+            </div>
+            <h3>Possible Outcomes</h3>
+            {currentMission.possible_outcomes.map((outcome, index) => (
+              <div key={index}>
+                <button onClick={() => toggleEditNpcs(index)}>
+                  Certain NPCs Only
+                </button>
+
+                {(editingNpcsIndexes.includes(index) || outcome.npcs.length > 0) && (
+                  <div className="input-group">
+                    <label>NPCs</label>
+                    <select multiple value={outcome.npcs} onChange={(e) => handleNpcSelectionChange(index, Array.from(e.target.selectedOptions, option => option.value))}>
+                      {npcs.map(npc => (
+                        <option key={npc.npc_name} value={npc.npc_name}>
+                          {npc.npc_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <div className="input-group">
+                  <label>Outcome Name</label>
+                  <input value={outcome.outcome_name} onChange={(e) => handleOutcomeChange(index, 'outcome_name', e.target.value)} />
+                </div>
+                <div className="input-group">
+                  <label>Outcome Summary</label>
+                  <input value={outcome.outcome_summary} onChange={(e) => handleOutcomeChange(index, 'outcome_summary', e.target.value)} />
+                </div>
+                {/* <div className="input-group">
+                  <label>Effects</label>
+                  <input value={outcome.effects} onChange={(e) => handleOutcomeChange(index, 'effects', e.target.value)} />
+                </div> */}
+              </div>
+            ))}
+            <button onClick={handleAddOutcome}>Add Outcome</button>
+            <button onClick={saveMission}>Save Updates to Mission</button>
+            <h3>Test Mission</h3>
+            <select multiple value={selectedNpcsForMission} onChange={(e) => setSelectedNpcsForMission(Array.from(e.target.selectedOptions, option => option.value))}>
+              {npcs.map(npc => (
+                <option key={npc.npc_name} value={npc.npc_name}>
+                  {npc.npc_name}
+                </option>
+              ))}
+            </select>
+
+            <button onClick={sendNpcsOnMission}>Send NPCs on Mission</button>
+
+            <div className="input-group">
+              <label>Mission API Response</label>
+              <textarea readOnly value={missionApiResponse} />
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div className="input-group">
+            <label>mission_name</label>
+            <textarea value={currentMission.mission_name} onChange={(e) => setCurrentMission({...currentMission, mission_name: e.target.value}) }/>
+            </div>
+            <button onClick={createNewMission}>Create Mission</button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   if (editorOption === 'npc') {
     function TagDropdown({ tags, onChange, value }) {
       return (
@@ -757,13 +985,6 @@ const WorldCreator = () => {
     const addKnowledgeToNpc = () => {
       setNpcKnowledgeList(prevList => ({...prevList, [selectedTag]: selectedLevel}));
     }
-
-    // State and logic for the TagSelector
-    const handleTagChange = (index, newTag) => {
-      const newSelectedTags = [...selectedTags];
-      newSelectedTags[index] = newTag;
-      setSelectedTags(newSelectedTags);
-    };
 
     return (
         <div className="WorldCreator">
@@ -921,6 +1142,6 @@ const WorldCreator = () => {
 
     </div>
   );
-};
+}
 
 export default WorldCreator;
