@@ -151,6 +151,24 @@ def upsert_knowledge(q:dict):
     knowledge=q['knowledge']
     return fncs.upsert_knowledge(world_name=world_name,tag=tag,knowledge_description=knowledge_description, knowledge=knowledge,level=level)
 
+@app.post("/get_all_missions_for_world")
+def get_all_missions_for_world(q:dict):
+    world_name = q['world_name']
+    return fncs.get_all_missions_for_world(world_name=world_name)
+
+@app.post("/get_mission")
+def get_mission(q:dict):
+    mission_id = q['mission_id']
+    return fncs.get_mission(mission_id=mission_id)
+
+@app.post("/upsert_mission")
+def upsert_mission(q:dict):
+    mission_name = q['mission_name']
+    mission_briefing = q['mission_briefing']
+    world_name=q['world_name']
+    possible_outcomes = q['possible_outcomes']
+    return fncs.upsert_mission(world_name=world_name,mission_name=mission_name,mission_briefing=mission_briefing,possible_outcomes=possible_outcomes)
+
 ################################
 #####MULTI COLLECTION CALLS#####
 #####ALSO SORT OF RENPY STUAFF##

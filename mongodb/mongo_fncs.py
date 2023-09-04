@@ -61,8 +61,11 @@ def get_npcs_in_world(world_name):
     '''given a world_name get all of the NPCs in that world.'''
     return query_collection(collection_name='npcs',query={'world_name':world_name})
 
-def get_npc(world_name:str, npc_name:str):
+def get_npc(world_name:str, npc_name:str)->dict:
     items = query_collection(collection_name='npcs',query={'world_name': world_name, 'npc_name': npc_name})
+    print(world_name)
+    print(npc_name)
+    print(items)
     return items[0] if len(items) > 0 else None
 
 def delete_npc(world_name:str,npc_name:str):
@@ -77,11 +80,6 @@ def get_user_npc_interactions(world_name:str, user_name: str, npc_name:str)->lis
 
 
 def get_number_of_user_npc_interactions(world_name: str, user_name: str, npc_name: str, scene_id: Optional[str]=None):
-    print('inputs to get_number_of_user_npc_interactions:')
-    print(world_name)
-    print(user_name)
-    print(npc_name)
-    print(scene_id)
     query = {'world_name':world_name,'user_name':user_name,'npc_name':npc_name}
     if scene_id is not None:
         query['scene_id'] = scene_id
@@ -449,6 +447,51 @@ def get_knowledge_files_npc_has_access_to(world_name, npc_name):
     filenames.extend(k_zero_filenames)
     filenames=list(set(filenames))
     return filenames
+
+# ######################
+# #####MISSIONS#########
+# ######################
+
+def upsert_mission(
+        world_name: str,
+        mission_name:str,
+        mission_briefing: str,
+        possible_outcomes: list,
+        mission_availability_requirements: Optional[list]=None,
+        mission_unavailable_requirements:Optional[list]=None
+        ):
+    return upsert_item(collection_name='missions',item={
+        '_id': '-'.join(['missions',world_name,mission_name]),
+        'world_name': world_name,
+        'mission_name': mission_name,
+        'mission_briefing': mission_briefing,
+        'possible_outcomes': possible_outcomes
+    })
+
+# def get_mission(world_name: str, mission_name:str)
+def get_mission(mission_id: str):
+    items = query_collection(collection_name='missions',query={'_id': mission_id})
+    if items is not None and len(items) == 1:
+        return items[0]
+    else:
+        return None
+
+def get_all_missions_for_world(world_name: str):
+    return query_collection(collection_name='missions',query={'world_name':world_name})
+    
+
+
+# #################################
+# #####USER_MISSION_STATUS#########
+# #################################
+
+def upsert_mission_status_for_user():
+    pass
+
+
+def get_available_missions_for_user():
+    pass
+
 
 # ######################
 # #####OBSERVATIONS#####

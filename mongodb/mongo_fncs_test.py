@@ -164,6 +164,33 @@ In his journey for healing and understanding, Callum stumbled upon the settlemen
         print(out)
         
 
+    def test_missions(self):
+        upsert_mission(
+            world_name='TestWorldName',
+            mission_name='TavernBrawl',
+            mission_briefing="Ruffians have been causing trouble at the tavern. They have been getting into fights with patrons and stealing beer from the barkeep. Your mission is to stop this.",
+            possible_outcomes=[
+                {
+                'npcs': [],
+                'outcome_summary': 'kill all of the ruffians',
+                'effects': "",
+                'outcome_name': "Slaughter"
+                 },
+                {
+                'npcs': [],
+                'outcome_summary': 'incapacitate all of the ruffians',
+                'outcome_name': 'Mass Incapacitation',
+                'effects': ""
+                },
+                {
+                'npcs': ['Andre'],
+                'outcome_summary': 'Andre attempts to intimidate the ruffians and instead pisses them off.  The ruffians burn down the tavern.',
+                'outcome_name': 'Andre-Intimidation',
+                'effects': ""
+                }
+            ]
+        )
+
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
 # tc.test_collection_users()
@@ -180,5 +207,6 @@ tc = mongo_fncs_unittests()
 # tc.test_upsert_knowledge()
 # tc.test_get_knowledge_files_npc_has_access_to()
 # tc.test_get_formatted_conversational_chain()
-tc.test_knowledge_end_to_end()
-tc.test_get_number_of_user_npc_interactions()
+# tc.test_knowledge_end_to_end()
+# tc.test_get_number_of_user_npc_interactions()
+tc.test_missions()

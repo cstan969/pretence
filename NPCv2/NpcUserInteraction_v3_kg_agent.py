@@ -41,7 +41,7 @@ class NpcUserInteraction():
         self.scene = get_scene(scene_id=scene_id)
         self.npc_name=npc_name
         self.user_name = user_name
-        self.llm = ChatOpenAI(model='gpt-3.5-turbo')
+        self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
         self.ltm = LongTermMemory(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name)
         # self.llm = ChatOpenAI(model='gpt-4')
         # self.llm = ChatOpenAI(model=NpcUserInteraction_model)
@@ -87,29 +87,29 @@ class NpcUserInteraction():
 
 
 
-    def calculate_new_emotional_state(self, npc_emotional_response: dict):
-        '''
-        Sample input format:
-        "npc_emotional_response": {
-            "drunk": 0,
-            "angry": 0,
-            "trusting": 2,
-            "motivated": 5,
-            "sad": 0,
-            "happy": 0,
-            "afraid": 0,
-            "compassionate": 0
-        }'''
-        initial_emotional_state = get_latest_npc_emotional_state(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name)
-        if initial_emotional_state is None:
-            initial_emotional_state = {e:0 for e in EMOTIONS}
-        final_emotional_state = {}
-        for emotion, value in npc_emotional_response.items():
-            if value != 0:
-                final_emotional_state[emotion] = initial_emotional_state[emotion] + npc_emotional_response[emotion] * self.npc['emotional_susceptibility'][emotion] / 10
-            else:
-                final_emotional_state[emotion] = max([initial_emotional_state[emotion] - 0.2,0])
-        return final_emotional_state
+    # def calculate_new_emotional_state(self, npc_emotional_response: dict):
+    #     '''
+    #     Sample input format:
+    #     "npc_emotional_response": {
+    #         "drunk": 0,
+    #         "angry": 0,
+    #         "trusting": 2,
+    #         "motivated": 5,
+    #         "sad": 0,
+    #         "happy": 0,
+    #         "afraid": 0,
+    #         "compassionate": 0
+    #     }'''
+    #     initial_emotional_state = get_latest_npc_emotional_state(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name)
+    #     if initial_emotional_state is None:
+    #         initial_emotional_state = {e:0 for e in EMOTIONS}
+    #     final_emotional_state = {}
+    #     for emotion, value in npc_emotional_response.items():
+    #         if value != 0:
+    #             final_emotional_state[emotion] = initial_emotional_state[emotion] + npc_emotional_response[emotion] * self.npc['emotional_susceptibility'][emotion] / 10
+    #         else:
+    #             final_emotional_state[emotion] = max([initial_emotional_state[emotion] - 0.2,0])
+    #     return final_emotional_state
         
     def get_conversation(self):
         convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name, num_interactions=12)
