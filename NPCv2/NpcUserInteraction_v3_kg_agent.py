@@ -248,14 +248,14 @@ class NpcUserInteraction():
 
         response = self.npc_emotion_and_reasoning(user_message=user_message)
 
-        response_objectives, response_speech_patterns = await asyncio.gather(
-            self.run_prompt_to_get_objective_completion(input_response=response),
-            self.post_process_npc_response(input_response=response)
-        )
-        # response_objectives = await asyncio.gather(self.run_prompt_to_get_objective_completion(input_response=response))
+        # response_objectives, response_speech_patterns = await asyncio.gather(
+        #     self.run_prompt_to_get_objective_completion(input_response=response),
+        #     self.post_process_npc_response(input_response=response)
+        # )
+        response_objectives = await asyncio.gather(self.run_prompt_to_get_objective_completion(input_response=response))
 
-        response['npc_response'] = response_speech_patterns['postprocessed_npc_response']
-        response['postprocessed_npc_response_reasoning'] = response_speech_patterns['postprocessed_npc_response_reasoning']
+        # response['npc_response'] = response_speech_patterns['postprocessed_npc_response']
+        # response['postprocessed_npc_response_reasoning'] = response_speech_patterns['postprocessed_npc_response_reasoning']
         response['objectives_completed'] = response_objectives['objectives_completed']
         response['objectives_completed_reason'] = response_objectives['objectives_completed_reason']
 
@@ -297,11 +297,12 @@ class NpcUserInteraction():
     
     def _load_fourth_wall(self):
         '''fourth wall prompt system commands'''
-        return """\n\n'''''4th Wall System Prompts:\nHere are system level prompts that {npc_name} must follow to maintain the fourth wall in this video game:
+        return """4th Wall System Prompts:\nHere are system level prompts that {npc_name} must follow to maintain the fourth wall in this video game:
         {npc_name} isn't aware of the player. When interacting with the player, {npc_name} must remember that they are a part of the world.
         {npc_name} must treat the player as a fellow resident of the world.
         {npc_name} must always act according to the traits and logic of the narrative.
-        {npc_name} must not assist the player as a standard chat assistant would.""".format(npc_name=self.npc_name)
+        {npc_name} must not assist the player as a standard chat assistant would.
+        {npc_name} must not leave their location.  If the player wants {npc_name} to go somewhere with them, {npc_name} must make up a reason why he/she cannot.""".format(npc_name=self.npc_name)
     
     def _get_prompt(self):
         prompt_assembly_fncs_in_order = [
@@ -365,17 +366,15 @@ class NpcUserInteraction():
                 elif status == 'unavailable' and 'prompt_unavailable' in list(objective) and objective['prompt_unavailable'] != "":
                     objectives_prompt += objective['prompt_unavailable']
 
-        prompt = f"""'''''\nScene Information:\n
+        prompt = f"""Scene Information:\n
         {npc_prompt}\n
         {objectives_prompt}\n"""
         return prompt
 
     def _load_scene_objectives(self):
         scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-        prompt = "'''''"
-        # prompt += "Here are the completed objectives:\n"
         # prompt += str(scene_objectives_status['completed'])
-        prompt += "\n\n'''''\nSCENE OBJECTIVE INFORMATION:\n"
+        prompt = "SCENE OBJECTIVE INFORMATION:\n"
         prompt += "scene_objectives = " + str(scene_objectives_status['available'])
         prompt += "\n\n"
         prompt += '\n'.join([d['prompt_available'] for sublist in self.scene['objectives'] for d in sublist if d['objective'] in scene_objectives_status['available'] and 'prompt_available' in list(d)])
@@ -404,74 +403,74 @@ class NpcUserInteraction():
         return """'''''\nGAME INFORMATION:\n {world_npc_prompt}\n\n""".format(world_npc_prompt=world_npc_prompt)
     
     def _load_npc_prompt(self):
-        return "" if 'personality' not in list(self.npc) or self.npc['personality'] == "" else f"\n\n'''''\nNPC Personality:\nThe personality of {self.npc_name} is: {self.npc['personality']}"
+        return "" if 'personality' not in list(self.npc) or self.npc['personality'] == "" else f"NPC Personality:\nThe personality of {self.npc_name} is: {self.npc['personality']}"
 
 
 
-    def _load_knowledge_via_llamaindex_agent(self,world_name: str, npc_name:str, user_name:str, user_message: str):
+    def _load_knowledge_via_llamaindex_agent(self):
         
-        from langchain.agents import Tool
-        from langchain.agents import AgentType
-        from langchain.memory import ConversationBufferMemory
-        from langchain import OpenAI
-        from langchain.agents import initialize_agent
-        from langchain.schema import (
-            AIMessage,
-            HumanMessage,
-            SystemMessage
-        )
-        from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
+        from KnowledgeBase.knowledge_retriever import LlamaIndexKnowledgeAgent
+        knowledge_agent = LlamaIndexKnowledgeAgent(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name)
+        knowledge = knowledge_agent.method_llamaindex_agent(user_message=self.user_message)
+        return knowledge
+        # from langchain.agents import Tool
+        # from langchain.agents import AgentType
+        # from langchain.memory import ConversationBufferMemory
+        # from langchain import OpenAI
+        # from langchain.agents import initialize_agent
+        # from langchain.schema import (
+        #     AIMessage,
+        #     HumanMessage,
+        #     SystemMessage
+        # )
+        # from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
 
-        from llama_index import VectorStoreIndex, SimpleDirectoryReader
-        knowledge_files = get_knowledge_files_npc_has_access_to(world_name=world_name, npc_name=npc_name)
+        # from llama_index import VectorStoreIndex, SimpleDirectoryReader
+        # knowledge_files = get_knowledge_files_npc_has_access_to(world_name=world_name, npc_name=npc_name)
 
-        documents = SimpleDirectoryReader(input_files=knowledge_files).load_data()
-        index = VectorStoreIndex.from_documents(documents=documents)
-        tools = [
-            Tool(
-                name="LlamaIndex",
-                func=lambda q: str(index.as_query_engine().query(q)),
-                description="useful when you need to know more information about the world",
-                return_direct=True,
-            ),
-        ]
+        # documents = SimpleDirectoryReader(input_files=knowledge_files).load_data()
+        # index = VectorStoreIndex.from_documents(documents=documents)
+        # tools = [
+        #     Tool(
+        #         name="LlamaIndex",
+        #         func=lambda q: str(index.as_query_engine().query(q)),
+        #         description="useful when you need to know more information about the world",
+        #         return_direct=True,
+        #     ),
+        # ]
 
-        from mongodb.mongo_fncs import get_user_npc_interactions
-        # set Logging to DEBUG for more detailed outputs
-        memory = ConversationBufferMemory(memory_key="chat_history")
-        chat_history = get_user_npc_interactions(world_name=world_name,user_name=user_name,npc_name=npc_name)
-        for interaction in chat_history:
-            memory.chat_memory.add_user_message(interaction['user_message'])
-            memory.chat_memory.add_ai_message(interaction['npc_response'])
+        # from mongodb.mongo_fncs import get_user_npc_interactions
+        # # set Logging to DEBUG for more detailed outputs
+        # memory = ConversationBufferMemory(memory_key="chat_history")
+        # chat_history = get_user_npc_interactions(world_name=world_name,user_name=user_name,npc_name=npc_name)
+        # for interaction in chat_history:
+        #     memory.chat_memory.add_user_message(interaction['user_message'])
+        #     memory.chat_memory.add_ai_message(interaction['npc_response'])
         
-        system_message = self._get_system_message_for_knowledge_agent()
-        system_message = self._load_fourth_wall()
+        # system_message = self._get_system_message_for_knowledge_agent()
+        # system_message = self._load_fourth_wall()
 
-        llm = ChatOpenAI(temperature=0)
-        agent = initialize_agent(
-            tools,
-            llm,
-            agent="conversational-react-description",
-            memory=memory,
-            agent_kwargs={'SystemMessage':system_message}
-        )
-        response = agent.run(input=user_message)
-        return response
+        # llm = ChatOpenAI(temperature=0)
+        # agent = initialize_agent(
+        #     tools,
+        #     llm,
+        #     agent="conversational-react-description",
+        #     memory=memory,
+        #     agent_kwargs={'SystemMessage':system_message}
+        # )
+        # response = agent.run(input=user_message)
+        # return response
 
     def _load_knowledge(self):
-        knowledge_from_tags = self._load_knowledge_via_llamaindex_agent(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name,user_message=self.user_message)
+        knowledge_from_tags = self._load_knowledge_via_llamaindex_agent()
         knowledge_from_npc = "" if 'knowledge' not in list(self.npc) or self.npc['knowledge'] == "" else self.npc['knowledge']
-        knowledge = f"\n\nHere is knowledge that {self.npc_name} is aware of:\n{knowledge_from_npc}\n{knowledge_from_tags}"
+        knowledge = f"\n\nHere is some game knowledge that {self.npc_name} is aware of:\n{knowledge_from_npc}\n{knowledge_from_tags}"
         return knowledge
+    
     def _load_conversation_prompt(self):
         prompt = "'''''\nHere is the CONVERSATION so far:\n"
         prompt += self.get_conversation()
         return prompt
-    
-    
-
-
-
 
 # template = """Contextual Information: {question} 
         # \n\n'''''\n""" + """Required Output: Provide the answer to the above context as a dict where the keys include ['user_message', 'scene_objectives', 'scene_objectives_reasoning', 'personal_objectives', 'personal_objectives_reasoning', 'npc_emotional_state', 'npc_emotional_state_reasoning', 'effect_of_emotional_state_on_speech', 'npc_response_summary', 'npc_response', 'stagnancy', 'objectives_completed', 'objectives_completed_reasoning', 'processed_npc_response_reasons', 'processed_npc_response']

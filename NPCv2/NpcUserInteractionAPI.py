@@ -57,6 +57,16 @@ async def send_npcs_on_mission(q: dict)->dict:
     return mo.get_mission_outcome_and_debriefing()
 
 
+from KnowledgeBase.knowledge_retriever import LlamaIndexKnowledgeAgent
+@app.post('/create_or_update_kg_llama_index')
+async def create_or_update_kg_llama_index(q:dict)->dict:
+    world_name=q['world_name']
+    user_name = q['user_name']
+    npc_name = q['npc_name']
+    ka = LlamaIndexKnowledgeAgent(world_name,npc_name,user_name)
+    ka.create_or_update_kg_llama_index()
+
+
 
 # if __name__ == '__main__':
 #     uvicorn.run(app,host='127.0.0.1', port=8001)
