@@ -118,27 +118,27 @@ class NpcUserInteraction():
         else:
             return convo.replace(self.user_name,'Player')
         
-    async def run_prompt_to_get_objective_completion(self, input_response):
+    async def run_prompt_to_get_objective_completion(self, input_response: dict)->dict:
         '''given the current conversation with the current npc, figure out which objectives are completed for the current scene'''
         try:
             convo = self.get_conversation()
             # get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name, num_interactions=6).replace(self.user_name,'Player')
             scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
             
-            prompt = """For a given conversation and given list of conversational objectives to be completed by the player or NPCs.  Tell me which conversational objectives have been completed.
-            Based off of the conversation below, which of the conversational objectives have been completed?
-            player_scene_objectives:
-            {objectives}
+            # prompt = """For a given conversation and given list of conversational objectives to be completed by the player or NPCs.  Tell me which conversational objectives have been completed.
+            # Based off of the conversation below, which of the conversational objectives have been completed?
+            # player_scene_objectives:
+            # {objectives}
 
-            This is the conversation between the player and the NPC so far.
-            CONVERSATION:
-            {conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
+            # This is the conversation between the player and the NPC so far.
+            # CONVERSATION:
+            # {conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
 
             template = """Contextual Information:
             {question}
 
-            Required Output: You must format your output as a JSON value that adheres to a given JSON scehema instance with the following keys:
-                'objectives_completed': The value of that key should be another dict with keys that EXACTLY MATCH the objectives as given in the list of objectives and the values equal to either 'completed' or 'not_completed' depending on whether that objective has been completed.
+            Required Output: You must format your output as a JSON dictionary that adheres to a given JSON scehema instance with the following keys:
+                'objectives_completed': A dict with keys that EXACTLY MATCH the objectives as given in the player_scene_objectives list.  The values for each key value pair in this dict should be either 'completed' or 'not_completed' depending on whether that objective has been completed.
                 'objectives_completed_reason': A string that describes why or why not the objective(s) were marked as either completed or not completed."""
             prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
             llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
@@ -152,7 +152,10 @@ class NpcUserInteraction():
             CONVERSATION:
             {conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
             response = llm_chain.run(prompt)
+            print(response)
+            print('type of response in objc prompt: ', type(response))
             response = json.loads(response)
+            print('type of response in objc prompt: ', type(response))
             input_response['objectives_completed'] = response['objectives_completed']
             input_response['objectives_completed_reason'] = response['objectives_completed_reason']
             return input_response
@@ -200,7 +203,7 @@ class NpcUserInteraction():
         input_response['postprocessed_npc_response_reasoning'] = response['postprocessed_npc_response_reasoning']
         return input_response
 
-    def npc_emotion_and_reasoning(self, user_message):
+    def npc_emotion_and_reasoning(self, user_message)->dict:
 
         prompt = self._get_prompt()
         prompt += '\n' + "Player" + ': ' + user_message + '\n' + self.npc_name + ': '    
@@ -252,8 +255,12 @@ class NpcUserInteraction():
         #     self.run_prompt_to_get_objective_completion(input_response=response),
         #     self.post_process_npc_response(input_response=response)
         # )
-        response_objectives = await asyncio.gather(self.run_prompt_to_get_objective_completion(input_response=response))
-
+        response_objectives = await self.run_prompt_to_get_objective_completion(input_response=response)
+        # response_objectives = await asyncio.gather(self.run_prompt_to_get_objective_completion(input_response=response))[0]
+        pprint.pprint(response)
+        print('type(response): ', type(response))
+        print('type(response_objectives): ', type(response_objectives))
+        print(response_objectives)
         # response['npc_response'] = response_speech_patterns['postprocessed_npc_response']
         # response['postprocessed_npc_response_reasoning'] = response_speech_patterns['postprocessed_npc_response_reasoning']
         response['objectives_completed'] = response_objectives['objectives_completed']
@@ -400,7 +407,7 @@ class NpcUserInteraction():
             world_npc_prompt = ""
         if world_npc_prompt == "":
             return ""
-        return """'''''\nGAME INFORMATION:\n {world_npc_prompt}\n\n""".format(world_npc_prompt=world_npc_prompt)
+        return """GAME INFORMATION:\n {world_npc_prompt}\n\n""".format(world_npc_prompt=world_npc_prompt)
     
     def _load_npc_prompt(self):
         return "" if 'personality' not in list(self.npc) or self.npc['personality'] == "" else f"NPC Personality:\nThe personality of {self.npc_name} is: {self.npc['personality']}"
@@ -468,7 +475,7 @@ class NpcUserInteraction():
         return knowledge
     
     def _load_conversation_prompt(self):
-        prompt = "'''''\nHere is the CONVERSATION so far:\n"
+        prompt = "Here is the CONVERSATION so far:\n"
         prompt += self.get_conversation()
         return prompt
 

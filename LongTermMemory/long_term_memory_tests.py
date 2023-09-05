@@ -25,9 +25,9 @@ class TestLongTermMemory(unittest.TestCase):
         ]
 
         
-    # def test_add_memories(self):
-    #     self.ltm.add_memories(self.observations)
-    #     self.assertTrue(os.path.exists(self.ltm.vector_store_index_path))
+    def test_add_memories(self):
+        self.ltm.add_memories(self.observations)
+        self.assertTrue(os.path.exists(self.ltm.vector_store_index_path))
 
     def test_fetch_memories(self):
         observation_query = "Tell me about your birthplace."
@@ -43,5 +43,13 @@ class TestLongTermMemory(unittest.TestCase):
     #         # os.remove(self.ltm.vector_store_index_path)
     #         os.rmdir(os.path.join(LONG_TERM_MEMORY_PATH, self.ltm.world_name))
 
-if __name__ == "__main__":
-    unittest.main()
+
+def test_fetch_memories_stores_memories():
+    ltm = LongTermMemory(world_name="TestWorld", user_name="TestUser", npc_name="TestNPC")
+    mem = ltm.fetch_memories("tell me about your birthplace")
+    print(mem)
+
+test_fetch_memories_stores_memories()
+
+# if __name__ == "__main__":
+    # unittest.main()
