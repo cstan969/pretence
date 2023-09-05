@@ -1014,7 +1014,7 @@ const WorldCreator = () => {
             <div>
                 <h1>{currentNpc.npc_name}</h1>
                 <div className="input-group">
-                <label>Personality</label>
+                <label>Innate Personality / Traits</label>
                 <textarea value={npcPersonality} onChange={(e) => {setNpcPersonality(e.target.value)}}></textarea>
                 </div>
                 <div className="input-group">
