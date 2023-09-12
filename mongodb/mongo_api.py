@@ -167,7 +167,75 @@ def upsert_mission(q:dict):
     mission_briefing = q['mission_briefing']
     world_name=q['world_name']
     possible_outcomes = q['possible_outcomes']
-    return fncs.upsert_mission(world_name=world_name,mission_name=mission_name,mission_briefing=mission_briefing,possible_outcomes=possible_outcomes)
+    id_based_availability_logic = q['id_based_availability_logic'] if 'id_based_availability_logic' in list(q) else ""
+    name_based_availability_logic = q['name_based_availability_logic'] if 'name_based_availability_logic' in list(q) else ""
+    return fncs.upsert_mission(
+        world_name=world_name,
+        mission_name=mission_name,
+        mission_briefing=mission_briefing,
+        possible_outcomes=possible_outcomes,
+        id_based_availability_logic=id_based_availability_logic,
+        name_based_availability_logic=name_based_availability_logic
+        )
+
+
+
+
+#npc_objectives
+@app.post("/create_npc_objective")
+def create_npc_objective(q:dict):
+    return fncs.create_npc_objective(world_name=q['world_name'],npc_name=q['npc_name'])
+
+@app.post("/delete_npc_objective")
+def delete_npc_objective(q:dict):
+    return fncs.delete_npc_objective(npc_objective_id=q['npc_objective_id'])
+
+@app.post("/update_npc_objective")
+def update_npc_objective(q:dict):
+    return fncs.update_npc_objective(
+        npc_objective_id=q['npc_objective_id'],
+        world_name=q['world_name'],
+        npc_name=q['npc_name'],
+        objective_name=q['objective_name'],
+        objective_completion_string=q['objective_completion_string'],
+        prompt_completed = q['prompt_completed'] if 'prompt_completed' in list(q) else "",
+        prompt_available = q['prompt_available'] if 'prompt_available' in list(q) else "",
+        prompt_unavailable = q['prompt_unavailable'] if 'prompt_unavailable' in list(q) else "",
+        name_based_availability_logic= q['name_based_availability_logic'] if 'name_based_availability_logic' in list(q) else "",
+        id_based_availability_logic= q['id_based_availability_logic'] if 'id_based_availability_logic' in list(q) else "",
+
+    )
+
+@app.post("/get_npc_objectives")
+def get_npc_objectives(q:dict):
+    return fncs.get_npc_objectives(world_name=q['world_name'],npc_name=q['npc_name'])
+
+
+@app.post("/get_available_missions")
+def get_available_missions(q:dict):
+    return fncs.get_available_missions(world_name=q['world_name'],user_name=q['user_name'])
+
+@app.post("/get_available_npcs")
+def get_available_npcs(q:dict):
+    return fncs.get_available_npcs(world_name=q['world_name'],user_name=q['user_name'])
+
+@app.post("/convert_availability_logic_from_name_to_id")
+def convert_availability_logic_from_name_to_id(q:dict):
+    world_name = q['world_name']
+    expr = q['expr']
+    return {
+        'id_based_availability_logic': fncs.convert_availability_logic_from_name_to_id(world_name=world_name,expr=expr)
+    }
+
+@app.post("/convert_availability_logic_from_id_to_name")
+def convert_availability_logic_from_id_to_name(q:dict):
+    expr = q['expr']
+    return {
+        'name_based_availability_logic': fncs.convert_availability_logic_from_id_to_name(expr=expr)
+    }
+    
+
+
 
 ################################
 #####MULTI COLLECTION CALLS#####

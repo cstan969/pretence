@@ -34,6 +34,7 @@ async def get_conversation(q: dict)->dict:
 
 @app.post("/message_npc_and_get_response")
 async def message_npc_and_get_response(q: dict)->dict:
+    print(q)
     world_name=q['world_name']
     scene_id=q['scene_id']
     npc_name = q['npc_name']

@@ -191,6 +191,33 @@ In his journey for healing and understanding, Callum stumbled upon the settlemen
             ]
         )
 
+    def test_npc_objectives(self):
+        # objective = create_npc_objective(world_name='TraumaGame',npc_name='Callum')
+        # print(objective)
+        # _id = "npc_objectives-TraumaGame-Callum-20230907120204278204"
+        # update_npc_objective(
+        #     npc_objective_id=_id,
+        #     world_name='TraumaGame',
+        #     npc_name='Callum',
+        #     objective_name='Handling the Ruffians',
+        #     objective_completion_string='Callum tells the player about the ruffians messing with the tavern folks.')
+        
+
+        # obj = create_npc_objective(world_name='TraumaGame',npc_name='Callum')
+        # update_npc_objective(
+        #     npc_objective_id=obj['_id'],
+        #     world_name='TraumaGame',
+        #     npc_name='Callum',
+        #     objective_name='Recruit Callum',
+        #     objective_completion_string='Callum agrees to join your party'
+        # )
+
+        objs = get_npc_objectives(world_name='TraumaGame',npc_name='Callum')
+        print(objs)
+
+    def test_init_game_state(self):
+        init_game_state(user_name='TestUser',world_name='TraumaGame')
+
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
 # tc.test_collection_users()
@@ -209,4 +236,6 @@ tc = mongo_fncs_unittests()
 # tc.test_get_formatted_conversational_chain()
 # tc.test_knowledge_end_to_end()
 # tc.test_get_number_of_user_npc_interactions()
-tc.test_missions()
+# tc.test_missions()
+# tc.test_npc_objectives()
+tc.test_init_game_state()

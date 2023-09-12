@@ -11,9 +11,11 @@ import SceneMusicFileSelector from './SceneMusicFileSelector.jsx';
 
 
 const WorldCreator = () => {
+
   //user variables
   const [users, setUsers] = useState([]);
   const [newUserName, setNewUserName] = useState('');
+
   //world variables
   const [worlds, setWorlds] = useState([]);
   const [currentWorld, setCurrentWorld] = useState({
@@ -25,44 +27,25 @@ const WorldCreator = () => {
   const [worldDescription, setWorldDescription] = useState('');
   const [worldNarrationIntro, setWorldNarrationIntro] = useState('');
   const [worldNarrationOutro, setWorldNarrationOutro] = useState('');
-
   const [newWorldName, setNewWorldName] = useState('');
-  
   const [showPopup, setShowPopup] = useState(false);
   const [showPopupNewUser, setShowPopupNewUser] = useState(false);
   const [editorOption, setEditorOption] = useState(null);
-  const [scenes, setScenes] = useState([]);
-  const [currentScene, setCurrentScene] = useState({
-    scene_name: "",
-    previous_scene: "",
-    NPCs: {},
-    objectives: [],
-    narration_intro: "",
-    narration_outro: "",
-    background_image_filepath: "",
-    music_filepath: "",
-    max_number_of_dialogue_exchanges: null
-  });
-  const [previousSceneName, setPreviousSceneName] = useState('')
+
+  //NPC Stuffs
   const [npcs, setNpcs] = useState([]);
   const [currentNpc, setCurrentNpc] = useState(null);
   const [npcPersonality, setNpcPersonality] = useState('');
   const [npcKnowledge, setNpcKnowledge] = useState('');
   const [npcSpeechPatterns, setNpcSpeechPatterns] = useState('');
-  const [sceneNpcName, setSceneNpcName] = useState('');
-  const [sceneNpcPrompt, setSceneNpcPrompt] = useState('');
-  const sceneNPCs = {
-    [sceneNpcName]: {
-      scene_npc_prompt: sceneNpcPrompt
-    }
-  };
-  
+  const [npcObjectives, setNpcObjectives] = useState([]);
   const [newNpcName, setNewNpcName] = useState('');
-  const [newNpcPersonality, setNewNpcPersonality] = useState('');
   const [selectedTag, setSelectedTag] = useState("");
   const [selectedLevel, setSelectedLevel] = useState(0);
   const [npcKnowledgeList, setNpcKnowledgeList] = useState({});
-  const [isNewScene, setIsNewScene] = useState(true);
+  const [npcNameBasedAvailabilityLogic, setNpcNameBasedAvailabilityLogic] = useState("");
+  const [npcIdBasedAvailabilityLogic, setNpcIdBasedAvailabilityLogic] = useState("");
+
 
   //play game as user variables
   const [playGameWorld, setPlayGameWorld] = useState('')
@@ -82,7 +65,9 @@ const WorldCreator = () => {
   const [currentMission, setCurrentMission] = useState({
     mission_name: "",
     mission_brief: "",
-    possible_outcomes: []
+    possible_outcomes: [],
+    name_based_availability_logic: "",
+    id_based_availability_logic: ""
   });
   const [missions, setMissions] = useState([]);
   const [isNewMission, setIsNewMission] = useState(true);
@@ -95,32 +80,12 @@ const WorldCreator = () => {
   const [missionApiResponse, setMissionApiResponse] = useState("");
 
 
-  const clearCurrentScene = () => {
-    setCurrentScene({
-      scene_name: "",
-      previous_scene_name: "",
-      previous_scene: "",
-      NPCs: {},
-      objectives: [],
-      narration_intro: "",
-      narration_outro: "",
-      background_image_filepath: "",
-      music_filepath: "",
-      max_number_of_dialogue_exchanges: null
-    });
-    setSceneNpcName("");
-    setSceneNpcPrompt("");
-  };
+ 
 
   useEffect(() => {
     updateWorlds();
     updateUsers();
 }, []); // An empty dependency array
-
-  // For operations that run every time currentScene changes:
-  useEffect(() => {
-      console.log('currentScene has changed: ', currentScene);
-  }, [currentScene]); 
 
   const updateWorlds = () => {
     axios.get('http://127.0.0.1:8002/get_all_worlds')
@@ -184,23 +149,6 @@ const WorldCreator = () => {
     })
   };
 
-  
- 
-
-  const updateScenes = () => {
-    console.log('currentWorld: ', currentWorld.world_name)
-    if (currentWorld) {
-        axios.post('http://127.0.0.1:8002/get_all_scenes_in_order/', { world_name: currentWorld.world_name })
-          .then(res => setScenes(res.data.scenes))
-          .catch(err => console.log(err));
-      }
-  };
-
-  const handleSceneEditor = () => {
-    updateScenes();
-    updateNpcs();
-    setEditorOption('scene');
-  };
 
   const updateNpcs = () => {
     if (currentWorld) {
@@ -211,10 +159,6 @@ const WorldCreator = () => {
           .catch(err => console.log(err));
       }
   };
-      //   // For operations that run every time currentScene changes:
-      //   useEffect(() => {
-      //     console.log('currentKnowledge has changed: ', currentKnowledge);
-      // }, [currentKnowledge]); 
 
   const handleNpcEditor = () => {
     updateNpcs();
@@ -274,80 +218,15 @@ const WorldCreator = () => {
       .catch(err => console.log(err));
   };
 
-  const saveScene = () => {
-    const previousScene = scenes.find(scene => scene.scene_name === previousSceneName)
-    const updatedScene = {
-        ...currentScene,
-        objectives: currentScene.objectives.map(objective => [...objective]),
-        previous_scene: currentScene.previous_scene,
-        previous_scene_name: currentScene.previous_scene_name,
-        NPCs: sceneNPCs
-      }
-    // Update the Scene
-    axios.post('http://127.0.0.1:8002/update_scene/', updatedScene)
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
-    // Update 'scenes' variable by re-pulling the scenes
-    axios.post('http://127.0.0.1:8002/get_all_scenes_in_order/', { world_name: currentWorld.world_name })
-      .then(res => setScenes(res.data.scenes))
-      .catch(err => console.log(err));
-  }
 
-  const saveNpc = () => {
-    const updatedNpc = {...currentNpc,
-      personality: npcPersonality,
-      knowledge: npcKnowledge,
-      speech_patterns: npcSpeechPatterns,
-      knowledge_tag_levels: npcKnowledgeList
-    }
-
-    // console.log(updatedNpc)
-    axios.post('http://127.0.0.1:8002/upsert_npc/',updatedNpc)
-    .then(res=>console.log(res))
-    .catch(err=>console.log(err))
-  }
-
-  const createNewScene = () => {
-    const newScene = { 
-      world_name: currentWorld.world_name, 
-      scene_name: currentScene.scene_name, 
-      previous_scene: currentScene.previous_Scene ? currentScene.previous_scene : null,
-      previous_scene_name: currentScene.previous_scene_name ? currentScene.previous_scene_name : "",
-      NPCs: { sceneNpcName: {scene_npc_prompt: sceneNpcPrompt}},
-      objectives: currentScene.objectives,
-      narration_intro: currentScene.narration_intro,
-      narration_outro: currentScene.narration_outro,
-      background_image_filepath: currentScene.background_image_filepath,
-      music_filepath: currentScene.music_filepath,
-      max_number_of_dialogue_exchanges: currentScene.max_number_of_dialogue_exchanges
-    };
-    console.log('newScene: ', newScene)
-    // Upsert the new scene
-    axios.post('http://127.0.0.1:8002/insert_scene/', newScene)
-      .then(res => {
-        clearCurrentScene();
-        setCurrentScene(curScene => ({...curScene, scene_name: res.data.scene_name, previous_scene: res.data.previous_scene, previous_scene_name: res.data.previous_scene_name}));
-      })
-      .catch(err => console.log(err));
-    // Get the new updated 'scenes' variable from DB
-    axios.post('http://127.0.0.1:8002/get_all_scenes_in_order/', { world_name: currentWorld.world_name })
-      .then(res => {
-        setScenes(res.data.scenes);
-      })
-      .catch(err => console.log(err));
-    
-    // get scene editor to update (ulgy way w/e)
-    setEditorOption('world');
-    setEditorOption('scene');
-  };
+  
 
   const createNewNpc = () => {
-    const newNpc = { world_name: currentWorld.world_name, npc_name: newNpcName, personality: newNpcPersonality };
+    const newNpc = { world_name: currentWorld.world_name, npc_name: newNpcName};
     axios.post('http://127.0.0.1:8002/upsert_npc/', newNpc)
         .then(res => {
             // console.log(res);
             setNewNpcName('');
-            setNewNpcPersonality('');
             // Optionally, refresh your list of NPCs here
             handleNpcEditor();
         })
@@ -361,7 +240,6 @@ const WorldCreator = () => {
         <button onClick={() => setCurrentWorld({world_name: "",world_description: "",narration_intro: "",narration_outro: "",background_image_filepath: "",music_filepath: "",max_number_of_dialogue_exchanges:null})}>Back</button>
         <h1>{currentWorld.world_name}</h1>
         <button onClick={() => setEditorOption('world')}>World Editor</button>
-        <button onClick={handleSceneEditor}>Scene Editor</button>
         <button onClick={handleNpcEditor}>NPC Editor</button>
         <button onClick={handleKnowledgeEditor}>Knowledge Editor</button>
         <button onClick={handleMissionEditor}>Mission Editor</button>
@@ -394,227 +272,9 @@ const WorldCreator = () => {
       );
   }
 
-  // the scene editor
-  if (editorOption === 'scene') {
-    function handleObjectiveChange(listIndex, index, key, newValue) {
-      const updatedObjectives = [...currentScene.objectives];
-      updatedObjectives[listIndex][index] = {...updatedObjectives[listIndex][index], [key]: newValue};
-      setCurrentScene({ ...currentScene, objectives: updatedObjectives });
-  }
-  
-  function removeObjective(listIndex, index) {
-      const updatedObjectives = [...currentScene.objectives];
-      updatedObjectives[listIndex].splice(index, 1);
-      setCurrentScene({ ...currentScene, objectives: updatedObjectives });
-  }
-  
-  function addNewObjective(listIndex) {
-      const updatedObjectives = [...currentScene.objectives];
-      updatedObjectives[listIndex].push("");
-      setCurrentScene({ ...currentScene, objectives: updatedObjectives });
-  }
-  
-  function addNewObjectiveSet() {
-      const updatedObjectives = [...currentScene.objectives, []];
-      setCurrentScene({ ...currentScene, objectives: updatedObjectives });
-  }
-  
-    return (
-        <div className="WorldCreator">
-            <button onClick={() => {setEditorOption(null); clearCurrentScene()}}>Back</button>
-            <h1>Select a Scene:</h1>
-            {scenes.map((scene) => (
-                <button key={scene._id} onClick={() => {
-                    console.log(scenes)
-                    console.log('selected scene: ', scene)
-                    const matchedScene = scenes.find(scene2 => scene2._id === scene.previous_scene);
-                    console.log('matchedScene: ', matchedScene)
-                    setCurrentScene({...scene, previous_scene: matchedScene ? matchedScene._id : null, previous_scene_name: matchedScene ? matchedScene.scene_name : ""});
-                    const npcName = scene.NPCs ? Object.keys(scene.NPCs)[0] : '';
-                    const npcPrompt = scene.NPCs && scene.NPCs[npcName] ? scene.NPCs[npcName].scene_npc_prompt : '';
-                    setSceneNpcName(npcName);
-                    setSceneNpcPrompt(npcPrompt);
-                    setIsNewScene(false);
-                }}>
-                    {scene.scene_name}
-                </button>
-            ))}
-            <button onClick={() => {
-              setCurrentScene({
-                  scene_name: "",
-                  previous_scene: null,
-                  NPCs: {},
-                  objectives: [],
-                  narration_intro: "",
-                  narration_outro: "",
-                  max_number_of_dialogue_exchanges: null
-              });
-              setSceneNpcName("")
-              setSceneNpcPrompt("")
-              setIsNewScene(true);
-            }}>
-                New Scene Template
-            </button>
-            {!isNewScene ? (
-                <div>
-                    <h1>{currentScene.scene_name}</h1>
-                     <div className="editor">
-                     <div className="input-group">
-                     <label>Scene ID (read-only)</label>
-                     <input type="text" value={currentScene._id || ''} readOnly />
-                    </div>
-                    <div className="input-group">
-                        <label>Scene Name</label>
-                        <input type="text" value={currentScene.scene_name || ''} onChange={(e) => setCurrentScene({ ...currentScene, scene_name: e.target.value })} />
-                    </div>
-                    <div className="input-group">
-                        <label>Previous Scene</label>
-                        <select 
-                                value={currentScene.previous_scene_name || ''} 
-                                onChange={(e) => {
-                                  setCurrentScene({ ...currentScene, previous_scene_name: e.target.value });
-                                  setPreviousSceneName(e.target.value);}
-                                }>
-                                <option value="">Select previous scene</option>
-                                {scenes.map((scene, index) => (
-                                <option key={index} value={scene.scene_name}>{scene.scene_name}</option>
-                                ))}
-                            </select>
-                    </div>
-                    <div className="input-group">
-                            <label>NPC Name</label>
-                            <select 
-                                value={currentScene.npc_name || 'Select NPC'} 
-                                onChange={(e) => {
-                                  setCurrentScene({ ...currentScene, npc_name: e.target.value });
-                                  setSceneNpcName(e.target.value);}}>
-                                <option value="">Select NPC</option>
-                                {npcs.map((npc, index) => (
-                                <option key={index} value={npc.npc_name}>{npc.npc_name}</option>
-                                ))}
-                            </select>
-                        </div>
-                    <div className="input-group">
-                        <label>Scene NPC Prompt</label>
-                        <textarea value={sceneNpcPrompt} onChange={(e) => setSceneNpcPrompt(e.target.value)}></textarea>
-                    </div>
-              
-                    {currentScene.objectives.map((objectiveList, listIndex) => (
-                    <div key={`list-${listIndex}`}>
-                        <h3>Objective Set {listIndex + 1}</h3>
-                        {objectiveList.map((objective, index) => (
-                            <div key={`objective-${listIndex}-${index}`} className="input-group">
-                                <label>Objective {index + 1}</label>
-                                <div className="objective-group">
-                                  <div className="input-group">
-                                    <label>Quest Objective</label>
-                                      <textarea
-                                          placeholder="Quest Objective"
-                                          value={objective.objective || ''}
-                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'objective', e.target.value)}
-                                      />
-                                  </div>
-
-                                  <div className="input-group">
-                                      <label>User Facing Objective String</label>
-                                      <textarea
-                                          placeholder="User Facing Objective String"
-                                          value={objective.user_facing_objective_string || ''}
-                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'user_facing_objective_string', e.target.value)}
-                                      />
-                                  </div>
-
-                                  <div className="input-group">
-                                    <label>Prompt Completed</label>
-                                      <textarea
-                                          placeholder="Prompt Completed"
-                                          value={objective.prompt_completed || ''}
-                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'prompt_completed', e.target.value)}
-                                      />
-                                  </div>
-
-                                  <div className="input-group">
-                                    <label>Prompt Available</label>
-                                      <textarea
-                                          placeholder="Prompt Available"
-                                          value={objective.prompt_available || ''}
-                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'prompt_available', e.target.value)}
-                                      />
-                                  </div>
-
-                                  <div className="input-group">
-                                    <label>Prompt Unavailable</label>
-                                      <textarea
-                                          placeholder="Prompt Unavailable"
-                                          value={objective.prompt_unavailable || ''}
-                                          onChange={(e) => handleObjectiveChange(listIndex, index, 'prompt_unavailable', e.target.value)}
-                                      />
-                                  </div>
-                              </div>
-                              <FontAwesomeIcon
-                                  icon={faTrash}
-                                  onClick={() => removeObjective(listIndex, index)}
-                              />
-                          </div>
-                        ))}
-                        <button onClick={() => addNewObjective(listIndex)}>Add New Objective</button>
-                    </div>
-                    ))}
-                    <button onClick={addNewObjectiveSet}>Add New Objective Set</button>
-                    <div className="input-group">
-                        <label>Narration Intro</label>
-                        <textarea value={currentScene.narration_intro || ''} onChange={(e) => setCurrentScene({ ...currentScene, narration_intro: e.target.value })}></textarea>
-                    </div>
-                    <div className="input-group">
-                        <label>Narration Outro</label>
-                        <textarea value={currentScene.narration_outro || ''} onChange={(e) => setCurrentScene({ ...currentScene, narration_outro: e.target.value })}></textarea>
-                    </div>
-                    <div className="input-group">
-                        <label>Background Image Filepath</label>
-                        <SceneBackgroundImageFileSelector scene_id={currentScene._id} defaultFileName={currentScene.background_image_filepath}/>
-                    </div>
-                    <div className="input-group">
-                        <label>Music Filepath</label>
-                        <SceneMusicFileSelector scene_id={currentScene._id} defaultFileName={currentScene.music_filepath}/>
-                    </div>
-                    <div className="input-group">
-                        <label>Max Number of Dialogue Exchanges (number)</label>
-                        <textarea value={currentScene.max_number_of_dialogue_exchanges || null} onChange={(e) => setCurrentScene({ ...currentScene, max_number_of_dialogue_exchanges: e.target.value })}></textarea>
-                    </div>
-                    <button onClick={saveScene}>Save Updates to Scene</button>
-                    </div>
-                </div>
-            ) : (
-                <div>
-                    <h1>Create a new Scene</h1>
-                    <div className="editor">
-                        <div className="input-group">
-                            <label>Scene Name</label>
-                            <input type="text" value={currentScene.scene_name || ''} onChange={(e) => setCurrentScene({ ...currentScene, scene_name: e.target.value })} />
-                        </div>
-                        <div className="input-group">
-                            <label>Previous Scene</label>
-                            <select 
-                                value={currentScene.previous_scene_name || ''} 
-                                onChange={(e) => setCurrentScene({ ...currentScene, previous_scene_name: e.target.value })}>
-                                <option value="">Select previous scene</option>
-                                {scenes.map((scene, index) => (
-                                <option key={index} value={scene.scene_name}>{scene.scene_name}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                    <button onClick={createNewScene}>Create Scene</button>
-                </div>
-            )}
-        </div>
-    );
-}
-
   if (editorOption === 'knowledge') {
     
     function setCurrentKnowledgeFromTag(input_tag){
-      console.log('---hello---');
       let k = {
         tag: input_tag,
         knowledge_description: "",
@@ -629,7 +289,6 @@ const WorldCreator = () => {
       .then(res => {
         res.data.forEach(item => {
           const levelKey = `level${item.level}`;
-          console.log('levelKey: ', levelKey)
           k[levelKey] = item.knowledge;
           k['knowledge_description']=item.knowledge_description;
           setCurrentKnowledge(k);
@@ -765,6 +424,7 @@ const WorldCreator = () => {
   if (editorOption === 'mission'){
 
     const saveMission = () => {
+      console.log('save mission: ', currentMission)
       axios.post('http://127.0.0.1:8002/upsert_mission/', {...currentMission,world_name:currentWorld.world_name})
       .then(res => console.log(res.data))
       .catch(err => console.log(err));
@@ -812,14 +472,6 @@ const WorldCreator = () => {
       });
     }
 
-    // const toggleEditNpcs = (index) => {
-    //   if (editingNpcsIndexes.includes(index)) {
-    //     setEditingNpcsIndexes(prevIndexes => prevIndexes.filter(i => i !== index));
-    //   } else {
-    //     setEditingNpcsIndexes(prevIndexes => [...prevIndexes, index]);
-    //   }
-    // }
-
     const toggleEditNpcs = (index) => {
       if (editingNpcsIndexes.includes(index)) {
         // If already in editing mode, toggle off and clear NPCs for this outcome
@@ -854,6 +506,30 @@ const WorldCreator = () => {
       setIsNewMission(false);
     };
 
+    const handleNameToIdLogicConversion = async () => {
+      // If the name_based_availability_logic is empty, don't make the API call
+      if (!currentMission.name_based_availability_logic.trim()) {
+        setCurrentMission(prevState => ({
+            ...prevState,
+            id_based_availability_logic: ''
+        }));
+        return;
+      }
+    
+      // Example API call
+      axios.post("http://127.0.0.1:8002/convert_availability_logic_from_name_to_id", {'world_name': currentWorld.world_name,'expr': currentMission.name_based_availability_logic})
+        .then(response => {
+          console.log('Mission Updated:', response.data);
+          setCurrentMission(prevState => ({
+            ...prevState,
+            id_based_availability_logic: response.data.id_based_availability_logic
+          }));
+        })
+        .catch(err => {
+          console.log('Error converting availability logic from name to id:', err);
+        });
+      };
+
     return(
       <div className="WorldCreator">
         <button onClick={() => setEditorOption(null)}>Back</button>
@@ -874,6 +550,8 @@ const WorldCreator = () => {
                 mission_name: "",
                 mission_briefing: "",
                 possible_outcomes: [],
+                name_based_availability_logic: "",
+                id_based_availability_logic: ""
               });
               setIsNewMission(true);
             }}>
@@ -882,6 +560,7 @@ const WorldCreator = () => {
 
         {!isNewMission ? (
           <div>
+            <h3>Core</h3>
             <div className="input-group">
             <label>mission_name</label>
             <textarea readOnly value={currentMission.mission_name} onChange={(e) => setCurrentMission({...currentMission, mission_name: e.target.value}) }/>
@@ -890,6 +569,16 @@ const WorldCreator = () => {
             <label>mission_briefing</label>
             <textarea value={currentMission.mission_briefing} onChange={(e) => setCurrentMission({...currentMission, mission_briefing: e.target.value}) }/>
             </div>
+            <div className="input-group">
+            <label>Name-Based Mission Availability Logic</label>
+            <textarea value={currentMission.name_based_availability_logic} onChange={(e) => setCurrentMission({...currentMission, name_based_availability_logic: e.target.value}) }/>
+            </div>
+            <button onClick={handleNameToIdLogicConversion}>Convert to ID-based Logic</button>
+            <div className="input-group">
+            <label>(ReadOnly) ID-based Mission Availability Logic</label>
+            <textarea readOnly value={currentMission.id_based_availability_logic} onChange={(e) => setCurrentMission({...currentMission, id_based_availability_logic: e.target.value}) }/>
+            </div>
+
             <h3>Possible Outcomes</h3>
             {currentMission.possible_outcomes.map((outcome, index) => (
               <div key={index}>
@@ -924,6 +613,7 @@ const WorldCreator = () => {
               </div>
             ))}
             <button onClick={handleAddOutcome}>Add Outcome</button>
+            <h3>Save Your Changes!</h3>
             <button onClick={saveMission}>Save Updates to Mission</button>
             <h3>Test Mission</h3>
             <select multiple value={selectedNpcsForMission} onChange={(e) => setSelectedNpcsForMission(Array.from(e.target.selectedOptions, option => option.value))}>
@@ -955,6 +645,186 @@ const WorldCreator = () => {
   }
 
   if (editorOption === 'npc') {
+
+    function updateObjectives(npcObjectives) {
+      console.log('log npc objectives: ', npcObjectives);
+      npcObjectives.forEach((objective) => {
+        const payload = {
+          npc_objective_id: objective._id,
+          world_name: objective.world_name,
+          npc_name: objective.npc_name,
+          objective_name: objective.objective_name,
+          objective_completion_string: objective.objective_completion_string,
+          prompt_available: objective.prompt_available,
+          prompt_completed: objective.prompt_completed,
+          prompt_unavailable: objective.prompt_unavailable,
+          id_based_availability_logic: objective.id_based_availability_logic,
+          name_based_availability_logic: objective.name_based_availability_logic
+        };
+    
+        axios.post("http://127.0.0.1:8002/update_npc_objective", payload)
+          .then(response => {
+            console.log('Objective updated:', response.data);
+          })
+          .catch(err => {
+            console.log('Error updating objective:', err);
+          });
+      });
+    }
+
+    function NpcObjectivesComponent(props) {
+      // const { updateObjectives: updateObjectivesFromContext } = useContext(NpcContext);
+      const [npcObjectives, setNpcObjectives] = useState(props.npcObjectives || []);
+
+  
+      const handleInputChange = (index, key, value) => {
+          const newNpcObjectives = [...npcObjectives];
+          newNpcObjectives[index][key] = value;
+          console.log('new npc objectives: ', newNpcObjectives)
+          setNpcObjectives(newNpcObjectives);
+          console.log('npc objectives: ', npcObjectives);
+      };
+
+      
+
+      const addNewObjective = () => {
+        axios.post("http://127.0.0.1:8002/create_npc_objective",{world_name: currentWorld.world_name, npc_name: currentNpc.npc_name})
+        .then(res => {
+          console.log(res.data);
+          const _id = res.data._id;
+          const newObjective = {
+            "_id": _id,
+            "objective_name": "",
+            "objective_completion_string": "",
+            "prompt_completed": "",
+            "prompt_available": "",
+            "prompt_unavailable": "",
+            "name_based_availability_logic": "",
+            "id_based_availability_logic": ""
+        };
+        setNpcObjectives([...npcObjectives, newObjective]);
+        })
+        .catch(err => console.log(err));
+        
+     };
+
+     const handleNameToIdLogicConversionForObjective = (index) => {
+      axios.post("http://127.0.0.1:8002/convert_availability_logic_from_name_to_id", {'world_name': currentWorld.world_name,'expr': npcObjectives[index].name_based_availability_logic})
+      .then(response => {
+        handleInputChange(index, 'id_based_availability_logic', response.data.id_based_availability_logic);
+      })
+      .catch(err => {
+        console.log('Error converting availability logic from name to id:', err);
+      });
+     };
+
+     const deleteObjective = (index) => {
+      const objectiveToDelete = npcObjectives[index];
+  
+      const newNpcObjectives = [...npcObjectives];
+      newNpcObjectives.splice(index, 1);
+      setNpcObjectives(newNpcObjectives);
+  
+      axios.post("http://127.0.0.1:8002/delete_npc_objective", {
+          npc_objective_id: objectiveToDelete._id
+      })
+      .catch(err => console.log(err));
+     };
+  
+      return (
+          <div>
+              {npcObjectives.map((objective, index) => (
+                  <div key={objective._id} className="objective-container">
+                      <div className="input-group">
+                          <label>Objective Name</label>
+                          <textarea 
+                              value={objective.objective_name} 
+                              onChange={(e) => handleInputChange(index, 'objective_name', e.target.value)}
+                          />
+                      </div>
+  
+                      <div className="input-group">
+                          <label>Objective Completion String</label>
+                          <textarea 
+                              value={objective.objective_completion_string}
+                              onChange={(e) => handleInputChange(index, 'objective_completion_string', e.target.value)}
+                          />
+                      </div>
+
+                      <div className="input-group">
+                        <label>Name-Based Objective Availability Logic</label>
+                        <textarea 
+                          value={objective.name_based_availability_logic} 
+                          onChange={(e) => handleInputChange(index, 'name_based_availability_logic', e.target.value)}
+                        />
+                      </div>
+
+                      <button onClick={() => handleNameToIdLogicConversionForObjective(index)}>Convert to ID-based Logic</button>
+
+                      <div className="input-group">
+                        <label>(ReadOnly) ID-based Objective Availability Logic</label>
+                        <textarea 
+                          readOnly 
+                          value={objective.id_based_availability_logic} 
+                          onChange={(e) => handleInputChange(index, 'id_based_availability_logic', e.target.value)}
+                        />
+                      </div>
+
+  
+                      <div className="input-group">
+                          <label>Prompt Completed</label>
+                          <textarea 
+                              value={objective.prompt_completed} 
+                              onChange={(e) => handleInputChange(index, 'prompt_completed', e.target.value)}
+                          />
+                      </div>
+  
+                      <div className="input-group">
+                          <label>Prompt Available</label>
+                          <textarea 
+                              value={objective.prompt_available}
+                              onChange={(e) => handleInputChange(index, 'prompt_available', e.target.value)}
+                          />
+                      </div>
+  
+                      <div className="input-group">
+                          <label>Prompt Unavailable</label>
+                          <textarea 
+                              value={objective.prompt_unavailable}
+                              onChange={(e) => handleInputChange(index, 'prompt_unavailable', e.target.value)}
+                          />
+                      </div>
+                      <button onClick={() => deleteObjective(index)}>Delete Objective</button>
+                      {index !== npcObjectives.length - 1 && <hr className="objective-divider" />}
+                  </div>
+              ))}
+              <button onClick={addNewObjective}>Add New Objective</button>
+          </div>
+      );
+  }
+  
+
+  const saveNpc = () => {
+    const updatedNpc = {...currentNpc,
+      personality: npcPersonality,
+      knowledge: npcKnowledge,
+      speech_patterns: npcSpeechPatterns,
+      objectives: npcObjectives,
+      knowledge_tag_levels: npcKnowledgeList,
+      id_based_availability_logic: npcIdBasedAvailabilityLogic,
+      name_based_availability_logic: npcNameBasedAvailabilityLogic
+    }
+    console.log('save Npc: ', updatedNpc);
+
+
+    axios.post('http://127.0.0.1:8002/upsert_npc/',updatedNpc)
+    .then(res=>console.log(res))
+    .catch(err=>console.log(err))
+    updateObjectives(npcObjectives);
+
+  }
+
+
     function TagDropdown({ tags, onChange, value }) {
       return (
         <select value={value} onChange={e => onChange(e.target.value)}>
@@ -981,10 +851,45 @@ const WorldCreator = () => {
       );
     }
 
-
+   
+    
     const addKnowledgeToNpc = () => {
       setNpcKnowledgeList(prevList => ({...prevList, [selectedTag]: selectedLevel}));
     }
+
+    function setNpc(npc) {
+      setCurrentNpc(npc);
+      setNpcPersonality(npc.personality !== undefined ? npc.personality : '');
+      setNpcKnowledge(npc.knowledge != undefined ? npc.knowledge : '');
+      setNpcSpeechPatterns(npc.speech_patterns !== undefined ? npc.speech_patterns : '')
+      setNpcKnowledgeList(npc.knowledge_tag_levels != undefined ? npc.knowledge_tag_levels : {});
+      setNpcNameBasedAvailabilityLogic(npc.name_based_availability_logic != undefined ? npc.name_based_availability_logic : "");
+      setNpcIdBasedAvailabilityLogic(npc.id_based_availability_logic != undefined ? npc.id_based_availability_logic : "");
+      axios.post('http://127.0.0.1:8002/get_npc_objectives',{'world_name': currentWorld.world_name,'npc_name':npc.npc_name})
+      .then(res => {
+        console.log(res.data);
+        setNpcObjectives(res.data);
+      })
+      .catch(err => console.log(err));
+    }
+
+    const handleNameToIdLogicConversion = async () => {
+      // If the name_based_availability_logic is empty, don't make the API call
+      if (!npcNameBasedAvailabilityLogic.trim()) {
+        setNpcIdBasedAvailabilityLogic("");
+        return;
+      }
+    
+      // Example API call
+      axios.post("http://127.0.0.1:8002/convert_availability_logic_from_name_to_id", {'world_name': currentWorld.world_name,'expr': npcNameBasedAvailabilityLogic})
+        .then(response => {
+          console.log('Npc Updated:', response.data);
+          setNpcIdBasedAvailabilityLogic(response.data.id_based_availability_logic);
+        })
+        .catch(err => {
+          console.log('Error converting availability logic from name to id:', err);
+        });
+      };
 
     return (
         <div className="WorldCreator">
@@ -993,11 +898,7 @@ const WorldCreator = () => {
             {npcs.map((npc) => (
                 <button key={npc._id} onClick={
                   () => {
-                  setCurrentNpc(npc);
-                  setNpcPersonality(npc.personality !== undefined ? npc.personality : '');
-                  setNpcKnowledge(npc.knowledge != undefined ? npc.knowledge : '');
-                  setNpcSpeechPatterns(npc.speech_patterns !== undefined ? npc.speech_patterns : '')
-                  setNpcKnowledgeList(npc.knowledge_tag_levels != undefined ? npc.knowledge_tag_levels : {});
+                    setNpc(npc);
                 }
                 }>
 
@@ -1013,20 +914,34 @@ const WorldCreator = () => {
             {currentNpc ? (
             <div>
                 <h1>{currentNpc.npc_name}</h1>
+                <h3>Core</h3>
                 <div className="input-group">
                 <label>Innate Personality / Traits</label>
                 <textarea value={npcPersonality} onChange={(e) => {setNpcPersonality(e.target.value)}}></textarea>
                 </div>
                 <div className="input-group">
+                <label>Name-Based NPC Availability Logic</label>
+                <textarea value={npcNameBasedAvailabilityLogic} onChange={(e) => setNpcNameBasedAvailabilityLogic(e.target.value) }/>
+                </div>
+                <button onClick={handleNameToIdLogicConversion}>Convert to ID-based Logic</button>
+                <div className="input-group">
+                <label>(ReadOnly) ID-based NPC Availability Logic</label>
+                <textarea readOnly value={npcIdBasedAvailabilityLogic}/>
+                </div>
+                {/* <div className="input-group">
                 <label>Speech Patterns</label>
                 <textarea value={npcSpeechPatterns} onChange={(e) => {setNpcSpeechPatterns(e.target.value)}}></textarea>
-                </div>
-                <div className="input-group">
+                </div> */}
+                {/* <div className="input-group">
                 <label>Knowledge</label>
                 <textarea value={npcKnowledge} onChange={(e) => {setNpcKnowledge(e.target.value)}}></textarea>
-                </div>
-                
+                </div> */}
 
+                <h3>NPC Objectives</h3>
+                <NpcObjectivesComponent npcObjectives={npcObjectives} />
+
+               
+                <h3>Knowledge</h3>
                 <div>
                   <TagDropdown 
                     tags={knowledgeTags}
@@ -1047,6 +962,8 @@ const WorldCreator = () => {
                     ))}
                   </div>
                 </div>
+                <h3>Saving Updates</h3>
+
                 <button onClick={saveNpc}>Save Updates to NPC</button>
 
             </div>

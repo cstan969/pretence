@@ -7,10 +7,7 @@ from mongodb.mongo_fncs import (
 from langchain import PromptTemplate, LLMChain
 from langchain.chat_models import ChatOpenAI
 import json, os, pprint
-from langchain.llms import LlamaCpp
 from langchain import PromptTemplate, LLMChain
-from langchain.callbacks.manager import CallbackManager
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 
 class MissionOutcomes():
@@ -23,17 +20,12 @@ class MissionOutcomes():
         self.mission_name = self.mission['mission_name']
         self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
 
-        # self.llm = LlamaCpp(
-        #     model_path="/home/carl/Pretence/models/llama2-chronos-hermes-13b/chronos-hermes-13b-v2.ggmlv3.q5_0.bin",
-        #     n_gpu_layers=50,
-        #     n_batch=512,
-        #     temperature=0.75,
-        #     max_tokens=2000,
-        #     top_p=1,
-        #     callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
-        #     verbose=True,
-        #     n_ctx=2000,
-        # )
+    def fix_json(self, json_to_fix):
+        template = """I have some broken JSON below that I need to be able to run json.loads() on.  Can you fix it for me? Thanks.\n\n{question}"""
+        prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
+        llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
+        response = llm_chain.run(json_to_fix)
+        return response
 
     def _load_mission_prompt(self):
         return """I am making a video game where I, the player of the game, am the leader of a mercenary guild. As part of the game, I am given missions and I must assign member(s) of the mercenary guild to go on these missions. Depending on the mission, the mission is liable to succeed or fail depending on the mercenary members that I assign to the mission. I am going to give you information about the mission and then also give you information about the mercenary guild member(s) that were assigned to go on the mission."""
@@ -68,12 +60,6 @@ class MissionOutcomes():
             npc_summaries[npc_name] = personality
         return f"Here are the mercenary member(s) assigned to the mission:\n{npc_summaries}"
         
-
-    
-
-    
-        
-
     def get_mission_outcome_and_debriefing(self):
         prompt_assembly_fncs_in_order = [
             self._load_mission_prompt(), #generic prompt to LLM so it knows what is going on
@@ -101,7 +87,11 @@ The narrative should be written in such a way that the player reads the story as
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
         response = llm_chain.run(prompt)
         print(response)
-        response = json.loads(response)
+        try:
+            response = json.loads(response)
+        except:
+            response = self.fix_json(response)
+            response = json.loads(response)
         pprint.pprint(response)
         return response
 

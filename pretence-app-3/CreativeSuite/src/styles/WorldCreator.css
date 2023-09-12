@@ -54,3 +54,8 @@
   flex-direction: column;
 }
 
+.objective-divider {
+  border: 0;
+  border-top: 1px solid black; 
+  margin: 20px 0; /* Spacing above and below the line */
+}
