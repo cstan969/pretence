@@ -14,7 +14,11 @@ origins = [
     "http://localhost:5173",
     "localhost:5173",
     "http://127.0.0.1:5173",
-    "127.0.0.1:5173"
+    "127.0.0.1:5173",
+    "http://localhost:5174",
+    "localhost:5174",
+    "http://127.0.0.1:5174",
+    "127.0.0.1:5174"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -203,7 +207,7 @@ def update_npc_objective(q:dict):
         prompt_unavailable = q['prompt_unavailable'] if 'prompt_unavailable' in list(q) else "",
         name_based_availability_logic= q['name_based_availability_logic'] if 'name_based_availability_logic' in list(q) else "",
         id_based_availability_logic= q['id_based_availability_logic'] if 'id_based_availability_logic' in list(q) else "",
-
+        effects = q['effects'] if 'effects' in list(q) else []
     )
 
 @app.post("/get_npc_objectives")
@@ -226,6 +230,10 @@ def convert_availability_logic_from_name_to_id(q:dict):
     return {
         'id_based_availability_logic': fncs.convert_availability_logic_from_name_to_id(world_name=world_name,expr=expr)
     }
+
+@app.post("/init_game_state")
+def init_game_state(q:dict):
+    return fncs.init_game_state(world_name=q['world_name'],user_name=q['user_name'])
 
 @app.post("/convert_availability_logic_from_id_to_name")
 def convert_availability_logic_from_id_to_name(q:dict):

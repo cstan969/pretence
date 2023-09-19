@@ -59,3 +59,21 @@
   border-top: 1px solid black; 
   margin: 20px 0; /* Spacing above and below the line */
 }
+
+.effect-container {
+  display: flex;
+  align-items: center;  /* Align vertically in the center */
+  gap: 10px;           /* Space between each item */
+}
+
+/* Adjusting width to ensure all elements fit well in one row */
+select, textarea, .delete-effect-btn {
+  flex: 1;             /* Make each item take up an equal width */
+}
+
+.delete-effect-btn {
+  flex: none;          /* Override flex:1 for the button to only take the space it needs */
+  background-color: transparent; /* Optional: if you don't want a background color */
+  border: none;        /* Optional: if you don't want a button border */
+  cursor: pointer;     /* Change cursor to hand when hovering over the button */
+}

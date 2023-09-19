@@ -12,7 +12,11 @@ origins = [
     "http://localhost:5173",
     "localhost:5173",
     "http://127.0.0.1:5173",
-    "127.0.0.1:5173"
+    "127.0.0.1:5173",
+    "http://localhost:5174",
+    "localhost:5174",
+    "http://127.0.0.1:5174",
+    "127.0.0.1:5174"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -36,11 +40,10 @@ async def get_conversation(q: dict)->dict:
 async def message_npc_and_get_response(q: dict)->dict:
     print(q)
     world_name=q['world_name']
-    scene_id=q['scene_id']
     npc_name = q['npc_name']
     user_name = q['user_name']
     user_message = q['user_message']
-    user_interaction = NpcUserInteraction(world_name=world_name,scene_id=scene_id,npc_name=npc_name,user_name=user_name)
+    user_interaction = NpcUserInteraction(world_name=world_name,npc_name=npc_name,user_name=user_name)
     response = await user_interaction.message_npc_and_get_response(user_message=user_message)        
     return response
 

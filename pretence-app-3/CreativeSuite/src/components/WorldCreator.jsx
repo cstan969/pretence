@@ -258,14 +258,14 @@ const WorldCreator = () => {
               <label>World Description</label>
               <textarea value={worldDescription} onChange={(e) => setWorldDescription(e.target.value)}></textarea>
             </div>
-            <div className="input-group">
+            {/* <div className="input-group">
               <label>Narration Intro</label>
               <textarea value={worldNarrationIntro} onChange={(e) => setWorldNarrationIntro(e.target.value)}></textarea>
             </div>
             <div className="input-group">
               <label>Narration Outro</label>
               <textarea value={worldNarrationOutro} onChange={(e) => setWorldNarrationOutro(e.target.value)}></textarea>
-            </div>
+            </div> */}
             <button className="update-button" onClick={saveWorldChanges}>Save Changes to World</button>
           </div>
         </div>
@@ -441,7 +441,7 @@ const WorldCreator = () => {
           npcs: "",
           outcome_summary: "",
           outcome_name: "",
-          effects: ""
+          effects: []
         }]
       }));
     }
@@ -646,20 +646,43 @@ const WorldCreator = () => {
 
   if (editorOption === 'npc') {
 
+    const saveNpc = () => {
+      console.log('inside saveNpc: objectives: ', npcObjectives)
+      const { objectives, ...restOfCurrentNpc } = currentNpc;
+      const updatedNpc = {...restOfCurrentNpc,
+        personality: npcPersonality,
+        knowledge: npcKnowledge,
+        speech_patterns: npcSpeechPatterns,
+        knowledge_tag_levels: npcKnowledgeList,
+        id_based_availability_logic: npcIdBasedAvailabilityLogic,
+        name_based_availability_logic: npcNameBasedAvailabilityLogic
+      }
+      console.log('save Npc: ', updatedNpc);
+  
+  
+      axios.post('http://127.0.0.1:8002/upsert_npc/',updatedNpc)
+      .then(res=>console.log(res))
+      .catch(err=>console.log(err))
+      updateObjectives(npcObjectives);
+  
+    }
+  
+
     function updateObjectives(npcObjectives) {
       console.log('log npc objectives: ', npcObjectives);
       npcObjectives.forEach((objective) => {
         const payload = {
           npc_objective_id: objective._id,
-          world_name: objective.world_name,
-          npc_name: objective.npc_name,
+          world_name: currentWorld.world_name,
+          npc_name: currentNpc.npc_name,
           objective_name: objective.objective_name,
           objective_completion_string: objective.objective_completion_string,
           prompt_available: objective.prompt_available,
           prompt_completed: objective.prompt_completed,
           prompt_unavailable: objective.prompt_unavailable,
           id_based_availability_logic: objective.id_based_availability_logic,
-          name_based_availability_logic: objective.name_based_availability_logic
+          name_based_availability_logic: objective.name_based_availability_logic,
+          effects: objective.effects
         };
     
         axios.post("http://127.0.0.1:8002/update_npc_objective", payload)
@@ -676,7 +699,26 @@ const WorldCreator = () => {
       // const { updateObjectives: updateObjectivesFromContext } = useContext(NpcContext);
       const [npcObjectives, setNpcObjectives] = useState(props.npcObjectives || []);
 
+      const addEffectToObjective = (index) => {
+        console.log('newObjectives inside addEffectToObjective: ', npcObjectives)
+        const newNpcObjectives = [...npcObjectives];
+        newNpcObjectives[index].effects.push({ type: '', data: '' });
+        setNpcObjectives(newNpcObjectives);
+      }
+      
+      const handleEffectChange = (objectiveIndex, effectIndex, key, value) => {
+        const newNpcObjectives = [...npcObjectives];
+        newNpcObjectives[objectiveIndex].effects[effectIndex][key] = value;
+        setNpcObjectives(newNpcObjectives);
+      }
   
+      const deleteEffectFromObjective = (objectiveIndex, effectIndex) => {
+        const newNpcObjectives = [...npcObjectives];
+        newNpcObjectives[objectiveIndex].effects.splice(effectIndex, 1);
+        setNpcObjectives(newNpcObjectives);
+      }
+
+
       const handleInputChange = (index, key, value) => {
           const newNpcObjectives = [...npcObjectives];
           newNpcObjectives[index][key] = value;
@@ -700,9 +742,11 @@ const WorldCreator = () => {
             "prompt_available": "",
             "prompt_unavailable": "",
             "name_based_availability_logic": "",
-            "id_based_availability_logic": ""
-        };
-        setNpcObjectives([...npcObjectives, newObjective]);
+            "id_based_availability_logic": "",
+            "effects": []
+          };
+          setNpcObjectives([...npcObjectives, newObjective]);
+          console.log('inside addNewObjective, npcObjectives is: ', npcObjectives);
         })
         .catch(err => console.log(err));
         
@@ -794,6 +838,48 @@ const WorldCreator = () => {
                               onChange={(e) => handleInputChange(index, 'prompt_unavailable', e.target.value)}
                           />
                       </div>
+
+                      {objective.effects.map((effect, effectIndex) => (
+                        <div key={effectIndex} className="effect-container">
+                          <select 
+                            value={effect.type}
+                            onChange={e => handleEffectChange(index, effectIndex, 'type', e.target.value)}
+                          >
+                            <option value="">Select effect type</option>
+                            <option value="Gain NPC as Companion">Gain NPC as Companion</option>
+                            <option value="Player Knowledge Acquisition">Player Knowledge Acquisition</option>
+                          </select>
+                          {effect.type === 'Gain NPC as Companion' && (
+                            <select 
+                              value={effect.npc}
+                              onChange={e => handleEffectChange(index, effectIndex, 'npc', e.target.value)}
+                            >
+                              <option value="">Select an NPC</option>
+                              {npcs.map(npc => (
+                                <option value={npc.npc_name} key={npc.npc_name}>
+                                  {npc.npc_name}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                          {effect.type === 'Player Knowledge Acquisition' && (
+                            <textarea
+                              value={effect.data}
+                              onChange={e => handleEffectChange(index, effectIndex, 'data', e.target.value)}
+                              placeholder="Enter knowledge information"
+                            />
+                          )}
+                          <button 
+                            onClick={() => deleteEffectFromObjective(index, effectIndex)}
+                            className="delete-effect-btn"
+                          >
+                            🗑️  {/* This is a trash can emoji, but you can also use an icon */}
+                          </button>
+                        </div>
+                      ))}
+                      <button onClick={() => addEffectToObjective(index)}>Add Objective On-Completion Effect</button>
+
+
                       <button onClick={() => deleteObjective(index)}>Delete Objective</button>
                       {index !== npcObjectives.length - 1 && <hr className="objective-divider" />}
                   </div>
@@ -804,26 +890,7 @@ const WorldCreator = () => {
   }
   
 
-  const saveNpc = () => {
-    const updatedNpc = {...currentNpc,
-      personality: npcPersonality,
-      knowledge: npcKnowledge,
-      speech_patterns: npcSpeechPatterns,
-      objectives: npcObjectives,
-      knowledge_tag_levels: npcKnowledgeList,
-      id_based_availability_logic: npcIdBasedAvailabilityLogic,
-      name_based_availability_logic: npcNameBasedAvailabilityLogic
-    }
-    console.log('save Npc: ', updatedNpc);
-
-
-    axios.post('http://127.0.0.1:8002/upsert_npc/',updatedNpc)
-    .then(res=>console.log(res))
-    .catch(err=>console.log(err))
-    updateObjectives(npcObjectives);
-
-  }
-
+  
 
     function TagDropdown({ tags, onChange, value }) {
       return (
