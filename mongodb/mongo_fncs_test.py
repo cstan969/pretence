@@ -219,6 +219,30 @@ In his journey for healing and understanding, Callum stumbled upon the settlemen
         '''running test for initing the game state, '''
         init_game_state(user_name='TestUser',world_name='Mercenary Manager')
 
+    def test_update_npc_objective_game_state(self):
+        update_npc_objective_game_state(
+            world_name="Mercenary Manager",
+            user_name="Carl11",
+            npc_name="TumTum",
+            npc_objective_id="npc_objectives-Mercenary Manager-TumTum-20230912162042051734",
+            npc_objective_status="available"
+        )
+
+        update_npc_objective_game_state(
+            world_name="Mercenary Manager",
+            user_name="Carl11",
+            npc_name="TumTum",
+            npc_objective_id="npc_objectives-Mercenary Manager-TumTum-20230912162042051734",
+            npc_objective_status="completed"
+        )
+
+    def test_get_completed_missions(self):
+        miss = get_completed_missions(
+            world_name="Mercenary Manager",
+            user_name="Carl11"
+        )
+        print(miss)
+
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
 # tc.test_collection_users()
@@ -239,4 +263,6 @@ tc = mongo_fncs_unittests()
 # tc.test_get_number_of_user_npc_interactions()
 # tc.test_missions()
 # tc.test_npc_objectives()
-tc.test_init_game_state()
+# tc.test_init_game_state()
+# tc.test_update_npc_objective_game_state()
+tc.test_get_completed_missions()

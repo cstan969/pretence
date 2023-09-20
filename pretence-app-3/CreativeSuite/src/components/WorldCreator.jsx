@@ -668,7 +668,7 @@ const WorldCreator = () => {
     }
   
 
-    function updateObjectives(npcObjectives) {
+    const updateObjectives = (npcObjectives) => {
       console.log('log npc objectives: ', npcObjectives);
       npcObjectives.forEach((objective) => {
         const payload = {

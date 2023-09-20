@@ -130,8 +130,12 @@ class LlamaIndexKnowledgeAgent:
             agent="conversational-react-description",
             memory=memory,
         )
-        response = agent.run(input=user_message)
-        return response
+        try:
+            response = agent.run(input="Here is the most recently message from the player: " + user_message)
+            return response
+        except Exception as e:
+            print('failed to get data from KG (or there is none), returning nothing')
+            return ""
 
 
 

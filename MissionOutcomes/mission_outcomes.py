@@ -1,13 +1,16 @@
 
 from mongodb.mongo_fncs import (
     get_mission,
-    get_npc
+    get_npc,
+    update_mission_game_state
 )
 
 from langchain import PromptTemplate, LLMChain
 from langchain.chat_models import ChatOpenAI
 import json, os, pprint
 from langchain import PromptTemplate, LLMChain
+
+from LongTermMemory.long_term_memory import LongTermMemory
 
 
 class MissionOutcomes():
@@ -16,6 +19,7 @@ class MissionOutcomes():
         self.world_name = world_name
         self.user_name = user_name
         self.npc_names = npc_names
+        self.mission_id = mission_id
         self.mission = get_mission(mission_id=mission_id)
         self.mission_name = self.mission['mission_name']
         self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
@@ -71,27 +75,45 @@ class MissionOutcomes():
         template = """{question}
         \n'''''
         Here is additional information for writing 'mission_narrative':
-In paragraph 1 introduce the mission's setting and context. Describe the initial problem or challenge that the mercenary guild was tasked with addressing. Highlight the importance of the mission and the potential consequences if left unresolved. Emphasize the mission's specific objectives and potential outcomes, including both success and failure scenarios. This paragraph should lay the foundation for the readers to understand the mission's significance and what's at stake.
-In paragraph 2 detail the actions and decisions made by the mercenary or mercenaries assigned to the mission. Describe their approach and strategy and why they chose the method they did. Describe initial interactions with the situation or enemies. Provide a vivid portrayal of the conflict, whether it's a battle, negotiation, or investigation, depending on the nature of the mission. Highlight any challenges or obstacles the mercenaries faced, as well as any moments of tension, suspense, or unexpected twists that occurred during the mission. This paragraph should create a sense of anticipation and engagement as the readers follow the unfolding events.
-In paragraph 3 wrap up the account by describing the mission's resolution and its aftermath. Clarify the outcome of the mission, whether it was a success or failure, and how it aligned with the potential outcomes outlined earlier. Explain the consequences of the mercenary or mercenaries' actions on the mission's overall objective and the people or entities involved. Delve into the impact of the resolution on the mercenary characters themselves, both emotionally and in terms of personal growth. Touch on how the mission's completion might influence future quests or interactions within the game world. This paragraph should provide a satisfying conclusion to the mission account while also paving the way for new developments.
-The narrative should be written in such a way that the player reads the story as if reading a novel.  mission_narrative should simply be a string.  It should not mention 
-        
+        In paragraph 1 introduce the mission's setting and context. Describe the initial problem or challenge that the mercenary guild was tasked with addressing. Highlight the importance of the mission and the potential consequences if left unresolved. Emphasize the mission's specific objectives and potential outcomes, including both success and failure scenarios. This paragraph should lay the foundation for the readers to understand the mission's significance and what's at stake.
+        In paragraph 2 detail the actions and decisions made by the mercenary or mercenaries assigned to the mission. Describe their approach and strategy and why they chose the method they did. Describe initial interactions with the situation or enemies. Provide a vivid portrayal of the conflict, whether it's a battle, negotiation, or investigation, depending on the nature of the mission. Highlight any challenges or obstacles the mercenaries faced, as well as any moments of tension, suspense, or unexpected twists that occurred during the mission. This paragraph should create a sense of anticipation and engagement as the readers follow the unfolding events.
+        In paragraph 3 wrap up the account by describing the mission's resolution and its aftermath. Clarify the outcome of the mission, whether it was a success or failure, and how it aligned with the potential outcomes outlined earlier. Explain the consequences of the mercenary or mercenaries' actions on the mission's overall objective and the people or entities involved. Delve into the impact of the resolution on the mercenary characters themselves, both emotionally and in terms of personal growth. Touch on how the mission's completion might influence future quests or interactions within the game world. This paragraph should provide a satisfying conclusion to the mission account while also paving the way for new developments.
+        The narrative should be written in such a way that the player reads the story as if reading a novel.  mission_narrative should simply be a string.  It should not mention 
+                
         '''''
         You must format your output as a JSON value that adheres to the following JSON schema instance:
         'outcome' : the name of the outcome that the NPC chose.
         'mission_narrative_summary': a summary of what happened during the mission.
         'mission_narrative': This should just be a simple python string.  A 3 paragraph long narrative that explains what happened in the mission.  This should be written like a detailed story.
-        'npc_observations': a dictionary with keys equal to each mercenary name and values that are a list of memories/observations that the mercenary takes away from the mission.
+        'npc_observations': a dictionary with keys equal to each mercenary name and value should be a list of strings that account for the narrative from the perspective from each NPC.  The output should be a list of observations.
         'npc_outcome_reasoning': for each potential outcome, explain why the mercenary of mercenaries assigned to this mission might result in said outcome(s)."""
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
         response = llm_chain.run(prompt)
-        print(response)
+        # print(response)
         try:
             response = json.loads(response)
         except:
             response = self.fix_json(response)
             response = json.loads(response)
-        pprint.pprint(response)
-        return response
+        # pprint.pprint(response)
 
+        #Add observations to Companions' LTMs
+        for npc_name in self.npc_names:
+            ltm = LongTermMemory(world_name=self.world_name, user_name=self.user_name,npc_name=npc_name)
+            ltm.acquire_memories_from_mission_debrief(mission_debrief=response['mission_narrative'])
+
+
+        #Update the mission game state
+        update_mission_game_state(
+            world_name=self.world_name,
+            user_name=self.user_name,
+            mission_id=self.mission_id,
+            mission_status = "completed",
+            mission_outcome=response['outcome'],
+            mission_debrief=response['mission_narrative'],
+            npcs_sent_on_mission=self.npc_names,
+            npc_observations=response['npc_observations']
+        )
+
+        return response

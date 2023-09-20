@@ -112,6 +112,7 @@ class GenerativeAgentMemory(BaseMemory):
             for insight in insights:
                 self.add_memory(insight, now=now)
             new_insights.extend(insights)
+        print('here are the insights: ', new_insights)
         return new_insights
 
     def _score_memory_importance(self, memory_content: str) -> float:
@@ -196,8 +197,12 @@ class GenerativeAgentMemory(BaseMemory):
         self, memory_content: str, now: Optional[datetime] = None
     ) -> List[str]:
         """Add an observation or memory to the agent's memory."""
+        print('memory_content: ', memory_content)
         importance_score = self._score_memory_importance(memory_content)
+        print('importance_score: ', importance_score)
+
         self.aggregate_importance += importance_score
+        print('aggregate importance: ', self.aggregate_importance)
         document = Document(
             page_content=memory_content, metadata={"importance": importance_score}
         )

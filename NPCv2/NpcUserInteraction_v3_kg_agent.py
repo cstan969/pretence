@@ -19,7 +19,9 @@ from mongodb.mongo_fncs import (
     upsert_user_npc_interaction,
     get_world,
     get_available_npc_objectives_for_user,
-    update_npc_objective_game_state
+    update_npc_objective_game_state,
+    get_npc_objectives,
+    get_npcs_objectives_for_user
 )
 from config import NpcUserInteraction_model
 from langchain import PromptTemplate, LLMChain
@@ -39,6 +41,9 @@ class NpcUserInteraction():
         # self.llm = ChatOpenAI(model='gpt-4')
         # self.llm = ChatOpenAI(model=NpcUserInteraction_model)
         self.npc = get_npc(world_name,npc_name)
+
+        self.npc_objectives = get_npc_objectives(world_name=world_name, npc_name=npc_name)
+        self.state_of_npc_objectives = get_npcs_objectives_for_user(world_name=world_name,npc_name=npc_name,user_name=user_name)
 
     def _get_speech_pattern(self, npc_emotional_state):
         patterns = {
@@ -115,9 +120,10 @@ class NpcUserInteraction():
         '''given the current conversation with the current npc, figure out which objectives are completed for the NPC'''
         #conversation
         convo = self.get_conversation()
-        available_npc_objectives = get_available_npc_objectives_for_user(world_name=self.world_name, user_name=self.user_name, npc_name=self.npc_name)
-        list_of_objectives = [obj['objective_completion_string'] for obj in available_npc_objectives]
-        print('list of objectives: ', list_of_objectives)
+        available_npc_objective_game_states = [obj for obj in self.state_of_npc_objectives if obj['status']=='available']
+        available_npc_objective_game_state_ids = [obj['npc_objective_id'] for obj in available_npc_objective_game_states]
+        available_npc_objectives = [obj for obj in self.npc_objectives if obj['_id'] in available_npc_objective_game_state_ids]
+        list_of_objectives_completion_strings = [obj['objective_completion_string'] for obj in available_npc_objectives]
         template = """Contextual Information:
         {question}
 
@@ -134,7 +140,7 @@ class NpcUserInteraction():
 
         This is the conversation between the player and the NPC so far.
         CONVERSATION:
-        {conversation}""".format(objectives=list_of_objectives,conversation=convo)
+        {conversation}""".format(objectives=list_of_objectives_completion_strings,conversation=convo)
         response = llm_chain.run(prompt)
         print(response)
         print('type of response in objc prompt: ', type(response))
@@ -145,27 +151,19 @@ class NpcUserInteraction():
             response = json.loads(response)
 
         #completed objectives
-        for obj in list_of_objectives:
+        for obj in available_npc_objectives:
             print(obj)
+            print(obj['objective_completion_string'])
             if obj['objective_completion_string'] in list(response['objectives_completed']):
                 if response['objectives_completed'][obj['objective_completion_string']] == 'completed':
                     update_npc_objective_game_state(
                     world_name=self.world_name,
                     user_name=self.user_name,
+                    npc_name=self.npc_name,
                     npc_objective_id=obj['_id'],
                     npc_objective_status="completed"
                     )
             
-        # completed_npc_objective_ids = [d['_id'] for d in list_of_objectives if response['objectives_completed'].get(d['objective_completion_string'],'not_completed')) == 'completed']
-        # mark the objectives that've been completed as such in DB. 
-        # for obj_id in completed_npc_objective_ids:
-                # update_npc_objective_game_state(
-                # world_name=self.world_name,
-                # user_name=self.user_name,
-                # npc_objective_id=obj_id,
-                # npc_objective_status="completed"
-                # )
-                 
 
         print('type of response in objc prompt: ', type(response))
         input_response['objectives_completed'] = response['objectives_completed']
@@ -309,6 +307,7 @@ class NpcUserInteraction():
         prompt_assembly_fncs_in_order = [
             self._load_generic_npc_prompt(), #role of any NPC generically
             self._load_fourth_wall(),
+            self._load_prompt_info_from_npc_objectives_state(),
             # self._load_scene_objectives(), # the objectives of the scene for the protagonist to meet
             # self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
             self._load_npc_prompt(), # summarization of the NPC (personality etc)
@@ -371,6 +370,38 @@ class NpcUserInteraction():
     #     {npc_prompt}\n
     #     {objectives_prompt}\n"""
     #     return prompt
+
+    def _load_prompt_info_from_npc_objectives_state(self):
+        '''depending on game state, different prompts will be added to the prompt.  
+        For example, if a certain npc_objective is available/completed etc'''
+        #this is going to be a list of all of the 
+        list_of_prompts = []
+        #create a mapper to get the user-specific objective status from _npc objective id
+        id_to_status_mapper = {}
+        for npc_objective_state in self.state_of_npc_objectives:
+            id_to_status_mapper[npc_objective_state['npc_objective_id']] = npc_objective_state['status']
+
+        #
+        for npc_objective in self.npc_objectives:
+            id = npc_objective['_id']
+            #get the status
+            status = id_to_status_mapper[id] if id in id_to_status_mapper else 'unavailable'
+            #add prompt strings depending on status state
+            if status == "available":
+                if npc_objective['prompt_available'] != "":
+                    list_of_prompts.append(npc_objective['prompt_available'])
+            elif status == "unavailable":
+                if npc_objective['prompt_unavailable'] != "":
+                    list_of_prompts.append(npc_objective['prompt_unavailable'])
+            elif status == "completed":
+                if npc_objective['prompt_completed'] != "":
+                    list_of_prompts.append(npc_objective['prompt_completed'])
+        if len(list_of_prompts) == 0:
+            return ""
+        else:
+            return "Here is some importance npc_objective scene information:\n" + '\n'.join(list_of_prompts)
+
+
 
     # def _load_scene_objectives(self):
     #     scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)

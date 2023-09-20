@@ -215,9 +215,19 @@ def get_npc_objectives(q:dict):
     return fncs.get_npc_objectives(world_name=q['world_name'],npc_name=q['npc_name'])
 
 
+@app.post("/get_available_companions")
+def get_available_companions(q:dict):
+    return fncs.get_available_companions(world_name=q['world_name'],user_name=q['user_name'])
+
 @app.post("/get_available_missions")
 def get_available_missions(q:dict):
     return fncs.get_available_missions(world_name=q['world_name'],user_name=q['user_name'])
+
+
+@app.post("/get_completed_missions")
+def get_completed_missions(q:dict):
+    return fncs.get_completed_missions(world_name=q['world_name'], user_name=q['user_name'])
+
 
 @app.post("/get_available_npcs")
 def get_available_npcs(q:dict):

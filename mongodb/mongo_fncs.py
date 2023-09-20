@@ -143,6 +143,7 @@ def get_npc_objective_id_from_objective_name(world_name: str, npc_name: str, obj
     return items[0]['_id'] if len(items) == 1 else None
 
 def get_npc_objective(npc_objective_id: str)->dict:
+    print('getting npc_objective from id: ', npc_objective_id)
     collection_name = 'npc_objectives'
     items = query_collection(collection_name=collection_name,query={'_id':npc_objective_id})
     return items[0] if len(items)==1 else None 
@@ -225,6 +226,9 @@ def get_available_npc_objectives_for_user(world_name: str, user_name: str, npc_n
     items = query_collection(collection_name='npc_objectives',query={'_id':{'$in': [s['npc_objective_id'] for s in states]}})
     print('npc objectives: ', items)
     return items
+
+def get_npcs_objectives_for_user(world_name: str, user_name: str, npc_name: str)->list:
+    return query_collection(collection_name='npc_objective_game_states',query={'world_name': world_name, 'npc_name': npc_name, 'user_name': user_name})
 
 def get_npc_dependents(npc_id: str)->list:
     try:
@@ -436,9 +440,11 @@ def upsert_mission(
     })
 
 def get_available_missions(world_name: str, user_name:str):
-    return query_collection(
+    available_mission_states = query_collection(
         collection_name='mission_game_states',
-        query={'world_name':world_name,'user_name':user_name,'status':"available"})
+        query={'world_name':world_name,'user_name':user_name,'status':"available"}
+    )
+    return query_collection(collection_name='missions',query={'_id':{'$in':[s['mission_id'] for s in available_mission_states]}})
 
 def get_completed_mission_game_states(world_name: str, user_name:str):
     return query_collection(
@@ -559,6 +565,8 @@ def evaluate_availability_logic(world_name: str, user_name: str, expr:str):
         # Return the attribute if it exists, otherwise return None
         return doc.get(attribute, None) if doc else None
 
+
+    #ugly workaround
     print('--evaluate avail logic--')
     print(expr)
     #Return True for the default empty string
@@ -566,10 +574,15 @@ def evaluate_availability_logic(world_name: str, user_name: str, expr:str):
         return "available"
     
     # Capture both collection-id and attribute
-    matches = re.findall(r'\[(\w+-[\w-]+)\]\.(\w+)', expr)
+    # matches = re.findall(r'\[(\w+-[\w-]+)\]\.(\w+)', expr)
+    matches = re.findall(r'\[([\w\s-]+)\]\.(\w+)', expr)
+
 
     for match in matches:
+        print('match: ', match)
         collection_id, attribute = match
+        print('collection_id: ', collection_id)
+        print('attribute: ', attribute)
         value = get_attribute(collection_id, attribute)
 
         # Replace the placeholders with the actual value in the original expression
@@ -704,7 +717,8 @@ def update_mission_game_state(
     mission_status: Optional[str]=None,
     mission_outcome: Optional[str]=None,
     mission_debrief: Optional[str]=None,
-    npcs_sent_on_mission: Optional[list]=None
+    npcs_sent_on_mission: Optional[list]=None,
+    npc_observations: Optional[dict] = None
     )->dict:
     collection_name = 'mission_game_states'
     mission = query_collection(
@@ -735,6 +749,8 @@ def update_mission_game_state(
         item_to_upsert['npcs_sent_on_mission'] = npcs_sent_on_mission
     if mission_status is not None:
         item_to_upsert['status'] = mission_status
+    if npc_observations is not None:
+        item_to_upsert['npc_observations'] = npc_observations
 
     upsert_item(collection_name=collection_name,item=item_to_upsert)
 
@@ -752,8 +768,32 @@ def update_mission_game_state(
     return item_to_upsert
 
 def get_available_companions(world_name: str, user_name: str)->list:
-    companion_statuses = query_collection(collection_name='npc_game_states',query={'world_name':world_name,'user_name':user_name,'npc_companion_status':'available'})
-    return query_collection(collection_name='npcs',query={'_id':{'$in':[status['npc_id'] for status in companion_statuses]}})
+    companion_statuses = query_collection(collection_name='npc_game_states',query={'world_name':world_name,'user_name':user_name,'npc_companion_status':True})
+    print(companion_statuses)
+    return [c['npc_name'] for c in query_collection(collection_name='npcs', query={'_id': {'$in': [status['npc_id'] for status in companion_statuses]}})]
+
+def get_completed_missions(world_name: str, user_name: str):
+
+    def merge_dicts(list1, list2):
+        # Create a lookup dictionary from list2 based on mission_id
+        lookup = {item['_id']: item for item in list2}
+        
+        # Iterate over list1 and update each dict with fields from the matching dict in list2
+        for d in list1:
+            matched_dict = lookup.get(d['mission_id'], {})
+            d['mission_name'] = matched_dict.get('mission_name')
+            d['mission_briefing'] = matched_dict.get('mission_briefing')
+        return list1
+
+    completed_mission_game_states = query_collection(collection_name='mission_game_states',query={
+        'world_name':world_name,
+        'user_name':user_name,
+        'status': 'completed'
+    })
+    print('completed_mission_game_states: ', completed_mission_game_states)
+    associated_missions = query_collection(collection_name='missions', query={'_id':{'$in':[gs['mission_id'] for gs in completed_mission_game_states]}})
+    print('associated_missions: ', associated_missions)
+    return merge_dicts(completed_mission_game_states, associated_missions)
 
 
 def update_npc_game_state(
@@ -792,9 +832,9 @@ def update_npc_game_state(
 
     return item_to_upsert
 
-def get_available_companions(world_name: str, user_name: str):
-    items = query_collection(collection_name='npc_game_states',query={'world_name':world_name,'user_name':user_name,'npc_companion_status': True})
-    return [npc['npc_id'] for npc in items]
+# def get_available_companions(world_name: str, user_name: str):
+#     items = query_collection(collection_name='npc_game_states',query={'world_name':world_name,'user_name':user_name,'npc_companion_status': True})
+#     return [npc['npc_id'] for npc in items]
 
 def update_npc_objective_game_state(
     world_name: str,
@@ -824,17 +864,21 @@ def update_npc_objective_game_state(
     previous_npc_objective_status = None
     if len(user_specific_npc_objectives) == 1:
         previous_npc_objective_status = user_specific_npc_objectives[0]['status']
-
+    print('previous status: ', previous_npc_objective_status)
 
     if npc_objective_status is not None:
         if previous_npc_objective_status != npc_objective_status:
+            print('looking to trigger effects')
             #Trigger Effects based on objective completion
             if npc_objective_status == "completed":
                 effects = get_npc_objective(npc_objective_id=npc_objective_id)['effects']
+                print('effects: ', effects)
                 if len(effects) > 0:
                     trigger_effects(world_name=world_name, user_name=user_name, effects=effects)
+            print('now onto cascading game states')
             #Cascading Game State Updates
             dependents = get_npc_objective_dependents(npc_objective_id)
+            print('dependents: ', dependents)
             for dependent in dependents:
                 recheck_availability_for_some_game_state_id(
                     world_name=world_name,
