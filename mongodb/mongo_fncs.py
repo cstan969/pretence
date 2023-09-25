@@ -10,6 +10,8 @@ import regex as re
 from fuzzywuzzy import fuzz
 from config import RENPY_SH_PATH, KNOWLEDGE_STORE_PATH
 
+from LongTermMemory.long_term_memory import LongTermMemory
+
 
 #####USERS#####
 def upsert_user(user_name:str):
@@ -685,6 +687,12 @@ def init_game_state(user_name: str, world_name: str):
                 npc_id=npc['_id'],
                 npc_status="available"
             )
+            #init NPC LTM
+            ltm = LongTermMemory(world_name=world_name,user_name=user_name,npc_name=npc['npc_name'])
+            if 'npc_ltms' in list(npc):
+                if len(npc['npc_ltms']) > 0:
+                    print('initializing ', len(npc['npc_ltms']), ' npc memories: ')
+                    ltm.add_memories(npc['npc_ltms'])
         else:
             print("NPC '", npc['npc_name'], "' is unavailable")
     for npc_objective in all_npc_objectives:

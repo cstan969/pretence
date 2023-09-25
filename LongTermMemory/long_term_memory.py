@@ -23,7 +23,9 @@ class LongTermMemory():
         self.world_name = world_name
         self.user_name = user_name
         self.npc_name = npc_name
+        self.game_designer_user_name = 'DefaultGameDesignerUserName'
         self.vector_store_index_path = os.path.join(LONG_TERM_MEMORY_PATH,self.world_name,self.user_name, self.npc_name)
+        self.game_designer_vector_store_index_path = os.path.join(LONG_TERM_MEMORY_PATH,self.world_name,self.game_designer_user_name, self.npc_name)
         os.makedirs(self.vector_store_index_path, exist_ok=True)
 
 
@@ -38,7 +40,7 @@ class LongTermMemory():
             llm=self.llm,
             memory_retriever=self.memory_retriever,
             verbose=False,
-            reflection_threshold=0,  # we will give this a relatively low number to show how reflection works
+            reflection_threshold=5,  # we will give this a relatively low number to show how reflection works
         )
 
     def acquire_memories_from_mission_debrief(self, mission_debrief):
@@ -71,7 +73,10 @@ class LongTermMemory():
 
     def _load_faiss(self):
         try:
-            return FAISS.load_local(self.vector_store_index_path, OpenAIEmbeddings())
+            if os.path.exists(self.game_designer_vector_store_index_path) and not os.path.exists(self.vector_store_index_path):
+                return FAISS.load_local(self.game_designer_vector_store_index_path, OpenAIEmbeddings)
+            else:
+                return FAISS.load_local(self.vector_store_index_path, OpenAIEmbeddings())
         except:
             embeddings_model = OpenAIEmbeddings()
             embedding_size = 1536
@@ -83,6 +88,10 @@ class LongTermMemory():
                 {},
                 relevance_score_fn=self._relevance_score_fn,
             )
+        
+    def _delete_faiss(self):
+        if os.path.exists(self.vector_store_index_path):
+            os.remove(self.vector_store_index_path)
     
     def _save_faiss(self):
         self.faiss.save_local(self.vector_store_index_path)
@@ -90,6 +99,7 @@ class LongTermMemory():
 
     def add_memories(self, observations: List[str]):
         print('into add_memories')
+        self.gen_memory.add_memories(memory_content=";".join(observations))
         # self.gen_memory.add_memories(memory_content=obs)
         # for obs in observations:
         #     self.gen_memory.add_memory(memory_content=obs)

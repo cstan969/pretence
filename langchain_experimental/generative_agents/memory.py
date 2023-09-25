@@ -166,6 +166,7 @@ class GenerativeAgentMemory(BaseMemory):
 
         self.aggregate_importance += max(importance_scores)
         memory_list = memory_content.split(";")
+
         documents = []
 
         for i in range(len(memory_list)):

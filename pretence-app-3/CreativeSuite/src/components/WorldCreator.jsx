@@ -37,6 +37,8 @@ const WorldCreator = () => {
   const [currentNpc, setCurrentNpc] = useState(null);
   const [npcPersonality, setNpcPersonality] = useState('');
   const [npcKnowledge, setNpcKnowledge] = useState('');
+  const [npcBackstory, setNpcBackstory] = useState('');
+  const [npcLtms, setNpcLtms] = useState([]);
   const [npcSpeechPatterns, setNpcSpeechPatterns] = useState('');
   const [npcObjectives, setNpcObjectives] = useState([]);
   const [newNpcName, setNewNpcName] = useState('');
@@ -655,7 +657,9 @@ const WorldCreator = () => {
         speech_patterns: npcSpeechPatterns,
         knowledge_tag_levels: npcKnowledgeList,
         id_based_availability_logic: npcIdBasedAvailabilityLogic,
-        name_based_availability_logic: npcNameBasedAvailabilityLogic
+        name_based_availability_logic: npcNameBasedAvailabilityLogic,
+        npc_backstory: npcBackstory,
+        npc_ltms: npcLtms
       }
       console.log('save Npc: ', updatedNpc);
   
@@ -932,6 +936,8 @@ const WorldCreator = () => {
       setNpcKnowledgeList(npc.knowledge_tag_levels != undefined ? npc.knowledge_tag_levels : {});
       setNpcNameBasedAvailabilityLogic(npc.name_based_availability_logic != undefined ? npc.name_based_availability_logic : "");
       setNpcIdBasedAvailabilityLogic(npc.id_based_availability_logic != undefined ? npc.id_based_availability_logic : "");
+      setNpcBackstory(npc.npc_backstory != undefined ? npc.npc_backstory : ""); 
+      setNpcLtms(npc.npc_ltms != undefined ? npc.npc_ltms : []);
       axios.post('http://127.0.0.1:8002/get_npc_objectives',{'world_name': currentWorld.world_name,'npc_name':npc.npc_name})
       .then(res => {
         console.log(res.data);
@@ -958,6 +964,20 @@ const WorldCreator = () => {
         });
       };
 
+    const genMemoriesFromBackstory = () => {
+      setNpcLtms([]);
+      axios.post("http://127.0.0.1:8006/genMemoriesFromBackstoryAndStoreGameInitIndex",{
+        'world_name': currentWorld.world_name,
+        'npc_name': currentNpc.npc_name,  
+        'backstory':npcBackstory
+      })
+      .then(response=>{
+        console.log('memories from backstory: ', response.data);
+        setNpcLtms(response.data);
+      })
+      .catch(err => console.log(err))
+    };
+
     return (
         <div className="WorldCreator">
             <button onClick={() => setEditorOption(null)}>Back</button>
@@ -976,6 +996,8 @@ const WorldCreator = () => {
               setCurrentNpc(null);
               setNpcPersonality('');
               setNpcKnowledge('');
+              setNpcBackstory('');
+              setNpcLtms([]);
               setNpcSpeechPatterns('');
               }}>Create a new NPC</button>
             {currentNpc ? (
@@ -1028,6 +1050,16 @@ const WorldCreator = () => {
                     </div>
                     ))}
                   </div>
+                </div>
+                <h3>Backstory & Long Term Memory</h3>
+                <div className="input-group">
+                <label>Backstory (Prose)</label>
+                <textarea value={npcBackstory} onChange={(e) => {setNpcBackstory(e.target.value)}}></textarea>
+                </div>
+                <button onClick={genMemoriesFromBackstory}>Generate Memories From Backstory and Calculate Index (this might take a little time)</button>
+                <div className="input-group">
+                <label>Long Term Memories</label>
+                <textarea readOnly value={npcLtms}></textarea>
                 </div>
                 <h3>Saving Updates</h3>
 
