@@ -39,9 +39,36 @@ def genMemoriesFromBackstory(backstory: str)->list:
         response = json.loads(response)
     return response['observations']
 
-def genQuestionsGivenMissionBrief(mission_brief: str)->list:
-    '''Given a mission brief, we need to be able to extract knowledge and/or memories that are pertinent
-    to that mission.  This requires us to put together a list of questions to query the KG / vectorDB'''
+def genLTMQuestionsGivenMissionInfo(mission_brief: str, formatted_mission_outcomes: str)->list:
+    '''Given a mission brief, we need to be able to extract how an NPC might react to/on that
+    mission given their long term memories'''
+
+    template = """Given the following mission brief and potential mission outcomes we need to generate a list of questions
+    that can be used to query an NPC's long-term memory to pull out core NPC characteristics as well as to gather 
+    relevant information and experiences that might impact the outcome or narrative of the mission:
+        
+    mission_brief: {mission_brief}
+
+    potential mission outcomes: {formatted_mission_outcomes}
+    
+    '''''
+    You must format your output as a JSON dictionary that adheres to the following JSON schema instance:
+    'questions': The list of questions
+    """
+    prompt_from_template = PromptTemplate(template=template, input_variables=["mission_brief", "formatted_mission_outcomes"])
+    llm_chain = LLMChain(prompt=prompt_from_template,llm=llm, verbose=True)
+    response = llm_chain.run(mission_brief=mission_brief, formatted_mission_outcomes=formatted_mission_outcomes)
+    try:
+        response = json.loads(response)
+    except:
+        response = fix_json(response)
+        response = json.loads(response)
+    return response['questions']
+
+
+def genKGQuestionsGivenMissionBrief(mission_brief: str)->list:
+    '''Given a mission brief, we need to be able to extract pertinent knowledge from a knowledge graph. 
+    This requires us to put together a list of questions to query the KG / vectorDB'''
 
     template = """given this mission brief: {mission_brief}
 

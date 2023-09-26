@@ -60,6 +60,8 @@ class LongTermMemory():
         self.add_memories(observations=response['observations'])
         # self.gen_memory.pause_to_reflect()
 
+    def get_relevant_memories_given_mission_brief(self, mission_brief)->list:
+        pass
 
     def _relevance_score_fn(self, score: float) -> float:
         """Return a similarity score on a scale [0, 1]."""
@@ -111,8 +113,8 @@ class LongTermMemory():
         self._save_faiss()
         
 
-    def fetch_memories(self, observation: str, k: Optional[int] = 7):
-        fetched_memories = self.faiss.similarity_search_with_relevance_scores(observation, k=5)
+    def fetch_memories(self, observation: str, k: Optional[int] = 5):
+        fetched_memories = self.faiss.similarity_search_with_relevance_scores(observation, k=k)
         # fetched_memories = self.gen_memory.fetch_memories(observation=observation)[0:k]
         page_contents = [m[0].page_content for m in fetched_memories]
         for memory in fetched_memories:
