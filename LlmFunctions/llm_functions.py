@@ -13,7 +13,7 @@ def fix_json(json_to_fix):
     response = llm_chain.run(json_to_fix)
     return response
 
-def genMemoriesFromBackstory(backstory:str)->list:
+def genMemoriesFromBackstory(backstory: str)->list:
     '''the purpose of this function is to generate a list of observations/memories
     from the written prose version of the backstory of an NPC (or maybe another entity, i dont know).
     These can then be utilized during game-init to generate an initial starting index of NPC
@@ -38,3 +38,37 @@ def genMemoriesFromBackstory(backstory:str)->list:
         response = fix_json(response)
         response = json.loads(response)
     return response['observations']
+
+def genQuestionsGivenMissionBrief(mission_brief: str)->list:
+    '''Given a mission brief, we need to be able to extract knowledge and/or memories that are pertinent
+    to that mission.  This requires us to put together a list of questions to query the KG / vectorDB'''
+
+    template = """given this mission brief: {mission_brief}
+
+    '''''
+    Objective: Extract and formulate relevant questions based on the mission details that can be used to query an NPC's long term memories and knowledge graph to gather pertinent information for the mission's success.  Keep questions general so as to best extract knowledge.
+
+    '''''
+    Process:
+    Read and understand the mission brief.
+    Identify key mission details, objectives, and potential challenges.
+    Formulate questions that highlight knowledge or memory gaps based on mission details.
+    
+    '''''
+    You must format your output as a JSON dictionary that adheres to the following JSON schema instance:
+    'questions': The list of questions
+    """
+    prompt_from_template = PromptTemplate(template=template, input_variables=["mission_brief"])
+    llm_chain = LLMChain(prompt=prompt_from_template,llm=llm, verbose=True)
+    response = llm_chain.run(mission_brief)
+    try:
+        response = json.loads(response)
+    except:
+        response = fix_json(response)
+        response = json.loads(response)
+    return response['questions']
+
+
+
+
+    

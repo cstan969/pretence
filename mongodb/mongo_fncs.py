@@ -373,8 +373,9 @@ def get_knowledge_files_npc_has_access_to(world_name, npc_name):
         if 'knowledge_tag_levels' in list(npc):
             npc_knowledge_tag_levels = npc['knowledge_tag_levels']
             for tag, level in npc_knowledge_tag_levels.items():
-                for l in range(level + 1): 
-                    filenames.append(os.path.join(KNOWLEDGE_STORE_PATH, world_name, tag + "_" + str(l) + ".txt"))
+                for l in range(int(level) + 1): 
+                    filename = os.path.join(KNOWLEDGE_STORE_PATH, world_name, tag + "_" + str(l) + ".txt")
+                    filenames.append(filename)
     k_zeros = query_collection(collection_name='knowledge',query={'world_name':world_name,'level':0})
     k_zero_filenames = [f['knowledge_filepath'] for f in k_zeros]
     filenames.extend(k_zero_filenames)

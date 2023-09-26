@@ -43,7 +43,7 @@ class LongTermMemory():
             reflection_threshold=5,  # we will give this a relatively low number to show how reflection works
         )
 
-    def acquire_memories_from_mission_debrief(self, mission_debrief):
+    def add_memories_from_mission_debrief(self, mission_debrief):
         print('adding memories')
         # self.add_memories(mission_debrief)
         '''This section of code is designed to have NPCs remember and reflect on mission outcomes.'''
@@ -52,13 +52,13 @@ class LongTermMemory():
            
         '''''
         You must format your output as a JSON dictionary that adheres to the following JSON schema instance:
-        'observations': A list of observations that account for the narrative from the perspective of {npc_name} where an observation is an event directly perceived by an agent. Common observations include behaviors performed by the agent themselves or behaviors that agents perceive being performed by other agents or non-agent objects."""
+        'observations': A list of strings.  Each string is an observation that accounts for the narrative from the perspective of {npc_name} where an observation is an event directly perceived by an agent. Common observations include behaviors performed by the agent themselves or behaviors that agents perceive being performed by other agents or non-agent objects."""
         prompt_from_template = PromptTemplate(template=template, input_variables=["npc_name","mission_debrief"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
         response = llm_chain.run(npc_name=self.npc_name, mission_debrief=mission_debrief)
         response = json.loads(response)
         self.add_memories(observations=response['observations'])
-        self.gen_memory.pause_to_reflect()
+        # self.gen_memory.pause_to_reflect()
 
 
     def _relevance_score_fn(self, score: float) -> float:
@@ -99,7 +99,11 @@ class LongTermMemory():
 
     def add_memories(self, observations: List[str]):
         print('into add_memories')
-        self.gen_memory.add_memories(memory_content=";".join(observations))
+        print(type(observations))
+        print(observations)
+        for obs in observations:
+            self.gen_memory.add_memory(obs)
+        # self.gen_memory.add_memories(memory_content=";".join(observations))
         # self.gen_memory.add_memories(memory_content=obs)
         # for obs in observations:
         #     self.gen_memory.add_memory(memory_content=obs)

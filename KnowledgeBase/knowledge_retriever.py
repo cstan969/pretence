@@ -46,6 +46,10 @@ def extract_knowledge_for_user_npc_interaction(world_name: str, npc_name:str, us
     return ka.method_llamaindex_agent(user_message)
     
 
+def extract_knowledge_for_missions(world_name: str, npc_name:str, user_name:str, mission_brief: str):
+    ka = LlamaIndexKnowledgeAgent(world_name,npc_name,user_name)
+    return ka.get_knowledge_given_missions_brief(mission_brief=mission_brief)
+
 
 class LlamaIndexKnowledgeAgent:
     
@@ -74,6 +78,7 @@ class LlamaIndexKnowledgeAgent:
     def create_or_update_kg_llama_index(self):
         os.makedirs(self.persist_dir, exist_ok=True)
         knowledge_files = get_knowledge_files_npc_has_access_to(world_name=self.world_name, npc_name=self.npc_name)
+        knowledge_files = [file for file in knowledge_files if os.path.exists(file)]
         # create client and a new collection
         db = chromadb.PersistentClient(path=self.persist_dir)
         chroma_collection = db.get_or_create_collection("knowledge")
@@ -82,6 +87,7 @@ class LlamaIndexKnowledgeAgent:
             HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
         )
         # load documents
+        print('knowledge files: ', knowledge_files)
         documents = SimpleDirectoryReader(input_files=knowledge_files).load_data()
         # set up ChromaVectorStore and load in data
         vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
@@ -93,18 +99,16 @@ class LlamaIndexKnowledgeAgent:
         return index
 
 
-       
-        
-
     def method_llamaindex_agent(self, user_message: str):
-        try:
-            print('loading index')
-            index = self.load_index()
-            print('successfull loaded index')
-        except:
-            print('failed to load index')
-            index = self.create_or_update_kg_llama_index()
-            print('successfully created new index')
+        # try:
+        #     print('loading index')
+        #     index = self.load_index()
+        #     print('successfull loaded index')
+        # except:
+        #     print('failed to load index')
+        #     index = self.create_or_update_kg_llama_index()
+        #     print('successfully created new index')
+        index = self.create_or_update_kg_llama_index()
         tools = [
             Tool(
                 name="LlamaIndex",
@@ -118,7 +122,6 @@ class LlamaIndexKnowledgeAgent:
         # set Logging to DEBUG for more detailed outputs
         memory = ConversationBufferMemory(memory_key="chat_history")
         chat_history = get_user_npc_interactions(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name)
-        print(chat_history)
         for interaction in chat_history:
             memory.chat_memory.add_user_message(interaction['user_message'])
             memory.chat_memory.add_ai_message(interaction['npc_response'])
@@ -131,12 +134,48 @@ class LlamaIndexKnowledgeAgent:
             memory=memory,
         )
         try:
-            response = agent.run(input="Here is the most recently message from the player: " + user_message)
+            response = agent.run(input="Here is the most recent message from the player: " + user_message)
             return response
         except Exception as e:
             print('failed to get data from KG (or there is none), returning nothing')
             return ""
+        
+    def query_index(self, queries: list[str]):
+        # try:
+        #     print('loading index')
+        #     index = self.load_index()
+        #     print('successfull loaded index')
+        # except:
+        #     print('failed to load index')
+        #     index = self.create_or_update_kg_llama_index()
+        #     print('successfully created new index')
+        index = self.create_or_update_kg_llama_index()
+        engine = index.as_query_engine()
+        outputs = []
+        for q in queries:
+            output = engine.query(q)
+            outputs.append(output.response)
+        return outputs
+        # tools = [
+        #     Tool(
+        #         name="LlamaIndex",
+        #         func=lambda q: str(index.as_query_engine().query(q)),
+        #         description="useful when you need to know more information about the world",
+        #         return_direct=True,
+        #     ),
+        # ]
+        # llm = ChatOpenAI(temperature=0)
+        # agent = initialize_agent(
+        #     tools,
+        #     llm,
+        #     agent="conversational-react-description"
+        # )
 
+        # outputs = []
+        # for query in queries:
+        #     response = agent.run(query)
+        #     outputs.append(response)
+        # return outputs
 
 
 

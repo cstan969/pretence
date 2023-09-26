@@ -14,5 +14,7 @@ def test_extract_knowledge_for_user_npc_interaction():
         user_name='James Thomas Stanhope',user_message='Can you tell me more about Sunken Hearth??')
     print(knowledge)
 
+
 # test_knowledge_retriever()
-test_extract_knowledge_for_user_npc_interaction()
+# test_extract_knowledge_for_user_npc_interaction()
+test_query()

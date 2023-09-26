@@ -9,7 +9,8 @@ from langchain import PromptTemplate, LLMChain
 from langchain.chat_models import ChatOpenAI
 import json, os, pprint
 from langchain import PromptTemplate, LLMChain
-
+from LlmFunctions.llm_functions import genQuestionsGivenMissionBrief
+from KnowledgeBase.knowledge_retriever import LlamaIndexKnowledgeAgent
 from LongTermMemory.long_term_memory import LongTermMemory
 
 
@@ -63,13 +64,23 @@ class MissionOutcomes():
             personality = npc['personality']
             npc_summaries[npc_name] = personality
         return f"Here are the mercenary member(s) assigned to the mission:\n{npc_summaries}"
+    
+    def _load_knowledge(self):
+        questions_for_ltm_and_kg = genQuestionsGivenMissionBrief(mission_brief=self.mission['mission_briefing'])
+        combined_knowledge = []
+        for npc_name in self.npc_names:
+            ka = LlamaIndexKnowledgeAgent(world_name=self.world_name,npc_name=npc_name, user_name=self.user_name)
+            knowledge = ka.query_index(queries=questions_for_ltm_and_kg)
+            combined_knowledge.extend(knowledge)
+        return f"Here is the knowledge that the NPCs are aware of that may be pertinent to the mission:\n{combined_knowledge}"
         
     def get_mission_outcome_and_debriefing(self):
         prompt_assembly_fncs_in_order = [
             self._load_mission_prompt(), #generic prompt to LLM so it knows what is going on
             self._load_mission_brief(), #the specific mission brief
             self._load_possible_mission_outcomes(), #the possible mission outcomes per the NPCs selected
-            self._load_npc_summaries()
+            self._load_npc_summaries(),
+            self._load_knowledge()
         ]
         prompt = "\n\n'''''\n".join([fnc for fnc in prompt_assembly_fncs_in_order])
         template = """{question}
@@ -101,7 +112,7 @@ class MissionOutcomes():
         #Add observations to Companions' LTMs
         for npc_name in self.npc_names:
             ltm = LongTermMemory(world_name=self.world_name, user_name=self.user_name,npc_name=npc_name)
-            ltm.acquire_memories_from_mission_debrief(mission_debrief=response['mission_narrative'])
+            ltm.add_memories_from_mission_debrief(mission_debrief=response['mission_narrative'])
 
 
         #Update the mission game state

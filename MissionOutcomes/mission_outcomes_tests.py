@@ -1,6 +1,7 @@
 import unittest
 from MissionOutcomes.mission_outcomes import MissionOutcomes
 from mongodb.mongo_fncs import upsert_mission, upsert_npc
+from LongTermMemory.long_term_memory import LongTermMemory
 
 POSSIBLE_OUTCOMES = [
     {
@@ -56,6 +57,7 @@ class TestMissionOutcomes():
             npc_names=['Andre'])
 
         outcome = mo.get_mission_outcome_and_debriefing()
+
 
         print(outcome)
 
