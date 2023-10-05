@@ -30,7 +30,8 @@ port_allocations={
 # 'GameDesignerAIAPI':8003,
 # 'ExtractorAPI': 8004,
 'TTSAPI':8005,
-'AggregatorAPI':8006
+'AggregatorAPI':8006,
+'Knowledge':8007
 }
 
 GPT4 = ChatOpenAI(model='gpt-4')

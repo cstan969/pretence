@@ -24,3 +24,7 @@ async def genMemoriesFromBackstoryAndStoreGameInitIndex(q:dict):
         npc_name=q['npc_name'],
         backstory=q['backstory']
     )
+
+@app.post("/init_game_state")
+def init_game_state(q:dict):
+    return fncs.init_game_state(world_name=q['world_name'],user_name=q['user_name'])

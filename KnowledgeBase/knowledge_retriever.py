@@ -31,6 +31,7 @@ from config import KNOWLEDGE_STORE_PATH
 
 from llama_index.vector_stores import ChromaVectorStore
 
+from mongodb.mongo_fncs import get_available_companions
 
 
 
@@ -39,6 +40,17 @@ from llama_index.vector_stores import ChromaVectorStore
 #     llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo")
 #     chain = load_summarize_chain(llm, chain_type=convo)
 #     print(chain)
+
+def write_knowledge_to_user_journal(world_name: str, user_name: str, knowledge: str):
+    user_journal_path = os.path.join(KNOWLEDGE_STORE_PATH, world_name, user_name, 'user_journal.txt')
+    file = open(user_journal_path,'a')
+    file.write('\n\n' + knowledge)
+
+def write_knowledge_to_tag1(world_name: str, user_name: str, tag: str, knowledge: str):
+    knowledge_tag_path = os.path.join(KNOWLEDGE_STORE_PATH, world_name, user_name, tag + '_1.txt')
+    file = open(knowledge_tag_path,'a')
+    file.write('\n\n' + knowledge)
+
 
 def extract_knowledge_for_user_npc_interaction(world_name: str, npc_name:str, user_name:str, user_message: str):
     # return method_gpt4all_knowledge_base(world_name,npc_name,user_name,user_message)
@@ -78,7 +90,15 @@ class LlamaIndexKnowledgeAgent:
     def create_or_update_kg_llama_index(self):
         os.makedirs(self.persist_dir, exist_ok=True)
         knowledge_files = get_knowledge_files_npc_has_access_to(world_name=self.world_name, npc_name=self.npc_name)
+
+        #User Journal - the user journal is essentially game knowledge the player has figured out that companions have access to
+        #if the npc of interest is a companion, then add the user journal to their knowledge
+        if self.npc_name in get_available_companions(world_name=self.world_name, user_name=self.user_name):
+            knowledge_files.append(os.path.join(KNOWLEDGE_STORE_PATH,self.world_name,self.user_name,'user_journal.txt'))
         knowledge_files = [file for file in knowledge_files if os.path.exists(file)]
+
+
+        print('knowledge_files: ', knowledge_files)
         # create client and a new collection
         db = chromadb.PersistentClient(path=self.persist_dir)
         chroma_collection = db.get_or_create_collection("knowledge")

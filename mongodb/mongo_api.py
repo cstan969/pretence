@@ -173,13 +173,15 @@ def upsert_mission(q:dict):
     possible_outcomes = q['possible_outcomes']
     id_based_availability_logic = q['id_based_availability_logic'] if 'id_based_availability_logic' in list(q) else ""
     name_based_availability_logic = q['name_based_availability_logic'] if 'name_based_availability_logic' in list(q) else ""
+    associated_knowledge_tags = q['associated_knowledge_tags'] if 'associated_knowledge_tags' in list(q) else []
     return fncs.upsert_mission(
         world_name=world_name,
         mission_name=mission_name,
         mission_briefing=mission_briefing,
         possible_outcomes=possible_outcomes,
         id_based_availability_logic=id_based_availability_logic,
-        name_based_availability_logic=name_based_availability_logic
+        name_based_availability_logic=name_based_availability_logic,
+        associated_knowledge_tags=associated_knowledge_tags
         )
 
 
@@ -240,10 +242,6 @@ def convert_availability_logic_from_name_to_id(q:dict):
     return {
         'id_based_availability_logic': fncs.convert_availability_logic_from_name_to_id(world_name=world_name,expr=expr)
     }
-
-@app.post("/init_game_state")
-def init_game_state(q:dict):
-    return fncs.init_game_state(world_name=q['world_name'],user_name=q['user_name'])
 
 @app.post("/convert_availability_logic_from_id_to_name")
 def convert_availability_logic_from_id_to_name(q:dict):

@@ -69,7 +69,8 @@ const WorldCreator = () => {
     mission_brief: "",
     possible_outcomes: [],
     name_based_availability_logic: "",
-    id_based_availability_logic: ""
+    id_based_availability_logic: "",
+    associated_knowledge_tags: []
   });
   const [missions, setMissions] = useState([]);
   const [isNewMission, setIsNewMission] = useState(true);
@@ -80,6 +81,7 @@ const WorldCreator = () => {
   });
   const [selectedNpcsForMission, setSelectedNpcsForMission] = useState([]);
   const [missionApiResponse, setMissionApiResponse] = useState("");
+  const [selectedAssociatedKnowledgeTag, setSelectedAssociatedKnowledgeTag] = useState('');
 
 
  
@@ -176,7 +178,8 @@ const WorldCreator = () => {
   const handleMissionEditor = () => {
     updateMissions();
     updateNpcs();
-    setEditorOption('mission')
+    updateKnowledge();
+    setEditorOption('mission');
   };
 
   const updateMissions = () =>{
@@ -449,6 +452,24 @@ const WorldCreator = () => {
       }));
     }
 
+    const handleAddAssociatedKnowledgeTag = () => {
+      console.log(selectedAssociatedKnowledgeTag);
+      if (!currentMission.associated_knowledge_tags.includes(selectedAssociatedKnowledgeTag)) {
+        console.log('currentMission: ', currentMission);
+        console.log('selected tag not in list');
+        const updatedTags = [...currentMission.associated_knowledge_tags, selectedAssociatedKnowledgeTag];
+        console.log('updatedtags: ', updatedTags);
+        setCurrentMission({...currentMission,associated_knowledge_tags: updatedTags});
+        console.log('currentMission: ', currentMission);
+      }
+      setSelectedAssociatedKnowledgeTag('');
+    }
+
+    const handleDeleteKnowledgeTag = (tagToDelete) => {
+      const updatedTags = currentMission.associated_knowledge_tags.filter(tag => tag !== tagToDelete);
+      setCurrentMission({...currentMission,associated_knowledge_tags: updatedTags});
+    };
+
 
     const sendNpcsOnMission = async () => {
       try {
@@ -554,7 +575,8 @@ const WorldCreator = () => {
                 mission_briefing: "",
                 possible_outcomes: [],
                 name_based_availability_logic: "",
-                id_based_availability_logic: ""
+                id_based_availability_logic: "",
+                associated_knowledge_tags: []
               });
               setIsNewMission(true);
             }}>
@@ -572,6 +594,26 @@ const WorldCreator = () => {
             <label>mission_briefing</label>
             <textarea value={currentMission.mission_briefing} onChange={(e) => setCurrentMission({...currentMission, mission_briefing: e.target.value}) }/>
             </div>
+
+            <h3>Select Associated Entities/Tags</h3>
+            <select value={selectedAssociatedKnowledgeTag} onChange={e => setSelectedAssociatedKnowledgeTag(e.target.value)}>
+                <option value="" disabled>Select tag...</option>
+                {knowledgeTags.map(tag => (
+                    <option key={tag} value={tag}>{tag}</option>
+                ))}
+            </select>
+            <button onClick={handleAddAssociatedKnowledgeTag}>Add Tag</button>
+
+            <ul>
+                {currentMission.associated_knowledge_tags.map(tag => (
+                    <li key={tag} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {tag}
+                        <button onClick={() => handleDeleteKnowledgeTag(tag)}>Delete</button>
+                    </li>
+                ))}
+            </ul>
+
+            <h3>Availability Logic (What needs done to unlock the mission)</h3>
             <div className="input-group">
             <label>Name-Based Mission Availability Logic</label>
             <textarea value={currentMission.name_based_availability_logic} onChange={(e) => setCurrentMission({...currentMission, name_based_availability_logic: e.target.value}) }/>

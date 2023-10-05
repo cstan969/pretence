@@ -9,31 +9,19 @@ from langchain.retrievers import TimeWeightedVectorStoreRetriever
 from langchain.schema import BaseMemory, Document
 from langchain.schema.language_model import BaseLanguageModel
 from langchain.utils import mock_now
+from langchain.chat_models.base import BaseChatModel
 
 logger = logging.getLogger(__name__)
 
+from mongodb.mongo_fncs import get_generative_agent_memory_aggregate_importance, upsert_generative_agent_state, upsert_observation
 
-class GenerativeAgentMemory(BaseMemory):
+from pydantic import BaseModel, Field, root_validator
+
+class GenerativeAgentMemory(BaseMemory, BaseModel):
     """Memory for the generative agent."""
-
-    llm: BaseLanguageModel
-    """The core language model."""
+    llm: BaseChatModel
     memory_retriever: TimeWeightedVectorStoreRetriever
-    """The retriever to fetch related memories."""
-    verbose: bool = False
-    reflection_threshold: Optional[float] = None
-    """When aggregate_importance exceeds reflection_threshold, stop to reflect."""
-    current_plan: List[str] = []
-    """The current plan of the agent."""
-    # A weight of 0.15 makes this less important than it
-    # would be otherwise, relative to salience and time
-    importance_weight: float = 0.15
-    """How much weight to assign the memory importance."""
-    aggregate_importance: float = 0.0  # : :meta private:
-    """Track the sum of the 'importance' of recent memories.
-
-    Triggers reflection when it reaches reflection_threshold."""
-
+    reflection_threshold: float = Field(7, alias="reflection_threshold")
     max_tokens_limit: int = 1200  # : :meta private:
     # input keys
     queries_key: str = "queries"
@@ -45,6 +33,24 @@ class GenerativeAgentMemory(BaseMemory):
     most_recent_memories_key: str = "most_recent_memories"
     now_key: str = "now"
     reflecting: bool = False
+    current_plan: List[str] = []
+    importance_weight: float = 0.15
+    verbose: bool = Field(False, alias="verbose")
+    world_name: str
+    user_name: str
+    npc_name: str
+    aggregate_importance: Optional[float]=0
+
+    @root_validator(pre=True)
+    def set_aggregate_importance(cls, values):
+        world_name = values.get("world_name")
+        user_name = values.get("user_name")
+        npc_name = values.get("npc_name")
+
+        if world_name and user_name and npc_name:
+            values["aggregate_importance"] = get_generative_agent_memory_aggregate_importance(world_name, user_name, npc_name)
+
+        return values       
 
     def chain(self, prompt: PromptTemplate) -> LLMChain:
         return LLMChain(llm=self.llm, prompt=prompt, verbose=self.verbose)
@@ -65,6 +71,7 @@ class GenerativeAgentMemory(BaseMemory):
             "Provide each question on a new line."
         )
         observations = self.memory_retriever.memory_stream[-last_k:]
+        print('observations: ', observations)
         observation_str = "\n".join(
             [self._format_memory_detail(o) for o in observations]
         )
@@ -163,7 +170,6 @@ class GenerativeAgentMemory(BaseMemory):
     ) -> List[str]:
         """Add an observations or memories to the agent's memory."""
         importance_scores = self._score_memories_importance(memory_content)
-
         self.aggregate_importance += max(importance_scores)
         memory_list = memory_content.split(";")
 
@@ -178,6 +184,9 @@ class GenerativeAgentMemory(BaseMemory):
             )
 
         result = self.memory_retriever.add_documents(documents, current_time=now)
+        for mem in memory_list:
+            upsert_observation(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name,observation=mem)
+
 
         # After an agent has processed a certain amount of memories (as measured by
         # aggregate importance), it is time to reflect on recent events to add
@@ -192,6 +201,7 @@ class GenerativeAgentMemory(BaseMemory):
             # Hack to clear the importance from reflection
             self.aggregate_importance = 0.0
             self.reflecting = False
+        upsert_generative_agent_state(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name,gen_ag_memory_aggregate_importance=self.aggregate_importance)
         return result
 
     def add_memory(
@@ -202,12 +212,14 @@ class GenerativeAgentMemory(BaseMemory):
         importance_score = self._score_memory_importance(memory_content)
         print('importance_score: ', importance_score)
 
+
         self.aggregate_importance += importance_score
         print('aggregate importance: ', self.aggregate_importance)
         document = Document(
             page_content=memory_content, metadata={"importance": importance_score}
         )
         result = self.memory_retriever.add_documents([document], current_time=now)
+        upsert_observation(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name,observation=memory_content)
 
         # After an agent has processed a certain amount of memories (as measured by
         # aggregate importance), it is time to reflect on recent events to add
@@ -222,6 +234,7 @@ class GenerativeAgentMemory(BaseMemory):
             # Hack to clear the importance from reflection
             self.aggregate_importance = 0.0
             self.reflecting = False
+        upsert_generative_agent_state(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name,gen_ag_memory_aggregate_importance=self.aggregate_importance)
         return result
 
     def fetch_memories(

@@ -10,7 +10,8 @@ import regex as re
 from fuzzywuzzy import fuzz
 from config import RENPY_SH_PATH, KNOWLEDGE_STORE_PATH
 
-from LongTermMemory.long_term_memory import LongTermMemory
+import requests
+
 
 
 #####USERS#####
@@ -365,7 +366,7 @@ def get_all_unique_knowledge_tags_for_world(world_name: str):
     tags = [k['tag'] for k in knowledges]
     return list(set(tags))
 
-def get_knowledge_files_npc_has_access_to(world_name, npc_name):
+def get_knowledge_files_npc_has_access_to(world_name, npc_name, user_name: Optional[str]=None):
     npcs = query_collection(collection_name='npcs',query={'world_name':world_name,'npc_name':npc_name})
     filenames = []
     if len(npcs) > 0:
@@ -377,8 +378,12 @@ def get_knowledge_files_npc_has_access_to(world_name, npc_name):
                     filename = os.path.join(KNOWLEDGE_STORE_PATH, world_name, tag + "_" + str(l) + ".txt")
                     filenames.append(filename)
     k_zeros = query_collection(collection_name='knowledge',query={'world_name':world_name,'level':0})
+
+    #Knowledge 0, essentially is all information in tags with level=0 (meaning all NPCs know it period)
     k_zero_filenames = [f['knowledge_filepath'] for f in k_zeros]
     filenames.extend(k_zero_filenames)
+
+    
     filenames=list(set(filenames))
     return filenames
 
@@ -415,7 +420,8 @@ def upsert_mission(
         mission_briefing: str,
         possible_outcomes: list,
         id_based_availability_logic: Optional[str]="",
-        name_based_availability_logic: Optional[str]=""
+        name_based_availability_logic: Optional[str]="",
+        associated_knowledge_tags: Optional[list]=[]
         ):
     collection_name = 'missions'
     _id = '-'.join(['missions',world_name,mission_name])
@@ -439,7 +445,8 @@ def upsert_mission(
         'name_based_availability_logic': name_based_availability_logic,
         'id_based_availability_logic': id_based_availability_logic,
         'availability_dependencies': availability_dependencies,
-        'availability_dependents': availability_dependents
+        'availability_dependents': availability_dependents,
+        'associated_knowledge_tags': associated_knowledge_tags
     })
 
 def get_available_missions(world_name: str, user_name:str):
@@ -484,22 +491,48 @@ def delete_mission(mission_id: str):
     delete_items(collection_name='missions', query={'_id': mission_id})
 
 
-# ######################
-# #####OBSERVATIONS#####
-# ######################
+######################
+#####OBSERVATIONS#####
+######################
 
-# def upsert_observation(observation: str, world_name: str, user_name: str, npc_name: str, time: str):
-#     return upsert_item(collection_name='observations',item={
-#         '_id': '-'.join(['collections',world_name,user_name,npc_name,get_current_date_formatted_no_spaces()]),
-#         'world_name': world_name,
-#         'user_name': user_name,
-#         'npc_name': npc_name,
-#         'observation': observation,
-#         'time': time
-#     })    
+def upsert_observation(observation: str, world_name: str, user_name: str, npc_name: str, time: Optional[str]=None):
+    if time is None:
+        time = get_current_datetime_as_string()
+    return upsert_item(collection_name='observations',item={
+        '_id': '-'.join(['collections',world_name,user_name,npc_name,get_current_date_formatted_no_spaces()]),
+        'world_name': world_name,
+        'user_name': user_name,
+        'npc_name': npc_name,
+        'observation': observation,
+        'time': time
+    })    
 
-# def get_observations(world_name: str, user_name: str, npc_name: str):
-#     return query_collection(collection_name='observations',query={'world_name':world_name,'user_name': user_name,'npc_name':npc_name})
+def get_observations(world_name: str, user_name: str, npc_name: str):
+    return query_collection(collection_name='observations',query={'world_name':world_name,'user_name': user_name,'npc_name':npc_name})
+
+
+#####################
+#####GenAg State#####
+#####################
+
+def upsert_generative_agent_state(world_name: str, user_name: str, npc_name:str, gen_ag_memory_aggregate_importance:float):
+    collection_name='generative_agent_states'
+    _id = '-'.join([world_name,user_name,npc_name])
+    upsert_item(collection_name=collection_name,item={
+        '_id':_id,
+        'world_name':world_name,
+        'user_name':user_name,
+        'npc_name':npc_name,
+        'gen_ag_memory_aggregate_importance':gen_ag_memory_aggregate_importance
+    })
+
+def get_generative_agent_memory_aggregate_importance(world_name: str, user_name: str, npc_name:str):
+    collection_name='generative_agent_states'
+    _id = '-'.join([world_name,user_name,npc_name])
+    states = query_collection(collection_name=collection_name,query={'_id':_id})
+    return 0 if len(states) == 0 else states[0]['gen_ag_memory_aggregate_importance']
+
+
 
 
 ################################
@@ -659,56 +692,6 @@ def delete_user_world_game_state_items(user_name: str, world_name: str):
     delete_items(collection_name='npc_game_states',query={'user_name': user_name, 'world_name': world_name})
     delete_items(collection_name='npc_objective_game_states',query={'user_name': user_name, 'world_name': world_name})
     delete_items(collection_name='mission_game_states',query={'user_name': user_name, 'world_name': world_name})
-
-
-def init_game_state(user_name: str, world_name: str):
-    #Start by getting all of the missions, npcs, and npc objectives
-    all_missions_in_world = get_all_missions_for_world(world_name=world_name)
-    all_npcs_in_world = get_npcs_in_world(world_name=world_name)
-    all_npc_objectives = get_all_npc_objectives_in_world(world_name=world_name)
-    for mission in all_missions_in_world:
-        if mission['id_based_availability_logic'] == "":
-            print("Mission '", mission['mission_name'], "' is available")
-            #then the mission is available
-            update_mission_game_state(
-                world_name=world_name,
-                user_name=user_name,
-                mission_id = mission['_id'],
-                mission_status="available"
-            )
-        else:
-            print("Mission '", mission['mission_name'], "' is unavailable")
-    for npc in all_npcs_in_world:
-        if npc['id_based_availability_logic'] == "":
-            print("NPC '", npc['npc_name'], "' is available")
-            #then the npc is available to talk with
-            update_npc_game_state(
-                world_name=world_name,
-                user_name=user_name,
-                npc_id=npc['_id'],
-                npc_status="available"
-            )
-            #init NPC LTM
-            ltm = LongTermMemory(world_name=world_name,user_name=user_name,npc_name=npc['npc_name'])
-            if 'npc_ltms' in list(npc):
-                if len(npc['npc_ltms']) > 0:
-                    print('initializing ', len(npc['npc_ltms']), ' npc memories: ')
-                    ltm.add_memories(npc['npc_ltms'])
-        else:
-            print("NPC '", npc['npc_name'], "' is unavailable")
-    for npc_objective in all_npc_objectives:
-        if npc_objective['id_based_availability_logic'] == "":
-            print("Objective '", npc_objective['objective_name'], "' is available")
-            #then the npc objective is available
-            update_npc_objective_game_state(
-                world_name=world_name,
-                user_name=user_name,
-                npc_objective_id=npc_objective['_id'],
-                npc_objective_status="available",
-                npc_name=npc_objective['npc_name']
-            )
-        else:
-            print("Objective '", npc_objective['objective_name'], "' is unavailable")
 
 def get_user_specific_mission_game_state(world_name: str, user_name: str, mission_id:str)->dict:
     return query_collection(collection_name='mission_game_states',item={'world_name':world_name,'user_name':user_name,'mission_id':mission_id})[0]
@@ -905,5 +888,12 @@ def trigger_effects(world_name: str, user_name: str, effects: list):
             npc_name_to_gain = effect["npc"]
             npc=get_npc(world_name=world_name,npc_name=npc_name_to_gain)
             update_npc_game_state(world_name=world_name,user_name=user_name,npc_id=npc['_id'],npc_companion_status=True)
+        elif effect['type'] == "Player Knowledge Acquisition":
+            requests.post(url="http://localhost:8007/write_knowledge_to_user_journal",json={
+                'world_name':world_name,
+                'user_name':user_name,
+                'knowledge': effect['data']
+            })
+
 
 

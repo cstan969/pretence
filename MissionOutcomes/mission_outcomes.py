@@ -2,7 +2,8 @@
 from mongodb.mongo_fncs import (
     get_mission,
     get_npc,
-    update_mission_game_state
+    update_mission_game_state,
+    get_knowledge
 )
 
 from langchain import PromptTemplate, LLMChain
@@ -10,7 +11,7 @@ from langchain.chat_models import ChatOpenAI
 import json, os, pprint
 from langchain import PromptTemplate, LLMChain
 from LlmFunctions.llm_functions import genKGQuestionsGivenMissionBrief, genLTMQuestionsGivenMissionInfo
-from KnowledgeBase.knowledge_retriever import LlamaIndexKnowledgeAgent
+from KnowledgeBase.knowledge_retriever import LlamaIndexKnowledgeAgent, write_knowledge_to_tag1
 from LongTermMemory.long_term_memory import LongTermMemory
 
 
@@ -26,7 +27,7 @@ class MissionOutcomes():
         self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
         self.formatted_mission_outcomes = self._get_formatted_list_of_possible_mission_outcomes()
 
-    def fix_json(self, json_to_fix):
+    def fix_json(self, json_to_fix: str):
         template = """I have some broken JSON below that I need to be able to run json.loads() on.  Can you fix it for me? Thanks.\n\n{question}"""
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
@@ -159,11 +160,55 @@ class MissionOutcomes():
         response = llm_chain.run(narrative=response)
         print(response)
 
+        
 
-        #Add observations to Companions' LTMs
+        #PART 4. Acquire entity-specific (e.g. the tags associated with the mission) knowledge from the LLM and add it to the KB(s)
+        associated_tags = self.mission['associated_knowledge_tags']
+        associated_tags.extend(self.npc_names)
+        entities = [get_knowledge(world_name=self.world_name, tag=tag)[0] for tag in associated_tags]
+        entities = [{'entity':entity['tag'],'description':entity['knowledge_description']} for entity in entities]
+        print('---associated tags: ', associated_tags)
+        print('---entities: ', entities)
+        
+        if len(associated_tags) > 0:
+            template = """Given a mission narrative and list of entities I want you to extract knowledge from the mission narrative pertaining to each of those entities.
+            I need to be able to store this information in a knowledge base where each entity has it's own Document store.  Divide the information into documents based upon these entities.
+            It should be written from the perspective of if some npc knows about the entity, then they would know "such and such".
+            '''''
+            [entities]={entities}
+            
+            '''''
+            [mission_narrative]={mission_narrative}
+            
+            '''''
+            You must format your output as a JSON value that adheres to the following JSON schema instance:
+            "knowledge": A dictionary where the keys are each entity name in [entities] and the values are the knowledge extracted from the [mission_narrative] 
+            """
+            prompt_from_template = PromptTemplate(template=template, input_variables=["entities", "mission_narrative"])
+            llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
+            knowledge_response = llm_chain.run(entities=entities, mission_narrative=response)
+            print(type(knowledge_response))
+            try:
+                knowledge_response = json.loads(knowledge_response)
+            except:
+                print(type(knowledge_response))
+                knowledge_response = self.fix_json(knowledge_response)
+                print(type(knowledge_response))
+                knowledge_response = json.loads(knowledge_response)
+                print(type(knowledge_response))
+            pprint.pprint(knowledge_response)
+            print('-----knowledge response-----')
+            print(knowledge_response)
+            knowledges = knowledge_response['knowledge']
+            for entity in entities:
+                knowledge = knowledges[entity['entity']]
+                write_knowledge_to_tag1(world_name=self.world_name,user_name=self.user_name,tag=entity['entity'],knowledge=knowledge)
+
+        #PART 5. Add observations to Companions' LTMs
         for npc_name in self.npc_names:
             ltm = LongTermMemory(world_name=self.world_name, user_name=self.user_name,npc_name=npc_name)
             ltm.add_memories_from_mission_debrief(mission_debrief=response)
+        
 
 
         #Update the mission game state

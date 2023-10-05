@@ -10,12 +10,17 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.retrievers import TimeWeightedVectorStoreRetriever
 from langchain.vectorstores import FAISS
 from langchain import LLMChain, PromptTemplate
+from langchain.schema import Document
 
 import math, os
 import faiss
 from langchain_experimental.generative_agents import GenerativeAgentMemory
 from config import LONG_TERM_MEMORY_PATH
 
+from datetime import datetime
+import dill
+
+from mongodb.mongo_fncs import get_observations
 
 
 class LongTermMemory():
@@ -28,20 +33,35 @@ class LongTermMemory():
         self.game_designer_vector_store_index_path = os.path.join(LONG_TERM_MEMORY_PATH,self.world_name,self.game_designer_user_name, self.npc_name)
         os.makedirs(self.vector_store_index_path, exist_ok=True)
 
-
-        self.faiss = self._load_faiss()
+        
         self.llm = ChatOpenAI(max_tokens=1500)
-        #memory retriever
+        
+        #load the vector story
+        self.faiss = self._load_faiss()
+        #init the memory retriever
         self.memory_retriever = TimeWeightedVectorStoreRetriever(
             vectorstore=self.faiss, other_score_keys=["importance"], k=15
         )
+        #load and set the list of documents, e.g. memory stream
+        self.memory_stream_filepath = os.path.join(self.vector_store_index_path, 'memory_stream.pkl')
+        if os.path.exists(self.memory_stream_filepath):
+            with open(self.memory_stream_filepath, 'rb') as f:
+                loaded_memory_stream_obj = dill.load(f)
+                self.memory_retriever.memory_stream = loaded_memory_stream_obj
+        # self.memory_retriever.memory_stream = [Document(page_content=obs['observation'],metadata={'created_at':datetime.strptime(obs['last_updated'],"%Y-%m-%d %H:%M:%S")}) for obs in get_observations(world_name=world_name,user_name=user_name,npc_name=npc_name)]
+
         #generative memory
         self.gen_memory = GenerativeAgentMemory(
             llm=self.llm,
             memory_retriever=self.memory_retriever,
-            verbose=False,
-            reflection_threshold=5,  # we will give this a relatively low number to show how reflection works
+            world_name=world_name,
+            user_name=user_name,
+            npc_name=npc_name,
         )
+
+    def _pickle_memory_stream(self):
+        with open(self.memory_stream_filepath, 'wb') as f:
+            dill.dump(self.memory_retriever.memory_stream, f)
 
     def add_memories_from_mission_debrief(self, mission_debrief):
         print('adding memories')
@@ -111,6 +131,7 @@ class LongTermMemory():
         #     self.gen_memory.add_memory(memory_content=obs)
         
         self._save_faiss()
+        self._pickle_memory_stream()
         
 
     def fetch_memories(self, observation: str, k: Optional[int] = 5):
