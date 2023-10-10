@@ -142,7 +142,7 @@ class LlamaIndexKnowledgeAgent:
         # set Logging to DEBUG for more detailed outputs
         memory = ConversationBufferMemory(memory_key="chat_history")
         chat_history = get_user_npc_interactions(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name)
-        for interaction in chat_history:
+        for interaction in chat_history[-6:]:
             memory.chat_memory.add_user_message(interaction['user_message'])
             memory.chat_memory.add_ai_message(interaction['npc_response'])
 
