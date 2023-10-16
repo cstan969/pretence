@@ -35,8 +35,16 @@ class MissionOutcomes():
         return response
 
     def _load_mission_prompt(self):
-        return """I am making a video game where I, the player of the game, am the leader of a mercenary guild. As part of the game, I am given missions and I must assign member(s) of the mercenary guild to go on these missions. Depending on the mission, the mission is liable to succeed or fail depending on the mercenary members that I assign to the mission. I am going to give you information about the mission and then also give you information about the mercenary guild member(s) that were assigned to go on the mission."""
+        # return """I am making a video game where I, the player of the game, am the leader of a mercenary guild.
+        # As part of the game, I am given missions and I must assign member(s) of the mercenary guild to go on these missions.
+        # The mercenary member(s) go on their own, without me, the guild leader. 
+        # Depending on the mission, the mission is liable to succeed or fail depending on the mercenary members that I assign to the mission. 
+        # I am going to give you information about the mission and then also give you information about the mercenary guild member(s) that were assigned to go on the mission."""
     
+        return """As part of a video game, mercenary member(s) are assigned to go on various missions.
+        Depending on the mission, the mission is liable to succeed or fail depending on the mercenary members that I assign to the mission. 
+        I am going to give you information about the mission and then also give you information about the mercenary guild member(s) that were assigned to go on the mission."""
+
     def _load_mission_brief(self):
         return "Here is the mission briefing: " + self.mission['mission_briefing']
     
@@ -95,6 +103,28 @@ class MissionOutcomes():
             self._load_long_term_memories()
         ]
         mission_context = "\n\n'''''\n".join([fnc for fnc in prompt_assembly_fncs_in_order])
+#         template2 = """I'd like you to craft a mission narrative for me.  I will give you background information and then give you a general framework to guide the story, but please feel free to flex your creative muscles:
+
+#         '''''
+#         [Information]: {question}
+
+#         '''''
+#         [Narrative Framework]: You must format your output as a JSON value that adheres to the following JSON schema instance:
+
+# "Objective": "Begin with a clear mission goal. What are the NPCs trying to achieve? However, if the mission's objective isn't immediately clear or evolves, that's perfectly fine—some of the best stories involve discovering the purpose along the way."
+# "List of NPCs": "Introduce the NPCs central to this mission. Give a brief overview of who they are and their roles. If they have any unique quirks, backgrounds, or attributes, make sure to sprinkle those in."
+# "Setting the Scene": "Provide a backdrop or immediate context for the mission. Is it a rescue mission in a war-torn city? A heist in a lavish mansion? Feel free to dive into the ambiance and atmosphere."
+# "Preparation Phase": "Should there be any unique preparations, strategies, or pre-mission rituals that the NPC(s) carry out, detail them here."
+# "Emotions at the Onset": "Dive into the NPCs' mindset. Are they confident? Anxious? Hopeful? Reflect their feelings as they embark on the mission, but allow for shifts in their emotions based on unfolding events."
+# "Obstacles and Challenges": "As the NPCs progress, what hurdles do they face? This can range from tangible enemies to internal moral dilemmas. Let their challenges shape the flow of the narrative."
+# "High Tension Moments": "Amplify moments of tension or action, especially if they arise from mission-specific challenges. These scenes can make the narrative pulse with life."
+# "Decision Points": "Throughout the mission, the NPCs will make decisions. Some may be minor, while others could pivot the entire direction of the mission. If these decisions tie back to NPC attributes or past player decisions, that connection could enrich the narrative."
+# "Climactic Moments": "Detail the pinnacle of the mission. Is there a significant showdown, revelation, or twist? Let the narrative build to this crescendo."
+# "Consequences": "The actions of the NPCs will have repercussions. These could be immediate or set the stage for future missions. Rewards, information gained, alliances formed, or setbacks—paint the picture of the aftermath."
+# "Character Development": "If something significant or transformative happens to an NPC during the mission, showcase their growth or evolution. How have their experiences shaped them?"
+# "Echoes into the Future": "To wrap, hint at the potential long-term effects of this mission. Whether it's a subtle foreshadowing or a more overt cliffhanger, let the narrative suggest what might come next."
+# "outcome": "the name of the outcome that.  This must be an outcome name from the list of possible mission outcomes" """
+        
         template = """{question}
         \n'''''
         Here is additional information for writing 'mission_narrative':
@@ -105,7 +135,7 @@ class MissionOutcomes():
     "Summarize the mission's objective": "Provide a concise recap of what the mission seeks to achieve.",
     "List the chosen NPC(s) for the mission": "Identify and provide brief information on the non-player characters selected for the task.",
     "Set the immediate context for the story": "Offer a backdrop or situation that sets the stage for the upcoming mission.",
-    "Describe mission preparations": "Narrate the steps, arrangements, or strategies decided upon before embarking on the mission.",
+    "Describe mission preparations": "Narrate the steps, arrangements, or strategies decided upon before embarking on the mission by the chosen NPCs.",
     "Convey NPC emotions/thoughts as the mission starts": "Capture the feelings, mindset, or expectations of the NPCs as they begin their task.",
     "Set the initial tone": "Establish the atmosphere, mood, or general sentiment at the onset of the mission.",
     "Detail obstacles or confrontations faced": "Elaborate on challenges, enemies, or dilemmas the NPCs encountered during their journey.",
@@ -126,7 +156,7 @@ class MissionOutcomes():
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
         response = llm_chain.run(mission_context)
-        # print(response)
+        print(response)
         try:
             response = json.loads(response)
         except:
@@ -146,7 +176,10 @@ class MissionOutcomes():
         
         '''''
         [output]
-        Write a 3 paragraph narrative of the mission based on the [mission_outcome].  Expand upon the narrative I provided earlier, weaving in dialogue, emotions, actions, and the characters' thought processes, while retaining the perspective of a third-person narrator.  The player, e.g. the mercenary manager, should not be included in the narrative."""
+        Write a 3 paragraph narrative of the mission based on the [mission_outcome].
+        Expand upon the narrative I provided earlier, weaving in dialogue, emotions, actions, and the characters' thought processes,
+        while retaining the perspective of a third-person narrator.
+        The player, e.g. the mercenary manager, should not be included in the narrative.  The narrative should include NPCs' thoughts in regards to the mission, their prep, """
         prompt_from_template = PromptTemplate(template=template, input_variables=["mission_context","mission_outcome"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
         response = llm_chain.run(mission_context=mission_context, mission_outcome=response)

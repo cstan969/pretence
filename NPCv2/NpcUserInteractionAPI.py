@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from typing import Optional
 from pydantic import BaseModel
 from NPCv2.NpcUserInteraction_v3_kg_agent import NpcUserInteraction
-from MissionOutcomes.mission_outcomes import MissionOutcomes
+from MissionOutcomes.mission_outcomes_v2 import MissionOutcomes
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
