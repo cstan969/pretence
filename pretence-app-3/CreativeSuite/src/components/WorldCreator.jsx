@@ -8,6 +8,9 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import SceneBackgroundImageFileSelector from '../components/SceneBackgroundImageFileSelector';
 import SceneMusicFileSelector from './SceneMusicFileSelector.jsx';
 
+import { useRef } from 'react';
+
+import NpcObjectivesComponent from './NpcObjectivesComponent';
 
 
 const WorldCreator = () => {
@@ -47,6 +50,8 @@ const WorldCreator = () => {
   const [npcKnowledgeList, setNpcKnowledgeList] = useState({});
   const [npcNameBasedAvailabilityLogic, setNpcNameBasedAvailabilityLogic] = useState("");
   const [npcIdBasedAvailabilityLogic, setNpcIdBasedAvailabilityLogic] = useState("");
+  const npcObjectivesRef = useRef(null);
+
 
 
   //play game as user variables
@@ -710,233 +715,43 @@ const WorldCreator = () => {
       axios.post('http://127.0.0.1:8002/upsert_npc/',updatedNpc)
       .then(res=>console.log(res))
       .catch(err=>console.log(err))
-      updateObjectives(npcObjectives);
-  
-    }
-  
-
-    const updateObjectives = (npcObjectives) => {
-      console.log('log npc objectives: ', npcObjectives);
-      npcObjectives.forEach((objective) => {
-        const payload = {
-          npc_objective_id: objective._id,
-          world_name: currentWorld.world_name,
-          npc_name: currentNpc.npc_name,
-          objective_name: objective.objective_name,
-          objective_completion_string: objective.objective_completion_string,
-          prompt_available: objective.prompt_available,
-          prompt_completed: objective.prompt_completed,
-          prompt_unavailable: objective.prompt_unavailable,
-          id_based_availability_logic: objective.id_based_availability_logic,
-          name_based_availability_logic: objective.name_based_availability_logic,
-          effects: objective.effects
-        };
-    
-        axios.post("http://127.0.0.1:8002/update_npc_objective", payload)
-          .then(response => {
-            console.log('Objective updated:', response.data);
-          })
-          .catch(err => {
-            console.log('Error updating objective:', err);
-          });
-      });
+      // updateObjectives(npcObjectives);
+      if (npcObjectivesRef.current) {
+        npcObjectivesRef.current.saveObjectivesToDB();
+      }
     }
 
-    function NpcObjectivesComponent(props) {
-      // const { updateObjectives: updateObjectivesFromContext } = useContext(NpcContext);
-      const [npcObjectives, setNpcObjectives] = useState(props.npcObjectives || []);
-
-      const addEffectToObjective = (index) => {
-        console.log('newObjectives inside addEffectToObjective: ', npcObjectives)
-        const newNpcObjectives = [...npcObjectives];
-        newNpcObjectives[index].effects.push({ type: '', data: '' });
-        setNpcObjectives(newNpcObjectives);
-      }
-      
-      const handleEffectChange = (objectiveIndex, effectIndex, key, value) => {
-        const newNpcObjectives = [...npcObjectives];
-        newNpcObjectives[objectiveIndex].effects[effectIndex][key] = value;
-        setNpcObjectives(newNpcObjectives);
-      }
-  
-      const deleteEffectFromObjective = (objectiveIndex, effectIndex) => {
-        const newNpcObjectives = [...npcObjectives];
-        newNpcObjectives[objectiveIndex].effects.splice(effectIndex, 1);
-        setNpcObjectives(newNpcObjectives);
-      }
-
-
-      const handleInputChange = (index, key, value) => {
-          const newNpcObjectives = [...npcObjectives];
-          newNpcObjectives[index][key] = value;
-          console.log('new npc objectives: ', newNpcObjectives)
-          setNpcObjectives(newNpcObjectives);
-          console.log('npc objectives: ', npcObjectives);
-      };
-
-      
-
-      const addNewObjective = () => {
-        axios.post("http://127.0.0.1:8002/create_npc_objective",{world_name: currentWorld.world_name, npc_name: currentNpc.npc_name})
-        .then(res => {
-          console.log(res.data);
-          const _id = res.data._id;
-          const newObjective = {
-            "_id": _id,
-            "objective_name": "",
-            "objective_completion_string": "",
-            "prompt_completed": "",
-            "prompt_available": "",
-            "prompt_unavailable": "",
-            "name_based_availability_logic": "",
-            "id_based_availability_logic": "",
-            "effects": []
-          };
-          setNpcObjectives([...npcObjectives, newObjective]);
-          console.log('inside addNewObjective, npcObjectives is: ', npcObjectives);
-        })
-        .catch(err => console.log(err));
-        
-     };
-
-     const handleNameToIdLogicConversionForObjective = (index) => {
-      axios.post("http://127.0.0.1:8002/convert_availability_logic_from_name_to_id", {'world_name': currentWorld.world_name,'expr': npcObjectives[index].name_based_availability_logic})
-      .then(response => {
-        handleInputChange(index, 'id_based_availability_logic', response.data.id_based_availability_logic);
-      })
-      .catch(err => {
-        console.log('Error converting availability logic from name to id:', err);
-      });
-     };
-
-     const deleteObjective = (index) => {
-      const objectiveToDelete = npcObjectives[index];
-  
-      const newNpcObjectives = [...npcObjectives];
-      newNpcObjectives.splice(index, 1);
-      setNpcObjectives(newNpcObjectives);
-  
-      axios.post("http://127.0.0.1:8002/delete_npc_objective", {
-          npc_objective_id: objectiveToDelete._id
-      })
-      .catch(err => console.log(err));
-     };
-  
-      return (
-          <div>
-              {npcObjectives.map((objective, index) => (
-                  <div key={objective._id} className="objective-container">
-                      <div className="input-group">
-                          <label>Objective Name</label>
-                          <textarea 
-                              value={objective.objective_name} 
-                              onChange={(e) => handleInputChange(index, 'objective_name', e.target.value)}
-                          />
-                      </div>
-  
-                      <div className="input-group">
-                          <label>Objective Completion String</label>
-                          <textarea 
-                              value={objective.objective_completion_string}
-                              onChange={(e) => handleInputChange(index, 'objective_completion_string', e.target.value)}
-                          />
-                      </div>
-
-                      <div className="input-group">
-                        <label>Name-Based Objective Availability Logic</label>
-                        <textarea 
-                          value={objective.name_based_availability_logic} 
-                          onChange={(e) => handleInputChange(index, 'name_based_availability_logic', e.target.value)}
-                        />
-                      </div>
-
-                      <button onClick={() => handleNameToIdLogicConversionForObjective(index)}>Convert to ID-based Logic</button>
-
-                      <div className="input-group">
-                        <label>(ReadOnly) ID-based Objective Availability Logic</label>
-                        <textarea 
-                          readOnly 
-                          value={objective.id_based_availability_logic} 
-                          onChange={(e) => handleInputChange(index, 'id_based_availability_logic', e.target.value)}
-                        />
-                      </div>
-
-  
-                      <div className="input-group">
-                          <label>Prompt Completed</label>
-                          <textarea 
-                              value={objective.prompt_completed} 
-                              onChange={(e) => handleInputChange(index, 'prompt_completed', e.target.value)}
-                          />
-                      </div>
-  
-                      <div className="input-group">
-                          <label>Prompt Available</label>
-                          <textarea 
-                              value={objective.prompt_available}
-                              onChange={(e) => handleInputChange(index, 'prompt_available', e.target.value)}
-                          />
-                      </div>
-  
-                      <div className="input-group">
-                          <label>Prompt Unavailable</label>
-                          <textarea 
-                              value={objective.prompt_unavailable}
-                              onChange={(e) => handleInputChange(index, 'prompt_unavailable', e.target.value)}
-                          />
-                      </div>
-
-                      {objective.effects.map((effect, effectIndex) => (
-                        <div key={effectIndex} className="effect-container">
-                          <select 
-                            value={effect.type}
-                            onChange={e => handleEffectChange(index, effectIndex, 'type', e.target.value)}
-                          >
-                            <option value="">Select effect type</option>
-                            <option value="Gain NPC as Companion">Gain NPC as Companion</option>
-                            <option value="Player Knowledge Acquisition">Player Knowledge Acquisition</option>
-                          </select>
-                          {effect.type === 'Gain NPC as Companion' && (
-                            <select 
-                              value={effect.npc}
-                              onChange={e => handleEffectChange(index, effectIndex, 'npc', e.target.value)}
-                            >
-                              <option value="">Select an NPC</option>
-                              {npcs.map(npc => (
-                                <option value={npc.npc_name} key={npc.npc_name}>
-                                  {npc.npc_name}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                          {effect.type === 'Player Knowledge Acquisition' && (
-                            <textarea
-                              value={effect.data}
-                              onChange={e => handleEffectChange(index, effectIndex, 'data', e.target.value)}
-                              placeholder="Enter knowledge information"
-                            />
-                          )}
-                          <button 
-                            onClick={() => deleteEffectFromObjective(index, effectIndex)}
-                            className="delete-effect-btn"
-                          >
-                            🗑️  {/* This is a trash can emoji, but you can also use an icon */}
-                          </button>
-                        </div>
-                      ))}
-                      <button onClick={() => addEffectToObjective(index)}>Add Objective On-Completion Effect</button>
-
-
-                      <button onClick={() => deleteObjective(index)}>Delete Objective</button>
-                      {index !== npcObjectives.length - 1 && <hr className="objective-divider" />}
-                  </div>
-              ))}
-              <button onClick={addNewObjective}>Add New Objective</button>
-          </div>
-      );
+    const handleNpcObjectivesChange = (newObjectives) => {
+      setNpcObjectives(newObjectives);
   }
   
 
+    // const updateObjectives = (npcObjectives) => {
+    //   console.log('log npc objectives: ', npcObjectives);
+    //   npcObjectives.forEach((objective) => {
+    //     const payload = {
+    //       npc_objective_id: objective._id,
+    //       world_name: currentWorld.world_name,
+    //       npc_name: currentNpc.npc_name,
+    //       objective_name: objective.objective_name,
+    //       objective_completion_string: objective.objective_completion_string,
+    //       prompt_available: objective.prompt_available,
+    //       prompt_completed: objective.prompt_completed,
+    //       prompt_unavailable: objective.prompt_unavailable,
+    //       id_based_availability_logic: objective.id_based_availability_logic,
+    //       name_based_availability_logic: objective.name_based_availability_logic,
+    //       effects: objective.effects
+    //     };
+    
+    //     axios.post("http://127.0.0.1:8002/update_npc_objective", payload)
+    //       .then(response => {
+    //         console.log('Objective updated:', response.data);
+    //       })
+    //       .catch(err => {
+    //         console.log('Error updating objective:', err);
+    //       });
+    //   });
+    // }
   
 
     function TagDropdown({ tags, onChange, value }) {
@@ -1070,7 +885,7 @@ const WorldCreator = () => {
                 </div> */}
 
                 <h3>NPC Objectives</h3>
-                <NpcObjectivesComponent npcObjectives={npcObjectives} />
+                <NpcObjectivesComponent npcObjectives={npcObjectives} ref={npcObjectivesRef} currentWorld={currentWorld} currentNpc={currentNpc} npcs={npcs}/>
 
                
                 <h3>Knowledge</h3>

@@ -31,7 +31,9 @@ from config import KNOWLEDGE_STORE_PATH
 
 from llama_index.vector_stores import ChromaVectorStore
 
-from mongodb.mongo_fncs import get_available_companions
+from mongodb.mongo_fncs import get_available_companions, get_formatted_conversational_chain
+
+import pprint
 
 
 
@@ -52,8 +54,35 @@ def write_knowledge_to_tag1(world_name: str, user_name: str, tag: str, knowledge
     file.write('\n\n' + knowledge)
 
 
+def extract_knowledge_for_user_npc_interaction_v2(world_name: str, npc_name:str, user_name:str, user_message: str):
+    llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
+    template = """given this conversation between a player and NPC, i want to determine what knowledge the NPC has access to so that i can provide it as context to the prompt chain.  Given the conversation, give me a list of questions that I can use to query the llamaindex query_engine.
+    the question list should only include unique questions.  try to avoid questions that are too similar to each other.  Generate maximum three questions.
+    
+    '''''
+    [conversation]
+    {convo}
+
+    '''''
+    Required Output: You must format your output as a JSON dictionary that adheres to a given JSON scehema instance with the following keys:
+        "questions": "the python list of questions" """
+    prompt_from_template = PromptTemplate(template=template, input_variables=["convo"])
+    llm_chain = LLMChain(prompt=prompt_from_template,llm=llm, verbose=True)
+    convo=get_formatted_conversational_chain(world_name=world_name,user_name=user_name,npc_name=npc_name,num_interactions=3)
+    if convo is None:
+        convo = user_message
+    else:
+        convo += '\n' + "Player" + ': ' + user_message + '\n'
+    response = llm_chain.run(convo=convo)
+    print('---')
+    print(response)
+    response = json.loads(response)
+    queries = response['questions']
+    ka = LlamaIndexKnowledgeAgent(world_name,npc_name,user_name)
+    return ka.query_index(queries=queries)
+    # return ka.method_llamaindex_agent(user_message)
+
 def extract_knowledge_for_user_npc_interaction(world_name: str, npc_name:str, user_name:str, user_message: str):
-    # return method_gpt4all_knowledge_base(world_name,npc_name,user_name,user_message)
     ka = LlamaIndexKnowledgeAgent(world_name,npc_name,user_name)
     return ka.method_llamaindex_agent(user_message)
     
@@ -95,10 +124,11 @@ class LlamaIndexKnowledgeAgent:
         #if the npc of interest is a companion, then add the user journal to their knowledge
         if self.npc_name in get_available_companions(world_name=self.world_name, user_name=self.user_name):
             knowledge_files.append(os.path.join(KNOWLEDGE_STORE_PATH,self.world_name,self.user_name,'user_journal.txt'))
-        knowledge_files = [file for file in knowledge_files if os.path.exists(file)]
+        knowledge_files = list(set([file for file in knowledge_files if os.path.exists(file)]))
 
 
-        print('knowledge_files: ', knowledge_files)
+        print('knowledge_files: ')
+        pprint.pprint(knowledge_files)
         # create client and a new collection
         db = chromadb.PersistentClient(path=self.persist_dir)
         chroma_collection = db.get_or_create_collection("knowledge")
@@ -107,7 +137,6 @@ class LlamaIndexKnowledgeAgent:
             HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
         )
         # load documents
-        print('knowledge files: ', knowledge_files)
         documents = SimpleDirectoryReader(input_files=knowledge_files).load_data()
         # set up ChromaVectorStore and load in data
         vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
@@ -154,7 +183,9 @@ class LlamaIndexKnowledgeAgent:
             memory=memory,
         )
         try:
-            response = agent.run(input="Here is the most recent message from the player: " + user_message)
+            # response = agent.run(input=user_message)
+            # response = agent.run(input=f"Role play as {self.npc_name} in a video game.  You are not an AI assistant.  Given the conversation, retrieve return a summary of relevant knowledge as retrieved from the LlamaIndex tool.  Here is the most recent message from the player: " + user_message)
+            response = agent.run(input=f"You are {self.npc_name} in a video game.  You are not an AI assistant.  Given the conversation, retrieve relevant knowledge as retrieved from the LlamaIndex tool.  If no relevant knowledge exists, simply respond with 'I have no relevant knowledge on this topic'.  Here is the most recent message from the player: " + user_message)
             return response
         except Exception as e:
             print('failed to get data from KG (or there is none), returning nothing')

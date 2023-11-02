@@ -20,11 +20,15 @@ from config import LONG_TERM_MEMORY_PATH
 from datetime import datetime
 import dill
 
-from mongodb.mongo_fncs import get_observations
+from mongodb.mongo_fncs import get_observations, set_default_generative_agent_summary
 
 
 class LongTermMemory():
     def __init__(self, world_name: str, user_name: str, npc_name: str):
+        print('initializing LTM for:')
+        print('world_name: ', world_name)
+        print('user_name: ', user_name)
+        print('npc_name: ', npc_name)
         self.world_name = world_name
         self.user_name = user_name
         self.npc_name = npc_name
@@ -42,12 +46,23 @@ class LongTermMemory():
         self.memory_retriever = TimeWeightedVectorStoreRetriever(
             vectorstore=self.faiss, other_score_keys=["importance"], k=15
         )
+        
+        #wait, isnt this in FAISS index.pkl already?
         #load and set the list of documents, e.g. memory stream
         self.memory_stream_filepath = os.path.join(self.vector_store_index_path, 'memory_stream.pkl')
+        self.default_game_designer_memory_stream_filepath = os.path.join(self.game_designer_vector_store_index_path, 'memory_stream.pkl')
         if os.path.exists(self.memory_stream_filepath):
             with open(self.memory_stream_filepath, 'rb') as f:
                 loaded_memory_stream_obj = dill.load(f)
                 self.memory_retriever.memory_stream = loaded_memory_stream_obj
+                print('successfully loaded memory retriever at: ', self.memory_stream_filepath)
+        elif os.path.exists(self.default_game_designer_memory_stream_filepath):
+            with open(self.default_game_designer_memory_stream_filepath,'rb') as f:
+                loaded_memory_stream_obj = dill.load(f)
+                self.memory_retriever.memory_stream = loaded_memory_stream_obj
+                print('successfully loaded memory retriever at: ', self.default_game_designer_memory_stream_filepath)
+
+        #OR can create memory retriever from observations in mongoDB 'observations' collection
         # self.memory_retriever.memory_stream = [Document(page_content=obs['observation'],metadata={'created_at':datetime.strptime(obs['last_updated'],"%Y-%m-%d %H:%M:%S")}) for obs in get_observations(world_name=world_name,user_name=user_name,npc_name=npc_name)]
 
         #generative memory
@@ -58,6 +73,38 @@ class LongTermMemory():
             user_name=user_name,
             npc_name=npc_name,
         )
+
+        #test to make sure the memory stream we loaded is correct.
+        print('len of mem stream genAgMem: ', len(self.gen_memory.memory_retriever.memory_stream))
+        print(self.gen_memory.memory_retriever.memory_stream)
+
+    def genAgSummaryFromBackstory(self, backstory: str):
+        template = """can you generate an npc summary from this backstory?  It should include a summary of who the npc is (behaviors and traits),
+         as well as current motivations, location, disposition with regards to the player, skills, and current status.
+         
+         [npc_name]
+         {npc_name}
+
+         [backstory]
+         {backstory}
+         
+         '''''
+         You must format your output as a JSON dictionary that adheres to the following JSON schema instance:
+         "role": "role of {npc_name} in the game",
+         "personality": "the general personality of {npc_name}",
+         "motivations": "the current motivations of {npc_name}",
+         "values": "values and or beliefs of {npc_name},
+         "location": "where {npc_name} currently is",
+         "plans": "any current plans that {npc_name} has"
+         """
+        prompt_from_template = PromptTemplate(template=template, input_variables=['backstory','npc_name'])
+        llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
+        response = llm_chain.run(backstory=backstory,npc_name=self.npc_name)
+        print(response)
+        response = json.loads(response)
+        set_default_generative_agent_summary(world_name=self.world_name,npc_name=self.npc_name,summary=response)
+        
+
 
     def _pickle_memory_stream(self):
         with open(self.memory_stream_filepath, 'wb') as f:
@@ -94,26 +141,54 @@ class LongTermMemory():
         return 1.0 - score / math.sqrt(2)
 
     def _load_faiss(self):
-        try:
-            if os.path.exists(self.game_designer_vector_store_index_path) and not os.path.exists(self.vector_store_index_path):
-                return FAISS.load_local(self.game_designer_vector_store_index_path, OpenAIEmbeddings)
-            else:
-                return FAISS.load_local(self.vector_store_index_path, OpenAIEmbeddings())
-        except:
+        #load game specific index if it exists
+        if os.path.exists(os.path.join(self.vector_store_index_path,'index.faiss')):
+            output = FAISS.load_local(self.vector_store_index_path, OpenAIEmbeddings())
+            print('LOADED GAME SAVE SPECIFIC INDEX')
+            return output
+        #else the default if it exists
+        elif os.path.exists(os.path.join(self.game_designer_vector_store_index_path, 'index.faiss')):
+            output = FAISS.load_local(self.game_designer_vector_store_index_path, OpenAIEmbeddings())
+            print('LOADED DEFAULT INDEX')
+            return output
+        else:
             embeddings_model = OpenAIEmbeddings()
             embedding_size = 1536
             index = faiss.IndexFlatL2(embedding_size)
-            return FAISS(
+            output = FAISS(
                 embeddings_model.embed_query,
                 index,
                 InMemoryDocstore({}),
                 {},
                 relevance_score_fn=self._relevance_score_fn,
             )
+            print('LOADED EMPTY NEW INDEX')
+            return output
+        
+    def _delete_folder_and_contents(self, folder_path):
+        try:
+            # Check if the path exists and is a directory
+            if os.path.exists(folder_path) and os.path.isdir(folder_path):
+                # Remove all files and subdirectories inside the folder
+                for item in os.listdir(folder_path):
+                    item_path = os.path.join(folder_path, item)
+                    if os.path.isfile(item_path):
+                        os.remove(item_path)
+                    elif os.path.isdir(item_path):
+                        os.rmdir(item_path)
+                # Remove the empty folder itself
+                os.rmdir(folder_path)
+                print(f"Deleted folder and its contents: {folder_path}")
+            else:
+                print(f"Folder does not exist: {folder_path}")
+        except Exception as e:
+            print(f"Error deleting folder: {e}")
         
     def _delete_faiss(self):
+        '''deletes the index itself not the dir'''
         if os.path.exists(self.vector_store_index_path):
-            os.remove(self.vector_store_index_path)
+            self._delete_folder_and_contents(self.vector_store_index_path)
+            # os.remove(self.vector_store_index_path)
     
     def _save_faiss(self):
         self.faiss.save_local(self.vector_store_index_path)
@@ -123,19 +198,18 @@ class LongTermMemory():
         print('into add_memories')
         print(type(observations))
         print(observations)
+
         for obs in observations:
             self.gen_memory.add_memory(obs)
-        # self.gen_memory.add_memories(memory_content=";".join(observations))
-        # self.gen_memory.add_memories(memory_content=obs)
-        # for obs in observations:
-        #     self.gen_memory.add_memory(memory_content=obs)
+        
+        # print('---here are all of the memories we are pickling:\n',self.memory_retriever.memory_stream,'\n----------')
         
         self._save_faiss()
         self._pickle_memory_stream()
         
 
     def fetch_memories(self, observation: str, k: Optional[int] = 5):
-        fetched_memories = self.faiss.similarity_search_with_relevance_scores(observation, k=k)
+        fetched_memories = self.faiss.similarity_search_with_relevance_scores(query=observation, k=k)
         # fetched_memories = self.gen_memory.fetch_memories(observation=observation)[0:k]
         page_contents = [m[0].page_content for m in fetched_memories]
         for memory in fetched_memories:

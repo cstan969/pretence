@@ -21,7 +21,8 @@ from mongodb.mongo_fncs import (
     get_available_npc_objectives_for_user,
     update_npc_objective_game_state,
     get_npc_objectives,
-    get_npcs_objectives_for_user
+    get_npcs_objectives_for_user,
+    get_generative_agent_summary
 )
 from config import NpcUserInteraction_model
 from langchain import PromptTemplate, LLMChain
@@ -110,7 +111,7 @@ class NpcUserInteraction():
     #     return final_emotional_state
         
     def get_conversation(self):
-        convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name, num_interactions=12)
+        convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name, num_interactions=6)
         if convo is None:
             return "Player" + ": Placeholder dialog\n" + self.npc_name + ": Placeholder dialog"
         else:
@@ -303,11 +304,15 @@ class NpcUserInteraction():
         {npc_name} must not assist the player as a standard chat assistant would.
         {npc_name} must not leave their location.  If the player wants {npc_name} to go somewhere with them, {npc_name} must make up a reason why he/she cannot.""".format(npc_name=self.npc_name)
     
+    def _load_gen_ag_summary(self):
+        return f"Here is general information pertaining to {self.npc_name}:" + json.dumps(get_generative_agent_summary(world_name=self.world_name, npc_name=self.npc_name,user_name=self.user_name))
+
     def _get_prompt(self):
         prompt_assembly_fncs_in_order = [
             self._load_generic_npc_prompt(), #role of any NPC generically
             self._load_fourth_wall(),
             self._load_prompt_info_from_npc_objectives_state(),
+            self._load_gen_ag_summary(),
             # self._load_scene_objectives(), # the objectives of the scene for the protagonist to meet
             # self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
             self._load_npc_prompt(), # summarization of the NPC (personality etc)
@@ -448,6 +453,7 @@ class NpcUserInteraction():
 
     def _load_knowledge(self):
         knowledge_from_tags = self._load_knowledge_via_llamaindex_agent()
+        print('knowledge_from_tags: ', knowledge_from_tags)
         knowledge_from_npc = "" if 'knowledge' not in list(self.npc) or self.npc['knowledge'] == "" else self.npc['knowledge']
         knowledge = f"\n\nHere is some game knowledge that {self.npc_name} is aware of:\n{knowledge_from_npc}\n{knowledge_from_tags}"
         return knowledge

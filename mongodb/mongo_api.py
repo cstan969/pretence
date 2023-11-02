@@ -249,7 +249,10 @@ def convert_availability_logic_from_id_to_name(q:dict):
     return {
         'name_based_availability_logic': fncs.convert_availability_logic_from_id_to_name(expr=expr)
     }
-    
+
+@app.post("/delete_all_observations_for_clean_default_game_state")
+def delete_all_observations_for_clean_default_game_state(q:dict):
+    return fncs.delete_all_observations_for_clean_default_game_state(world_name=q['world_name'], npc_name=q['npc_name'])
 
 
 

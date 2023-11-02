@@ -510,6 +510,9 @@ def upsert_observation(observation: str, world_name: str, user_name: str, npc_na
 def get_observations(world_name: str, user_name: str, npc_name: str):
     return query_collection(collection_name='observations',query={'world_name':world_name,'user_name': user_name,'npc_name':npc_name})
 
+def delete_all_observations_for_clean_default_game_state(world_name: str, npc_name: str):
+    delete_items(collection_name='observations', query={'world_name':world_name,'npc_name':npc_name})
+
 
 #####################
 #####GenAg State#####
@@ -525,6 +528,29 @@ def upsert_generative_agent_state(world_name: str, user_name: str, npc_name:str,
         'npc_name':npc_name,
         'gen_ag_memory_aggregate_importance':gen_ag_memory_aggregate_importance
     })
+
+def set_default_generative_agent_summary(world_name: str, npc_name: str, summary: str):
+    collection_name='generative_agent_states'
+    user_name='DefaultGameDesignerUserName'
+    _id = '-'.join([world_name,user_name,npc_name])
+    upsert_item(collection_name=collection_name,item={
+        '_id':_id,
+        'world_name':world_name,
+        'user_name':user_name,
+        'npc_name':npc_name,
+        'genAgSummary':summary
+    })
+
+def get_generative_agent_summary(world_name: str, npc_name: str, user_name: str):
+    collection_name='generative_agent_states'
+    default_user_name='DefaultGameDesignerUserName'
+    items = query_collection(collection_name=collection_name,query={'world_name':world_name,'npc_name':npc_name,'user_name':user_name})
+    if len(items)==1 and 'genAgSummary' in list(items[0]):
+        return items[0]['genAgSummary']
+    items = query_collection(collection_name=collection_name,query={'world_name':world_name,'npc_name':npc_name,'user_name':default_user_name})
+    if len(items)==1 and 'genAgSummary' in list(items[0]):
+        return items[0]['genAgSummary']
+    return ""
 
 def get_generative_agent_memory_aggregate_importance(world_name: str, user_name: str, npc_name:str):
     collection_name='generative_agent_states'
