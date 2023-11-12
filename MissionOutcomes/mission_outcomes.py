@@ -1,16 +1,18 @@
 
 from mongodb.mongo_fncs import (
     get_mission,
-    get_npc
+    get_npc,
+    update_mission_game_state,
+    get_knowledge
 )
 
 from langchain import PromptTemplate, LLMChain
 from langchain.chat_models import ChatOpenAI
 import json, os, pprint
-from langchain.llms import LlamaCpp
 from langchain import PromptTemplate, LLMChain
-from langchain.callbacks.manager import CallbackManager
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from LlmFunctions.llm_functions import genKGQuestionsGivenMissionBrief, genLTMQuestionsGivenMissionInfo
+from KnowledgeBase.knowledge_retriever import LlamaIndexKnowledgeAgent, write_knowledge_to_tag1
+from LongTermMemory.long_term_memory import LongTermMemory
 
 
 class MissionOutcomes():
@@ -19,29 +21,34 @@ class MissionOutcomes():
         self.world_name = world_name
         self.user_name = user_name
         self.npc_names = npc_names
+        self.mission_id = mission_id
         self.mission = get_mission(mission_id=mission_id)
         self.mission_name = self.mission['mission_name']
         self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
+        self.formatted_mission_outcomes = self._get_formatted_list_of_possible_mission_outcomes()
 
-        # self.llm = LlamaCpp(
-        #     model_path="/home/carl/Pretence/models/llama2-chronos-hermes-13b/chronos-hermes-13b-v2.ggmlv3.q5_0.bin",
-        #     n_gpu_layers=50,
-        #     n_batch=512,
-        #     temperature=0.75,
-        #     max_tokens=2000,
-        #     top_p=1,
-        #     callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
-        #     verbose=True,
-        #     n_ctx=2000,
-        # )
+    def fix_json(self, json_to_fix: str):
+        template = """I have some broken JSON below that I need to be able to run json.loads() on.  Can you fix it for me? Thanks.\n\n{question}"""
+        prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
+        llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
+        response = llm_chain.run(json_to_fix)
+        return response
 
     def _load_mission_prompt(self):
-        return """I am making a video game where I, the player of the game, am the leader of a mercenary guild. As part of the game, I am given missions and I must assign member(s) of the mercenary guild to go on these missions. Depending on the mission, the mission is liable to succeed or fail depending on the mercenary members that I assign to the mission. I am going to give you information about the mission and then also give you information about the mercenary guild member(s) that were assigned to go on the mission."""
+        # return """I am making a video game where I, the player of the game, am the leader of a mercenary guild.
+        # As part of the game, I am given missions and I must assign member(s) of the mercenary guild to go on these missions.
+        # The mercenary member(s) go on their own, without me, the guild leader. 
+        # Depending on the mission, the mission is liable to succeed or fail depending on the mercenary members that I assign to the mission. 
+        # I am going to give you information about the mission and then also give you information about the mercenary guild member(s) that were assigned to go on the mission."""
     
+        return """As part of a video game, mercenary member(s) are assigned to go on various missions.
+        Depending on the mission, the mission is liable to succeed or fail depending on the mercenary members that I assign to the mission. 
+        I am going to give you information about the mission and then also give you information about the mercenary guild member(s) that were assigned to go on the mission."""
+
     def _load_mission_brief(self):
         return "Here is the mission briefing: " + self.mission['mission_briefing']
     
-    def _load_possible_mission_outcomes(self):
+    def _get_formatted_list_of_possible_mission_outcomes(self):
         possible_outcomes = self.mission['possible_outcomes']
         possible_outcomes_given_npcs = []
         for outcome in possible_outcomes:
@@ -51,13 +58,10 @@ class MissionOutcomes():
         formatted_outcomes = []
         for i, outcome in enumerate(possible_outcomes_given_npcs, start=1):
             formatted_outcomes.append(f"{i}. {outcome['outcome_name']} - {outcome['outcome_summary']}")
-        outcome_message = "Here are the possible mission outcomes:\n" + "\n".join(formatted_outcomes)
+        return formatted_outcomes
 
-
-        
-        # new_list_of_dicts = [{key: dct[key] for key in ['outcome_name','outcome_summary']} for dct in possible_outcomes_given_npcs]
-        # outcome_string = str(new_list_of_dicts)
-        return outcome_message
+    def _load_possible_mission_outcomes(self):
+        return "Here are the possible mission outcomes:\n" + "\n".join(self.formatted_mission_outcomes)
 
     
     def _load_npc_summaries(self):
@@ -67,41 +71,188 @@ class MissionOutcomes():
             personality = npc['personality']
             npc_summaries[npc_name] = personality
         return f"Here are the mercenary member(s) assigned to the mission:\n{npc_summaries}"
-        
-
     
-
+    def _load_knowledge(self):
+        questions_for_kg = genKGQuestionsGivenMissionBrief(mission_brief=self.mission['mission_briefing'])
+        combined_knowledge = []
+        for npc_name in self.npc_names:
+            ka = LlamaIndexKnowledgeAgent(world_name=self.world_name,npc_name=npc_name, user_name=self.user_name)
+            knowledge = ka.query_index(queries=questions_for_kg)
+            combined_knowledge.extend(knowledge)
+        return f"Here is the knowledge that the NPCs are aware of that may be pertinent to the mission:\n{combined_knowledge}"
     
-        
+    def _load_long_term_memories(self):
+        questions_for_ltm = genLTMQuestionsGivenMissionInfo(mission_brief=self.mission['mission_briefing'], formatted_mission_outcomes=self.formatted_mission_outcomes)
+        pprint.pprint(questions_for_ltm)
+        combined_ltms = []
+        for npc_name in self.npc_names:
+            ltm = LongTermMemory(world_name=self.world_name,user_name=self.user_name,npc_name=npc_name)
+            for q in questions_for_ltm:
+                memories = ltm.fetch_memories(q,k=2)
+                combined_ltms.extend(memories)
+        return f"Here are the companions' relevant long term memories:\n{combined_ltms}"
 
+        
     def get_mission_outcome_and_debriefing(self):
         prompt_assembly_fncs_in_order = [
             self._load_mission_prompt(), #generic prompt to LLM so it knows what is going on
             self._load_mission_brief(), #the specific mission brief
             self._load_possible_mission_outcomes(), #the possible mission outcomes per the NPCs selected
-            self._load_npc_summaries()
+            self._load_npc_summaries(),
+            self._load_knowledge(),
+            self._load_long_term_memories()
         ]
-        prompt = "\n\n'''''\n".join([fnc for fnc in prompt_assembly_fncs_in_order])
+        mission_context = "\n\n'''''\n".join([fnc for fnc in prompt_assembly_fncs_in_order])
+#         template2 = """I'd like you to craft a mission narrative for me.  I will give you background information and then give you a general framework to guide the story, but please feel free to flex your creative muscles:
+
+#         '''''
+#         [Information]: {question}
+
+#         '''''
+#         [Narrative Framework]: You must format your output as a JSON value that adheres to the following JSON schema instance:
+
+# "Objective": "Begin with a clear mission goal. What are the NPCs trying to achieve? However, if the mission's objective isn't immediately clear or evolves, that's perfectly fine—some of the best stories involve discovering the purpose along the way."
+# "List of NPCs": "Introduce the NPCs central to this mission. Give a brief overview of who they are and their roles. If they have any unique quirks, backgrounds, or attributes, make sure to sprinkle those in."
+# "Setting the Scene": "Provide a backdrop or immediate context for the mission. Is it a rescue mission in a war-torn city? A heist in a lavish mansion? Feel free to dive into the ambiance and atmosphere."
+# "Preparation Phase": "Should there be any unique preparations, strategies, or pre-mission rituals that the NPC(s) carry out, detail them here."
+# "Emotions at the Onset": "Dive into the NPCs' mindset. Are they confident? Anxious? Hopeful? Reflect their feelings as they embark on the mission, but allow for shifts in their emotions based on unfolding events."
+# "Obstacles and Challenges": "As the NPCs progress, what hurdles do they face? This can range from tangible enemies to internal moral dilemmas. Let their challenges shape the flow of the narrative."
+# "High Tension Moments": "Amplify moments of tension or action, especially if they arise from mission-specific challenges. These scenes can make the narrative pulse with life."
+# "Decision Points": "Throughout the mission, the NPCs will make decisions. Some may be minor, while others could pivot the entire direction of the mission. If these decisions tie back to NPC attributes or past player decisions, that connection could enrich the narrative."
+# "Climactic Moments": "Detail the pinnacle of the mission. Is there a significant showdown, revelation, or twist? Let the narrative build to this crescendo."
+# "Consequences": "The actions of the NPCs will have repercussions. These could be immediate or set the stage for future missions. Rewards, information gained, alliances formed, or setbacks—paint the picture of the aftermath."
+# "Character Development": "If something significant or transformative happens to an NPC during the mission, showcase their growth or evolution. How have their experiences shaped them?"
+# "Echoes into the Future": "To wrap, hint at the potential long-term effects of this mission. Whether it's a subtle foreshadowing or a more overt cliffhanger, let the narrative suggest what might come next."
+# "outcome": "the name of the outcome that.  This must be an outcome name from the list of possible mission outcomes" """
+        
         template = """{question}
         \n'''''
         Here is additional information for writing 'mission_narrative':
-In paragraph 1 introduce the mission's setting and context. Describe the initial problem or challenge that the mercenary guild was tasked with addressing. Highlight the importance of the mission and the potential consequences if left unresolved. Emphasize the mission's specific objectives and potential outcomes, including both success and failure scenarios. This paragraph should lay the foundation for the readers to understand the mission's significance and what's at stake.
-In paragraph 2 detail the actions and decisions made by the mercenary or mercenaries assigned to the mission. Describe their approach and strategy and why they chose the method they did. Describe initial interactions with the situation or enemies. Provide a vivid portrayal of the conflict, whether it's a battle, negotiation, or investigation, depending on the nature of the mission. Highlight any challenges or obstacles the mercenaries faced, as well as any moments of tension, suspense, or unexpected twists that occurred during the mission. This paragraph should create a sense of anticipation and engagement as the readers follow the unfolding events.
-In paragraph 3 wrap up the account by describing the mission's resolution and its aftermath. Clarify the outcome of the mission, whether it was a success or failure, and how it aligned with the potential outcomes outlined earlier. Explain the consequences of the mercenary or mercenaries' actions on the mission's overall objective and the people or entities involved. Delve into the impact of the resolution on the mercenary characters themselves, both emotionally and in terms of personal growth. Touch on how the mission's completion might influence future quests or interactions within the game world. This paragraph should provide a satisfying conclusion to the mission account while also paving the way for new developments.
-The narrative should be written in such a way that the player reads the story as if reading a novel.  mission_narrative should simply be a string.  It should not mention 
+        Generate a mission narrative for a game using the following structure: Begin with a 'Brief Recap' that summarizes the mission's objective and lists the chosen NPC(s). Transition into 'Departure', painting a scene of the mission preparations and capturing the emotions and thoughts of the NPCs as they start their journey. Introduce 'Challenges & Encounters', detailing the obstacles or confrontations the NPCs face, adding tension and action. As the narrative unfolds, highlight 'Decision Points', emphasizing critical choices made by NPCs and showing their consequences. Build the story to its 'Climax', narrating the peak and most intense moments of the mission. Follow with the 'Outcome', describing whether the mission was a success or failure and the direct consequences of NPC actions. Detail the 'Aftermath', illustrating post-mission events, the NPCs' return, and any character development. Finally, wrap up with a 'Feedback Loop' that offers reflection on the mission, player choices, and hints for future strategy. Using this structure, craft a dynamic mission narrative based on specific player choices and mission details.    
         
         '''''
         You must format your output as a JSON value that adheres to the following JSON schema instance:
-        'outcome' : the name of the outcome that the NPC chose.
-        'mission_narrative_summary': a summary of what happened during the mission.
-        'mission_narrative': This should just be a simple python string.  A 3 paragraph long narrative that explains what happened in the mission.  This should be written like a detailed story.
-        'npc_observations': a dictionary with keys equal to each mercenary name and values that are a list of memories/observations that the mercenary takes away from the mission.
-        'npc_outcome_reasoning': for each potential outcome, explain why the mercenary of mercenaries assigned to this mission might result in said outcome(s)."""
+    "Summarize the mission's objective": "Provide a concise recap of what the mission seeks to achieve.",
+    "List the chosen NPC(s) for the mission": "Identify and provide brief information on the non-player characters selected for the task.",
+    "Set the immediate context for the story": "Offer a backdrop or situation that sets the stage for the upcoming mission.",
+    "Describe mission preparations": "Narrate the steps, arrangements, or strategies decided upon before embarking on the mission by the chosen NPCs.",
+    "Convey NPC emotions/thoughts as the mission starts": "Capture the feelings, mindset, or expectations of the NPCs as they begin their task.",
+    "Set the initial tone": "Establish the atmosphere, mood, or general sentiment at the onset of the mission.",
+    "Detail obstacles or confrontations faced": "Elaborate on challenges, enemies, or dilemmas the NPCs encountered during their journey.",
+    "Create tension and action sequences based on the mission's challenges": "Construct thrilling and suspenseful moments deriving from the mission's hurdles.",
+    "Emphasize critical choices made by NPCs": "Highlight decisions or crossroads that had significant impact on the mission's direction.",
+    "Relate choices to NPC attributes or prior player decisions": "Connect decisions to the character traits of NPCs or actions taken by the player in previous scenarios.",
+    "Show the consequence of these decisions on the mission": "Illustrate the outcomes, results, or repercussions of the choices made during the mission.",
+    "Narrate the peak of the mission": "Provide a detailed account of the climax or pinnacle moment of the mission.",
+    "Describe the most intense or revealing moment": "Delve into the highlight or major twist of the mission, capturing its intensity.",
+    "State mission results (success/failure)": "Clearly announce the outcome of the mission, indicating whether objectives were met or not.",
+    "Outline direct consequences of NPC actions": "List the immediate effects, results, or changes brought about by the actions of the NPCs during the mission.",
+    "Highlight tangible rewards or setbacks": "Spotlight any physical rewards, information gained, alliances formed, or setbacks faced as a result of the mission's outcome.",
+    "Narrate the post-mission events": "Detail events or situations that arise after the main mission concludes.",
+    "Describe the NPCs' return and any character development": "Narrate the condition, mindset, or any growth of the NPCs as they return from the mission.",
+    "Highlight potential long-term consequences or future hints": "Provide clues, foreshadowing, or implications of the mission's impact on future events or missions."
+    "outcome" : "the name of the outcome that the NPC chose."
+"""
         prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
         llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
-        response = llm_chain.run(prompt)
+        response = llm_chain.run(mission_context)
         print(response)
-        response = json.loads(response)
+        try:
+            response = json.loads(response)
+        except:
+            response = self.fix_json(response)
+            response = json.loads(response)
         pprint.pprint(response)
-        return response
+        outcome = response['outcome']
 
+
+
+        #PART 2.  GENERATE FULL NARRATIVE FROM DICTIONARY REPRESENTATION
+        template = """{mission_context}
+        
+        '''''
+        [mission_outcome]
+        {mission_outcome}
+        
+        '''''
+        [output]
+        Write a 3 paragraph narrative of the mission based on the [mission_outcome].
+        Expand upon the narrative I provided earlier, weaving in dialogue, emotions, actions, and the characters' thought processes,
+        while retaining the perspective of a third-person narrator.
+        The player, e.g. the mercenary manager, should not be included in the narrative.  The narrative should include NPCs' thoughts in regards to the mission, their prep, """
+        prompt_from_template = PromptTemplate(template=template, input_variables=["mission_context","mission_outcome"])
+        llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
+        response = llm_chain.run(mission_context=mission_context, mission_outcome=response)
+        print(response)
+
+        #PART 3. Rewrite the narrative "take your time" and make it better
+        template = """Can you take a look at the following statement, take your time to figure out what could be improved, 
+        and then rewrite the following narrative to make it better?  The narrative should be 3 paragraphs long and roughly 15 sentences.\n\n{narrative}"""
+        prompt_from_template = PromptTemplate(template=template, input_variables=["narrative"])
+        llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
+        response = llm_chain.run(narrative=response)
+        print(response)
+
+        
+
+        #PART 4. Acquire entity-specific (e.g. the tags associated with the mission) knowledge from the LLM and add it to the KB(s)
+        associated_tags = self.mission['associated_knowledge_tags']
+        associated_tags.extend(self.npc_names)
+        entities = [get_knowledge(world_name=self.world_name, tag=tag)[0] for tag in associated_tags]
+        entities = [{'entity':entity['tag'],'description':entity['knowledge_description']} for entity in entities]
+        print('---associated tags: ', associated_tags)
+        print('---entities: ', entities)
+        
+        if len(associated_tags) > 0:
+            template = """Given a mission narrative and list of entities I want you to extract knowledge from the mission narrative pertaining to each of those entities.
+            I need to be able to store this information in a knowledge base where each entity has it's own Document store.  Divide the information into documents based upon these entities.
+            It should be written from the perspective of if some npc knows about the entity, then they would know "such and such".
+            '''''
+            [entities]={entities}
+            
+            '''''
+            [mission_narrative]={mission_narrative}
+            
+            '''''
+            You must format your output as a JSON value that adheres to the following JSON schema instance:
+            "knowledge": A dictionary where the keys are each entity name in [entities] and the values are the knowledge extracted from the [mission_narrative] 
+            """
+            prompt_from_template = PromptTemplate(template=template, input_variables=["entities", "mission_narrative"])
+            llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
+            knowledge_response = llm_chain.run(entities=entities, mission_narrative=response)
+            print(type(knowledge_response))
+            try:
+                knowledge_response = json.loads(knowledge_response)
+            except:
+                print(type(knowledge_response))
+                knowledge_response = self.fix_json(knowledge_response)
+                print(type(knowledge_response))
+                knowledge_response = json.loads(knowledge_response)
+                print(type(knowledge_response))
+            pprint.pprint(knowledge_response)
+            print('-----knowledge response-----')
+            print(knowledge_response)
+            knowledges = knowledge_response['knowledge']
+            for entity in entities:
+                knowledge = knowledges[entity['entity']]
+                write_knowledge_to_tag1(world_name=self.world_name,user_name=self.user_name,tag=entity['entity'],knowledge=knowledge)
+
+        #PART 5. Add observations to Companions' LTMs
+        for npc_name in self.npc_names:
+            ltm = LongTermMemory(world_name=self.world_name, user_name=self.user_name,npc_name=npc_name)
+            ltm.add_memories_from_mission_debrief(mission_debrief=response)
+        
+
+
+        #Update the mission game state
+        update_mission_game_state(
+            world_name=self.world_name,
+            user_name=self.user_name,
+            mission_id=self.mission_id,
+            mission_status = "completed",
+            mission_outcome=outcome,
+            mission_debrief=response,
+            npcs_sent_on_mission=self.npc_names
+        )
+
+        return {'mission_narrative': response}

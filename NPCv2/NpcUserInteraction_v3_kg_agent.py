@@ -15,16 +15,14 @@ from LongTermMemory.long_term_memory import LongTermMemory
 
 from mongodb.mongo_fncs import (
     get_npc,
-    get_latest_npc_emotional_state,
     get_formatted_conversational_chain,
     upsert_user_npc_interaction,
     get_world,
-    get_scene,
-    get_scene_objectives_completed,
-    mark_objectives_completed,
-    progress_user_to_next_scene,
-    get_scene_objectives_status,
-    get_knowledge_files_npc_has_access_to
+    get_available_npc_objectives_for_user,
+    update_npc_objective_game_state,
+    get_npc_objectives,
+    get_npcs_objectives_for_user,
+    get_generative_agent_summary
 )
 from config import NpcUserInteraction_model
 from langchain import PromptTemplate, LLMChain
@@ -35,10 +33,8 @@ DEBUGGING = False
 
 class NpcUserInteraction():
 
-    def __init__(self, world_name:str, scene_id:str, npc_name:str, user_name:str):
+    def __init__(self, world_name:str, npc_name:str, user_name:str):
         self.world_name=world_name
-        self.scene_id=scene_id
-        self.scene = get_scene(scene_id=scene_id)
         self.npc_name=npc_name
         self.user_name = user_name
         self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
@@ -46,6 +42,9 @@ class NpcUserInteraction():
         # self.llm = ChatOpenAI(model='gpt-4')
         # self.llm = ChatOpenAI(model=NpcUserInteraction_model)
         self.npc = get_npc(world_name,npc_name)
+
+        self.npc_objectives = get_npc_objectives(world_name=world_name, npc_name=npc_name)
+        self.state_of_npc_objectives = get_npcs_objectives_for_user(world_name=world_name,npc_name=npc_name,user_name=user_name)
 
     def _get_speech_pattern(self, npc_emotional_state):
         patterns = {
@@ -112,58 +111,65 @@ class NpcUserInteraction():
     #     return final_emotional_state
         
     def get_conversation(self):
-        convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name, num_interactions=12)
+        convo = get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name, num_interactions=6)
         if convo is None:
-            return "Player" + ": hello\n" + self.npc_name + ": hello"
+            return "Player" + ": Placeholder dialog\n" + self.npc_name + ": Placeholder dialog"
         else:
             return convo.replace(self.user_name,'Player')
         
     async def run_prompt_to_get_objective_completion(self, input_response: dict)->dict:
-        '''given the current conversation with the current npc, figure out which objectives are completed for the current scene'''
+        '''given the current conversation with the current npc, figure out which objectives are completed for the NPC'''
+        #conversation
+        convo = self.get_conversation()
+        available_npc_objective_game_states = [obj for obj in self.state_of_npc_objectives if obj['status']=='available']
+        available_npc_objective_game_state_ids = [obj['npc_objective_id'] for obj in available_npc_objective_game_states]
+        available_npc_objectives = [obj for obj in self.npc_objectives if obj['_id'] in available_npc_objective_game_state_ids]
+        list_of_objectives_completion_strings = [obj['objective_completion_string'] for obj in available_npc_objectives]
+        template = """Contextual Information:
+        {question}
+
+        Required Output: You must format your output as a JSON dictionary that adheres to a given JSON scehema instance with the following keys:
+            'objectives_completed': A dict with keys that EXACTLY MATCH the objectives as given in the player_scene_objectives list.  The values for each key value pair in this dict should be either 'completed' or 'not_completed' depending on whether that objective has been completed.
+            'objectives_completed_reason': A string that describes why or why not the objective(s) were marked as either completed or not completed."""
+        prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
+        llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
+
+
+        prompt = """Based off of the conversation below, which of the conversational objectives have been completed?
+        player_scene_objectives:
+        {objectives}
+
+        This is the conversation between the player and the NPC so far.
+        CONVERSATION:
+        {conversation}""".format(objectives=list_of_objectives_completion_strings,conversation=convo)
+        response = llm_chain.run(prompt)
+        print(response)
+        print('type of response in objc prompt: ', type(response))
         try:
-            convo = self.get_conversation()
-            # get_formatted_conversational_chain(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name, num_interactions=6).replace(self.user_name,'Player')
-            scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-            
-            # prompt = """For a given conversation and given list of conversational objectives to be completed by the player or NPCs.  Tell me which conversational objectives have been completed.
-            # Based off of the conversation below, which of the conversational objectives have been completed?
-            # player_scene_objectives:
-            # {objectives}
-
-            # This is the conversation between the player and the NPC so far.
-            # CONVERSATION:
-            # {conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
-
-            template = """Contextual Information:
-            {question}
-
-            Required Output: You must format your output as a JSON dictionary that adheres to a given JSON scehema instance with the following keys:
-                'objectives_completed': A dict with keys that EXACTLY MATCH the objectives as given in the player_scene_objectives list.  The values for each key value pair in this dict should be either 'completed' or 'not_completed' depending on whether that objective has been completed.
-                'objectives_completed_reason': A string that describes why or why not the objective(s) were marked as either completed or not completed."""
-            prompt_from_template = PromptTemplate(template=template, input_variables=["question"])
-            llm_chain = LLMChain(prompt=prompt_from_template,llm=self.llm, verbose=True)
-
-
-            prompt = """Based off of the conversation below, which of the conversational objectives have been completed?
-            player_scene_objectives:
-            {objectives}
-
-            This is the conversation between the player and the NPC so far.
-            CONVERSATION:
-            {conversation}""".format(objectives=scene_objectives_status['available'],conversation=convo)
-            response = llm_chain.run(prompt)
-            print(response)
-            print('type of response in objc prompt: ', type(response))
             response = json.loads(response)
-            print('type of response in objc prompt: ', type(response))
-            input_response['objectives_completed'] = response['objectives_completed']
-            input_response['objectives_completed_reason'] = response['objectives_completed_reason']
-            return input_response
-        except Exception as e:
-            print('Exception inside of run_prompt_to_get_objective_completion:\n', str(e))
-            print('type(input_response): ', type(input_response))
-            print('type(response): ', type(response))
-            return input_response
+        except:
+            response = self.fix_json(response)
+            response = json.loads(response)
+
+        #completed objectives
+        for obj in available_npc_objectives:
+            print(obj)
+            print(obj['objective_completion_string'])
+            if obj['objective_completion_string'] in list(response['objectives_completed']):
+                if response['objectives_completed'][obj['objective_completion_string']] == 'completed':
+                    update_npc_objective_game_state(
+                    world_name=self.world_name,
+                    user_name=self.user_name,
+                    npc_name=self.npc_name,
+                    npc_objective_id=obj['_id'],
+                    npc_objective_status="completed"
+                    )
+            
+
+        print('type of response in objc prompt: ', type(response))
+        input_response['objectives_completed'] = response['objectives_completed']
+        input_response['objectives_completed_reason'] = response['objectives_completed_reason']
+        return input_response
 
     def fix_json(self, json_to_fix):
         template = """I have some broken JSON below that I need to be able to run json.loads() on.  Can you fix it for me? Thanks.\n\n{question}"""
@@ -256,10 +262,7 @@ class NpcUserInteraction():
         #     self.post_process_npc_response(input_response=response)
         # )
         response_objectives = await self.run_prompt_to_get_objective_completion(input_response=response)
-        # response_objectives = await asyncio.gather(self.run_prompt_to_get_objective_completion(input_response=response))[0]
         pprint.pprint(response)
-        print('type(response): ', type(response))
-        print('type(response_objectives): ', type(response_objectives))
         print(response_objectives)
         # response['npc_response'] = response_speech_patterns['postprocessed_npc_response']
         # response['postprocessed_npc_response_reasoning'] = response_speech_patterns['postprocessed_npc_response_reasoning']
@@ -271,22 +274,12 @@ class NpcUserInteraction():
             world_name=self.world_name,
             user_name=self.user_name,
             npc_name=self.npc_name,
-            scene_id=self.scene_id,
             user_message=response['user_message'],
             npc_response=response['npc_response'],
             npc_emotional_response=response['npc_emotional_state'],
-            # npc_emotional_state=final_emotional_state
             )
+    
         
-        
-        # mark the objectives that've been completed.  The output is the DB item with full list of completed objectives from the database
-        updated_item = mark_objectives_completed(objectives_completed=response['objectives_completed'],scene_id=self.scene_id,user_name=self.user_name)
-        if all(val == 'completed' for val in updated_item['objectives_completed'].values()):
-            #mark the scene as the current scene in the world that the user is on
-            progress_user_to_next_scene(world_name=self.world_name,user_name=self.user_name)
-            response['scene_completed'] = True
-        else:
-            response['scene_completed'] = False
 
         self.ltm.add_memories([self.user_name + " said to " + self.npc_name + " '" + self.user_message + "'.",
                                self.npc_name + " said to " + self.user_name + " '" + response['npc_response'] + "'."])
@@ -311,12 +304,17 @@ class NpcUserInteraction():
         {npc_name} must not assist the player as a standard chat assistant would.
         {npc_name} must not leave their location.  If the player wants {npc_name} to go somewhere with them, {npc_name} must make up a reason why he/she cannot.""".format(npc_name=self.npc_name)
     
+    def _load_gen_ag_summary(self):
+        return f"Here is general information pertaining to {self.npc_name}:" + json.dumps(get_generative_agent_summary(world_name=self.world_name, npc_name=self.npc_name,user_name=self.user_name))
+
     def _get_prompt(self):
         prompt_assembly_fncs_in_order = [
             self._load_generic_npc_prompt(), #role of any NPC generically
             self._load_fourth_wall(),
-            self._load_scene_objectives(), # the objectives of the scene for the protagonist to meet
-            self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
+            self._load_prompt_info_from_npc_objectives_state(),
+            self._load_gen_ag_summary(),
+            # self._load_scene_objectives(), # the objectives of the scene for the protagonist to meet
+            # self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
             self._load_npc_prompt(), # summarization of the NPC (personality etc)
             self._load_knowledge(), #knowledge the NPC is aware of (via tags)
             self._load_long_term_memory(),
@@ -329,8 +327,8 @@ class NpcUserInteraction():
         prompt_assembly_fncs_in_order = [
             self._load_generic_npc_prompt(), #role of any NPC generically
             self._load_fourth_wall(),
-            self._load_scene_objectives(), # the objectives of the scene for the protagonist to meet
-            self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
+            # self._load_scene_objectives(), # the objectives of the scene for the protagonist to meet
+            # self._load_npc_in_scene_prompt(), # role of the NPC in the scene (objectives etc)
             self._load_npc_prompt(), # summarization of the NPC (personality etc)
             self._load_npc_in_world_prompt(), # role of the NPC in the world
         ]
@@ -343,58 +341,90 @@ class NpcUserInteraction():
             generic_npc_prompt = """I want you to roleplay as an NPC, {npc_name}, in a video game. {npc_name}'s dialogue adjusts based on their emotional state, showcasing nuances such as sarcasm, humor, or hesitation. Importantly, {npc_name} brings context into their interactions, referencing their knowledge of the world.""".format(npc_name=self.npc_name)
         return generic_npc_prompt
     
-    def _load_npc_in_scene_prompt(self):
-        '''originally this was a single prompt that is pulled from the front end.  Now this is a scene prompt that is
-        based off of objective completion as well.'''
+    # def _load_npc_in_scene_prompt(self):
+    #     '''originally this was a single prompt that is pulled from the front end.  Now this is a scene prompt that is
+    #     based off of objective completion as well.'''
 
-        #NEW
-        scene = get_scene(scene_id=self.scene_id)
-        npc_prompts = [scene['NPCs'][npc]['scene_npc_prompt'] for npc in list(scene['NPCs'])]
-        npc_prompt = "'''''\n".join(npc_prompts)
+    #     #NEW
+    #     scene = get_scene(scene_id=self.scene_id)
+    #     npc_prompts = [scene['NPCs'][npc]['scene_npc_prompt'] for npc in list(scene['NPCs'])]
+    #     npc_prompt = "'''''\n".join(npc_prompts)
         
-        objectives_prompt = ""
-        objective_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-        objective_to_status_map = {}
-        for item in objective_status['completed']:
-            objective_to_status_map[item] = 'completed'
-        for item in objective_status['available']:
-            objective_to_status_map[item] = 'available'
-        for item in objective_status['unavailable']:
-            objective_to_status_map[item] = 'unavailable'
-        # objective_
-        objectives = scene['objectives']
-        for objective_set in objectives:
-            for objective in objective_set:
-                status = objective_to_status_map[objective['objective']]
-                if status == 'completed' and 'prompt_completed' in list(objective) and objective['prompt_completed'] != "":
-                    objectives_prompt += objective['prompt_completed']
-                elif status == 'available' and 'prompt_available' in list(objective) and objective['prompt_available'] != "":
-                    objectives_prompt += objective['prompt_available']
-                elif status == 'unavailable' and 'prompt_unavailable' in list(objective) and objective['prompt_unavailable'] != "":
-                    objectives_prompt += objective['prompt_unavailable']
+    #     objectives_prompt = ""
+    #     objective_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
+    #     objective_to_status_map = {}
+    #     for item in objective_status['completed']:
+    #         objective_to_status_map[item] = 'completed'
+    #     for item in objective_status['available']:
+    #         objective_to_status_map[item] = 'available'
+    #     for item in objective_status['unavailable']:
+    #         objective_to_status_map[item] = 'unavailable'
+    #     # objective_
+    #     objectives = scene['objectives']
+    #     for objective_set in objectives:
+    #         for objective in objective_set:
+    #             status = objective_to_status_map[objective['objective']]
+    #             if status == 'completed' and 'prompt_completed' in list(objective) and objective['prompt_completed'] != "":
+    #                 objectives_prompt += objective['prompt_completed']
+    #             elif status == 'available' and 'prompt_available' in list(objective) and objective['prompt_available'] != "":
+    #                 objectives_prompt += objective['prompt_available']
+    #             elif status == 'unavailable' and 'prompt_unavailable' in list(objective) and objective['prompt_unavailable'] != "":
+    #                 objectives_prompt += objective['prompt_unavailable']
 
-        prompt = f"""Scene Information:\n
-        {npc_prompt}\n
-        {objectives_prompt}\n"""
-        return prompt
+    #     prompt = f"""Scene Information:\n
+    #     {npc_prompt}\n
+    #     {objectives_prompt}\n"""
+    #     return prompt
 
-    def _load_scene_objectives(self):
-        scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
-        # prompt += str(scene_objectives_status['completed'])
-        prompt = "SCENE OBJECTIVE INFORMATION:\n"
-        prompt += "scene_objectives = " + str(scene_objectives_status['available'])
-        prompt += "\n\n"
-        prompt += '\n'.join([d['prompt_available'] for sublist in self.scene['objectives'] for d in sublist if d['objective'] in scene_objectives_status['available'] and 'prompt_available' in list(d)])
-        # prompt += str([scene['objectives']scene_objectives_status['available']])
-        # prompt += "\n\nHere are the unavailable objectives.  These objectives cannot be completed yet.\n"
-        # prompt += str(scene_objectives_status['unavailable'])
+    def _load_prompt_info_from_npc_objectives_state(self):
+        '''depending on game state, different prompts will be added to the prompt.  
+        For example, if a certain npc_objective is available/completed etc'''
+        #this is going to be a list of all of the 
+        list_of_prompts = []
+        #create a mapper to get the user-specific objective status from _npc objective id
+        id_to_status_mapper = {}
+        for npc_objective_state in self.state_of_npc_objectives:
+            id_to_status_mapper[npc_objective_state['npc_objective_id']] = npc_objective_state['status']
+
+        #
+        for npc_objective in self.npc_objectives:
+            id = npc_objective['_id']
+            #get the status
+            status = id_to_status_mapper[id] if id in id_to_status_mapper else 'unavailable'
+            #add prompt strings depending on status state
+            if status == "available":
+                if npc_objective['prompt_available'] != "":
+                    list_of_prompts.append(npc_objective['prompt_available'])
+            elif status == "unavailable":
+                if npc_objective['prompt_unavailable'] != "":
+                    list_of_prompts.append(npc_objective['prompt_unavailable'])
+            elif status == "completed":
+                if npc_objective['prompt_completed'] != "":
+                    list_of_prompts.append(npc_objective['prompt_completed'])
+        if len(list_of_prompts) == 0:
+            return ""
+        else:
+            return "Here is some importance npc_objective scene information:\n" + '\n'.join(list_of_prompts)
 
 
-        '''Grab personal NPC objectives for a scene as well as generic scene-agnostic NPC objectives/motivations'''
-        # npc_personal_scene_objectives = "Timmy's personal scene objectives are to forge new friendships and thrive in school, to embody the courage of his superhero idol, and to relish carefree fun without the weight of fear. He aims to rebuild lost confidence, develop trust in others, and conquer the anxiety monster in his dream world, not only empowering himself but also easing his family's worries about his well-being."
-        # prompt += f"npc_personal_scene_objectives: {npc_personal_scene_objectives}"
 
-        return prompt
+    # def _load_scene_objectives(self):
+    #     scene_objectives_status = get_scene_objectives_status(scene_id=self.scene_id, user_name=self.user_name)
+    #     # prompt += str(scene_objectives_status['completed'])
+    #     prompt = "SCENE OBJECTIVE INFORMATION:\n"
+    #     prompt += "scene_objectives = " + str(scene_objectives_status['available'])
+    #     prompt += "\n\n"
+    #     prompt += '\n'.join([d['prompt_available'] for sublist in self.scene['objectives'] for d in sublist if d['objective'] in scene_objectives_status['available'] and 'prompt_available' in list(d)])
+    #     # prompt += str([scene['objectives']scene_objectives_status['available']])
+    #     # prompt += "\n\nHere are the unavailable objectives.  These objectives cannot be completed yet.\n"
+    #     # prompt += str(scene_objectives_status['unavailable'])
+
+
+    #     '''Grab personal NPC objectives for a scene as well as generic scene-agnostic NPC objectives/motivations'''
+    #     # npc_personal_scene_objectives = "Timmy's personal scene objectives are to forge new friendships and thrive in school, to embody the courage of his superhero idol, and to relish carefree fun without the weight of fear. He aims to rebuild lost confidence, develop trust in others, and conquer the anxiety monster in his dream world, not only empowering himself but also easing his family's worries about his well-being."
+    #     # prompt += f"npc_personal_scene_objectives: {npc_personal_scene_objectives}"
+
+    #     return prompt
     
 
     def _load_npc_in_world_prompt(self):
@@ -420,56 +450,10 @@ class NpcUserInteraction():
         knowledge_agent = LlamaIndexKnowledgeAgent(world_name=self.world_name,npc_name=self.npc_name,user_name=self.user_name)
         knowledge = knowledge_agent.method_llamaindex_agent(user_message=self.user_message)
         return knowledge
-        # from langchain.agents import Tool
-        # from langchain.agents import AgentType
-        # from langchain.memory import ConversationBufferMemory
-        # from langchain import OpenAI
-        # from langchain.agents import initialize_agent
-        # from langchain.schema import (
-        #     AIMessage,
-        #     HumanMessage,
-        #     SystemMessage
-        # )
-        # from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
-
-        # from llama_index import VectorStoreIndex, SimpleDirectoryReader
-        # knowledge_files = get_knowledge_files_npc_has_access_to(world_name=world_name, npc_name=npc_name)
-
-        # documents = SimpleDirectoryReader(input_files=knowledge_files).load_data()
-        # index = VectorStoreIndex.from_documents(documents=documents)
-        # tools = [
-        #     Tool(
-        #         name="LlamaIndex",
-        #         func=lambda q: str(index.as_query_engine().query(q)),
-        #         description="useful when you need to know more information about the world",
-        #         return_direct=True,
-        #     ),
-        # ]
-
-        # from mongodb.mongo_fncs import get_user_npc_interactions
-        # # set Logging to DEBUG for more detailed outputs
-        # memory = ConversationBufferMemory(memory_key="chat_history")
-        # chat_history = get_user_npc_interactions(world_name=world_name,user_name=user_name,npc_name=npc_name)
-        # for interaction in chat_history:
-        #     memory.chat_memory.add_user_message(interaction['user_message'])
-        #     memory.chat_memory.add_ai_message(interaction['npc_response'])
-        
-        # system_message = self._get_system_message_for_knowledge_agent()
-        # system_message = self._load_fourth_wall()
-
-        # llm = ChatOpenAI(temperature=0)
-        # agent = initialize_agent(
-        #     tools,
-        #     llm,
-        #     agent="conversational-react-description",
-        #     memory=memory,
-        #     agent_kwargs={'SystemMessage':system_message}
-        # )
-        # response = agent.run(input=user_message)
-        # return response
 
     def _load_knowledge(self):
         knowledge_from_tags = self._load_knowledge_via_llamaindex_agent()
+        print('knowledge_from_tags: ', knowledge_from_tags)
         knowledge_from_npc = "" if 'knowledge' not in list(self.npc) or self.npc['knowledge'] == "" else self.npc['knowledge']
         knowledge = f"\n\nHere is some game knowledge that {self.npc_name} is aware of:\n{knowledge_from_npc}\n{knowledge_from_tags}"
         return knowledge
@@ -479,24 +463,3 @@ class NpcUserInteraction():
         prompt += self.get_conversation()
         return prompt
 
-# template = """Contextual Information: {question} 
-        # \n\n'''''\n""" + """Required Output: Provide the answer to the above context as a dict where the keys include ['user_message', 'scene_objectives', 'scene_objectives_reasoning', 'personal_objectives', 'personal_objectives_reasoning', 'npc_emotional_state', 'npc_emotional_state_reasoning', 'effect_of_emotional_state_on_speech', 'npc_response_summary', 'npc_response', 'stagnancy', 'objectives_completed', 'objectives_completed_reasoning', 'processed_npc_response_reasons', 'processed_npc_response']
-        #     'user_message' should simply be the player's last message
-        #     'scene_objectives' should be a re-iteration of the current scene objectives
-        #     'scene_objectives_reasoning' should be the {npc_name}'s thought process when analyzing and determining how to react to scene_objectives
-        #     'personal_objectives' should be the objectives that {npc_name} is currently attempting to fulfill that are NOT the scene_objectives.  These are personal objectives that {npc_name} wants to fulfill.
-        #     'personal_objectives_reasoning' should be the {npc_name}'s thought process when analyzing and determining how to react to personal_objectives
-        #     'npc_emotional_state' should be a dict with keys [Happiness, Sadness, Anger, Fear, Surprise, Disgust, Excitement, Confusion, Calmness, Curiosity, Pride, Shyness] and values from 0-10 where 10 indicates a strong emotional response and 0 indicates no response for {npc_name}.
-        #     'npc_emotional_state_reasoning' should explain the npc_emotional_state of {npc_name}
-        #     'effect_of_emotional_state_on_speech' should describe how {npc_name}'s speech style or pattern changes due to npc_emotional_state.  NPCs. Joy triggers enthusiastic and positive language with animated expressions. Sadness results in slower, subdued speech, often accompanied by sighs, conveying melancholy feelings. Anger fuels confrontational, aggressive speech with strong language and increased volume. Fear causes panicked, higher-pitched, and stuttering speech, while surprise brings abrupt changes in tone and exclamatory phrases. Disgust evokes disdainful language and negative tones. Excitement yields rapid, enthusiastic speech with exclamation marks. Confusion is marked by repetition and hesitant speech seeking clarification. Calmness leads to controlled, measured speech and composed explanations. Curiosity prompts inquisitive, questioning speech, while pride results in confident, assertive tones. Shyness triggers soft-spoken, hesitant speech with self-deprecating language and averted eye contact.
-        #     'npc_response_summary' should be a summarization of {npc_name}'s thought process when analyzing and determining how to react to the user_message. This reasoning should be based on not only the user_message but also scene_objectives_reasoning and personal_objectives_reasoning.  It should summarize what {npc_name}'s response to the player would be.
-        #     'npc_response' should be {npc_name}'s response to the player's last message.  It must be based off of npc_response_summary as well as npc_emotional_state_reasoning.  {npc_name}'s response should be significantly different than {npc_name}'s previous response
-        #     'stagnancy' should explain if the conversation is stuck.  If the conversation is repeating itself, then npc_response should be made to not be stagnant
-        #     'objectives_completed' should be a dict with keys that EXACTLY MATCH the scene objectives as given in the list of SCENE OBJECTIVES and the values equal to either 'completed' or 'not_completed' depending on whether scene_objective has been completed either by user_message or npc_response.
-        #     'objectives_completed_reasoning' should explain why each of the scene_objectives in objectives_completed are marked as completed or not_completed.
-        #     'processed_npc_response_reasons' should explain what about npc_response is not immersive in accordance with the 4th wall and what changes need to be made to npc_response to make it immersive.
-        #     'processed_npc_response' should update npc_response based on processed_npc_response_reasons.
-            # 'npc_personal_objectives' should be generic scene-agnostic personal objectives that {npc_name} is looking to meet.
-            # 'npc_personal_objectives_reasoning' should explain {npc_name}'s thought process for meeting npc_personal_objectives.
-        #     The output should simply be a JSON dict that I can set as a JSON in Python that uses double quotes for strings.""".format(npc_name=self.npc_name)
-        

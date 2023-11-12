@@ -1,12 +1,19 @@
 from pymongo import MongoClient
 from datetime import datetime
 
-DB_NAME='pretence'
+DB_NAME='pretence2'
+# DB_NAME='pretence2-test'
+# import os
+# if os.getenv('db_env') == "test":
+#     DB_NAME='pretence2-test'
 URI="mongodb://localhost:27017"
 
 def get_current_datetime_as_string():
     now = datetime.now()
     return now.strftime("%Y-%m-%d %H:%M:%S")
+
+def get_mongo_client():
+    return MongoClient(URI)
 
     
 def upsert_item(collection_name, item):

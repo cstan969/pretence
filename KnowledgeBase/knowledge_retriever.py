@@ -31,6 +31,9 @@ from config import KNOWLEDGE_STORE_PATH
 
 from llama_index.vector_stores import ChromaVectorStore
 
+from mongodb.mongo_fncs import get_available_companions, get_formatted_conversational_chain
+
+import pprint
 
 
 
@@ -40,11 +43,53 @@ from llama_index.vector_stores import ChromaVectorStore
 #     chain = load_summarize_chain(llm, chain_type=convo)
 #     print(chain)
 
+def write_knowledge_to_user_journal(world_name: str, user_name: str, knowledge: str):
+    user_journal_path = os.path.join(KNOWLEDGE_STORE_PATH, world_name, user_name, 'user_journal.txt')
+    file = open(user_journal_path,'a')
+    file.write('\n\n' + knowledge)
+
+def write_knowledge_to_tag1(world_name: str, user_name: str, tag: str, knowledge: str):
+    knowledge_tag_path = os.path.join(KNOWLEDGE_STORE_PATH, world_name, user_name, tag + '_1.txt')
+    file = open(knowledge_tag_path,'a')
+    file.write('\n\n' + knowledge)
+
+
+def extract_knowledge_for_user_npc_interaction_v2(world_name: str, npc_name:str, user_name:str, user_message: str):
+    llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
+    template = """given this conversation between a player and NPC, i want to determine what knowledge the NPC has access to so that i can provide it as context to the prompt chain.  Given the conversation, give me a list of questions that I can use to query the llamaindex query_engine.
+    the question list should only include unique questions.  try to avoid questions that are too similar to each other.  Generate maximum three questions.
+    
+    '''''
+    [conversation]
+    {convo}
+
+    '''''
+    Required Output: You must format your output as a JSON dictionary that adheres to a given JSON scehema instance with the following keys:
+        "questions": "the python list of questions" """
+    prompt_from_template = PromptTemplate(template=template, input_variables=["convo"])
+    llm_chain = LLMChain(prompt=prompt_from_template,llm=llm, verbose=True)
+    convo=get_formatted_conversational_chain(world_name=world_name,user_name=user_name,npc_name=npc_name,num_interactions=3)
+    if convo is None:
+        convo = user_message
+    else:
+        convo += '\n' + "Player" + ': ' + user_message + '\n'
+    response = llm_chain.run(convo=convo)
+    print('---')
+    print(response)
+    response = json.loads(response)
+    queries = response['questions']
+    ka = LlamaIndexKnowledgeAgent(world_name,npc_name,user_name)
+    return ka.query_index(queries=queries)
+    # return ka.method_llamaindex_agent(user_message)
+
 def extract_knowledge_for_user_npc_interaction(world_name: str, npc_name:str, user_name:str, user_message: str):
-    # return method_gpt4all_knowledge_base(world_name,npc_name,user_name,user_message)
     ka = LlamaIndexKnowledgeAgent(world_name,npc_name,user_name)
     return ka.method_llamaindex_agent(user_message)
     
+
+def extract_knowledge_for_missions(world_name: str, npc_name:str, user_name:str, mission_brief: str):
+    ka = LlamaIndexKnowledgeAgent(world_name,npc_name,user_name)
+    return ka.get_knowledge_given_missions_brief(mission_brief=mission_brief)
 
 
 class LlamaIndexKnowledgeAgent:
@@ -74,6 +119,16 @@ class LlamaIndexKnowledgeAgent:
     def create_or_update_kg_llama_index(self):
         os.makedirs(self.persist_dir, exist_ok=True)
         knowledge_files = get_knowledge_files_npc_has_access_to(world_name=self.world_name, npc_name=self.npc_name)
+
+        #User Journal - the user journal is essentially game knowledge the player has figured out that companions have access to
+        #if the npc of interest is a companion, then add the user journal to their knowledge
+        if self.npc_name in get_available_companions(world_name=self.world_name, user_name=self.user_name):
+            knowledge_files.append(os.path.join(KNOWLEDGE_STORE_PATH,self.world_name,self.user_name,'user_journal.txt'))
+        knowledge_files = list(set([file for file in knowledge_files if os.path.exists(file)]))
+
+
+        print('knowledge_files: ')
+        pprint.pprint(knowledge_files)
         # create client and a new collection
         db = chromadb.PersistentClient(path=self.persist_dir)
         chroma_collection = db.get_or_create_collection("knowledge")
@@ -93,18 +148,16 @@ class LlamaIndexKnowledgeAgent:
         return index
 
 
-       
-        
-
     def method_llamaindex_agent(self, user_message: str):
-        try:
-            print('loading index')
-            index = self.load_index()
-            print('successfull loaded index')
-        except:
-            print('failed to load index')
-            index = self.create_or_update_kg_llama_index()
-            print('successfully created new index')
+        # try:
+        #     print('loading index')
+        #     index = self.load_index()
+        #     print('successfull loaded index')
+        # except:
+        #     print('failed to load index')
+        #     index = self.create_or_update_kg_llama_index()
+        #     print('successfully created new index')
+        index = self.create_or_update_kg_llama_index()
         tools = [
             Tool(
                 name="LlamaIndex",
@@ -118,8 +171,7 @@ class LlamaIndexKnowledgeAgent:
         # set Logging to DEBUG for more detailed outputs
         memory = ConversationBufferMemory(memory_key="chat_history")
         chat_history = get_user_npc_interactions(world_name=self.world_name,user_name=self.user_name,npc_name=self.npc_name)
-        print(chat_history)
-        for interaction in chat_history:
+        for interaction in chat_history[-6:]:
             memory.chat_memory.add_user_message(interaction['user_message'])
             memory.chat_memory.add_ai_message(interaction['npc_response'])
 
@@ -130,9 +182,51 @@ class LlamaIndexKnowledgeAgent:
             agent="conversational-react-description",
             memory=memory,
         )
-        response = agent.run(input=user_message)
-        return response
+        try:
+            # response = agent.run(input=user_message)
+            # response = agent.run(input=f"Role play as {self.npc_name} in a video game.  You are not an AI assistant.  Given the conversation, retrieve return a summary of relevant knowledge as retrieved from the LlamaIndex tool.  Here is the most recent message from the player: " + user_message)
+            response = agent.run(input=f"You are {self.npc_name} in a video game.  You are not an AI assistant.  Given the conversation, retrieve relevant knowledge as retrieved from the LlamaIndex tool.  If no relevant knowledge exists, simply respond with 'I have no relevant knowledge on this topic'.  Here is the most recent message from the player: " + user_message)
+            return response
+        except Exception as e:
+            print('failed to get data from KG (or there is none), returning nothing')
+            return ""
+        
+    def query_index(self, queries: list[str]):
+        # try:
+        #     print('loading index')
+        #     index = self.load_index()
+        #     print('successfull loaded index')
+        # except:
+        #     print('failed to load index')
+        #     index = self.create_or_update_kg_llama_index()
+        #     print('successfully created new index')
+        index = self.create_or_update_kg_llama_index()
+        engine = index.as_query_engine()
+        outputs = []
+        for q in queries:
+            output = engine.query(q)
+            outputs.append(output.response)
+        return outputs
+        # tools = [
+        #     Tool(
+        #         name="LlamaIndex",
+        #         func=lambda q: str(index.as_query_engine().query(q)),
+        #         description="useful when you need to know more information about the world",
+        #         return_direct=True,
+        #     ),
+        # ]
+        # llm = ChatOpenAI(temperature=0)
+        # agent = initialize_agent(
+        #     tools,
+        #     llm,
+        #     agent="conversational-react-description"
+        # )
 
+        # outputs = []
+        # for query in queries:
+        #     response = agent.run(query)
+        #     outputs.append(response)
+        # return outputs
 
 
 

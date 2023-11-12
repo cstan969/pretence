@@ -57,63 +57,63 @@ class mongo_fncs_unittests(TestCase):
         self.assertEqual(world,[])
         print('test_collection_worlds: successful')
 
-    def test_collection_scenes(self):
-        '''Included Functions to test:
-        upsert_scene
-        get_all_scenes
-        get_next_scene
-        delete_scene'''
-        scene1 = insert_scene(world_name='test_world_name',scene_info={})
-        pprint.pprint(scene1)
-        scene2 = insert_scene(world_name='test_world_name',scene_info={},previous_scene=scene1['_id'])
-        pprint.pprint(scene2)
-        next_scene = get_next_scene(scene_id=scene1['_id'])
-        pprint.pprint(next_scene)
-        scenes_in_order = get_all_scenes_in_order(world_name='test_world_name')
-        pprint.pprint(scenes_in_order)
-        delete_scene(id=scene1['_id'])
-        delete_scene(id=scene2['_id'])
+    # def test_collection_scenes(self):
+    #     '''Included Functions to test:
+    #     upsert_scene
+    #     get_all_scenes
+    #     get_next_scene
+    #     delete_scene'''
+    #     scene1 = insert_scene(world_name='test_world_name',scene_info={})
+    #     pprint.pprint(scene1)
+    #     scene2 = insert_scene(world_name='test_world_name',scene_info={},previous_scene=scene1['_id'])
+    #     pprint.pprint(scene2)
+    #     next_scene = get_next_scene(scene_id=scene1['_id'])
+    #     pprint.pprint(next_scene)
+    #     scenes_in_order = get_all_scenes_in_order(world_name='test_world_name')
+    #     pprint.pprint(scenes_in_order)
+    #     delete_scene(id=scene1['_id'])
+    #     delete_scene(id=scene2['_id'])
 
-    def test_get_scene_objectives_completed(self):
-        items = get_scene_objectives_completed(scene_id="scenes-TraumaGame-20230711145400",user_name="Carl2")
-        print(items)
+    # def test_get_scene_objectives_completed(self):
+    #     items = get_scene_objectives_completed(scene_id="scenes-TraumaGame-20230711145400",user_name="Carl2")
+    #     print(items)
 
 
-    def test_progress_user_to_next_scene(self):
-        progress_user_to_next_scene(world_name='NocturnalVeil',user_name='Carl5')
+    # def test_progress_user_to_next_scene(self):
+    #     progress_user_to_next_scene(world_name='NocturnalVeil',user_name='Carl5')
 
-    def test_play_test_scene_in_renpy(self):
-        world_name='NocturnalVeil'
-        scene_id='scenes-NocturnalVeil-07112023093300'
-        play_test_scene_in_renpy(world_name=world_name,scene_id=scene_id)
+    # def test_play_test_scene_in_renpy(self):
+    #     world_name='NocturnalVeil'
+    #     scene_id='scenes-NocturnalVeil-07112023093300'
+    #     play_test_scene_in_renpy(world_name=world_name,scene_id=scene_id)
 
-    def test_get_progress_of_user_in_game(self):
-        world_name='TraumaGame'
-        user_name='James Thomas Stanhope'
-        get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
+    # def test_get_progress_of_user_in_game(self):
+    #     world_name='TraumaGame'
+    #     user_name='James Thomas Stanhope'
+    #     get_progress_of_user_in_game(world_name=world_name,user_name=user_name)
 
-    def test_get_all_scenes_in_order(self):
-        world_name='Fun with Food'
-        get_all_scenes_in_order(world_name=world_name)
+    # def test_get_all_scenes_in_order(self):
+    #     world_name='Fun with Food'
+    #     get_all_scenes_in_order(world_name=world_name)
 
-    def test_get_scene_objectives_status(self):
-        scene_id = 'scenes-Fun with Food-20230730202644869837'
-        user_name='James Thomas Stanhope'
-        obj_status = get_scene_objectives_status(scene_id=scene_id,user_name=user_name)
-        print('---')
-        pprint.pprint(obj_status)
+    # def test_get_scene_objectives_status(self):
+    #     scene_id = 'scenes-Fun with Food-20230730202644869837'
+    #     user_name='James Thomas Stanhope'
+    #     obj_status = get_scene_objectives_status(scene_id=scene_id,user_name=user_name)
+    #     print('---')
+    #     pprint.pprint(obj_status)
 
-    def test_get_scene(self):
-        scene_id = 'scenes-TraumaGame-20230711145400'
-        scene = get_scene(scene_id=scene_id)
-        print('---')
-        pprint.pprint(scene['objectives'])
+    # def test_get_scene(self):
+    #     scene_id = 'scenes-TraumaGame-20230711145400'
+    #     scene = get_scene(scene_id=scene_id)
+    #     print('---')
+    #     pprint.pprint(scene['objectives'])
 
-    def test_mark_objectives_completed(self):
-        obj = {'objectives_completed': {"Chef Celine shares the story about the time her friend baguette was taken by humans her story": 'completed'}}
-        scene_id = "scenes-Fun with Food-20230802112545611010"
-        user_name = "James Thomas Stanhope"
-        mark_objectives_completed(objectives_completed=obj['objectives_completed'],scene_id=scene_id,user_name=user_name)
+    # def test_mark_objectives_completed(self):
+    #     obj = {'objectives_completed': {"Chef Celine shares the story about the time her friend baguette was taken by humans her story": 'completed'}}
+    #     scene_id = "scenes-Fun with Food-20230802112545611010"
+    #     user_name = "James Thomas Stanhope"
+    #     mark_objectives_completed(objectives_completed=obj['objectives_completed'],scene_id=scene_id,user_name=user_name)
 
     def test_upsert_knowledge(self):
         upsert_knowledge(world_name="test",tag="tag",knowledge_description="test_description",level="1",knowledge="test knowledge")
@@ -191,6 +191,58 @@ In his journey for healing and understanding, Callum stumbled upon the settlemen
             ]
         )
 
+    def test_npc_objectives(self):
+        # objective = create_npc_objective(world_name='TraumaGame',npc_name='Callum')
+        # print(objective)
+        # _id = "npc_objectives-TraumaGame-Callum-20230907120204278204"
+        # update_npc_objective(
+        #     npc_objective_id=_id,
+        #     world_name='TraumaGame',
+        #     npc_name='Callum',
+        #     objective_name='Handling the Ruffians',
+        #     objective_completion_string='Callum tells the player about the ruffians messing with the tavern folks.')
+        
+
+        # obj = create_npc_objective(world_name='TraumaGame',npc_name='Callum')
+        # update_npc_objective(
+        #     npc_objective_id=obj['_id'],
+        #     world_name='TraumaGame',
+        #     npc_name='Callum',
+        #     objective_name='Recruit Callum',
+        #     objective_completion_string='Callum agrees to join your party'
+        # )
+
+        objs = get_npc_objectives(world_name='TraumaGame',npc_name='Callum')
+        print(objs)
+
+    def test_init_game_state(self):
+        '''running test for initing the game state, '''
+        init_game_state(user_name='TestUser',world_name='Mercenary Manager')
+
+    def test_update_npc_objective_game_state(self):
+        update_npc_objective_game_state(
+            world_name="Mercenary Manager",
+            user_name="Carl11",
+            npc_name="TumTum",
+            npc_objective_id="npc_objectives-Mercenary Manager-TumTum-20230912162042051734",
+            npc_objective_status="available"
+        )
+
+        update_npc_objective_game_state(
+            world_name="Mercenary Manager",
+            user_name="Carl11",
+            npc_name="TumTum",
+            npc_objective_id="npc_objectives-Mercenary Manager-TumTum-20230912162042051734",
+            npc_objective_status="completed"
+        )
+
+    def test_get_completed_missions(self):
+        miss = get_completed_missions(
+            world_name="Mercenary Manager",
+            user_name="Carl11"
+        )
+        print(miss)
+
 tc = mongo_fncs_unittests()
 # tc.test_collection_npcs()
 # tc.test_collection_users()
@@ -209,4 +261,8 @@ tc = mongo_fncs_unittests()
 # tc.test_get_formatted_conversational_chain()
 # tc.test_knowledge_end_to_end()
 # tc.test_get_number_of_user_npc_interactions()
-tc.test_missions()
+# tc.test_missions()
+# tc.test_npc_objectives()
+# tc.test_init_game_state()
+tc.test_update_npc_objective_game_state()
+# tc.test_get_completed_missions()

@@ -12,6 +12,16 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 from langchain.chat_models import ChatOpenAI
 
+API_CORS_ORIGINS = [
+    "http://localhost:5173",
+    "localhost:5173",
+    "http://127.0.0.1:5173",
+    "127.0.0.1:5173",
+    "http://localhost:5174",
+    "localhost:5174",
+    "http://127.0.0.1:5174",
+    "127.0.0.1:5174"
+]
 
 port_allocations={
 # 'Vicuna':8000,
@@ -19,7 +29,9 @@ port_allocations={
 'MongoDB':8002,
 # 'GameDesignerAIAPI':8003,
 # 'ExtractorAPI': 8004,
-'TTSAPI':8005
+'TTSAPI':8005,
+'AggregatorAPI':8006,
+'Knowledge':8007
 }
 
 GPT4 = ChatOpenAI(model='gpt-4')
